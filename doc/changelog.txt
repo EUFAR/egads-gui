@@ -2,12 +2,76 @@
 CHANGELOG
 =========
 
+To do in the next version:
+==========================
+  - rewrite the logging system
+  - rework the metadata windows to handle properly NASA Ames files
+  - allow the simple save of a NASA Ames file
 
-July XX 2016, Release version 0.8.0
+
+June 13 2017, Release version 0.9.0
+====================================
+  Following the release of EGADS 0.8.0, the GUI has been reworked to add improvements and make it compatible. Actually for deadlines reasons, the GUI function to read NASA Ames files is not fully ready: it's still possible to read NASA Ames files, and export them to a new NetCDF or NASA Ames file, but its not possible to simply save the opened NASA Ames file (the user has to "Save As ..." to save modifications brought to a NASA Ames file and with a different name). Also, the handling of metadata has not been totally converted to handle metadata in NASA Ames files. It should be ready in the next minor version.
+  PyQt4 has been replaced by PyQt5 to improve compatibility with few scientific modules. It is now possible to create algorithms from the GUI.
+  
+  MODIFIED:
+    - the main window has been modified to decrease memory and cpu footprints.
+    - the global attributes window has been modified to decrease memory and cpu footprints.
+    - the variable attributes window has been modified to decrease memory and cpu footprints.
+    - the object in which are stored all data and metadata has been changed from a list to a dictionnary.
+    - all functions to handle the data object has been modified to comply with the new object type.
+    - plot options are now applied to subplot(s).
+    - a new way to list all embedded algorithms has been introduced.
+    - user-created algorithms are now listed into EGADS GUI with embedded algorithms.
+    - as the "Quantities" module doesn't allow to change units of a variable, the possibility to modify units in EGADS GUI has been disabled.
+    
+  FIXED:
+    - when multiple plots are created, all the radio buttons belong to the same group.
+    - when chosen, the marker line style wasn't applied to the plot.
+    - if a time series is deleted in the 'single plot' part, and if it's the last one, the figure options are not deleted.
+    - if a time series is deleted in the 'single plot' part, and if there are still other time series left, the name of the time series is not deleted from the legend.
+    - if a subplot is deleted without being drawn, an error appears when trying to remove subplot options which don't exist.
+    - properties of the legend are not the same if the 'Update' button is pushed in the plot options section or in the figure options section.
+    - after creating two or more subplots, if the first one is deleted, unique options are deleted as well, and it's leading to a crash.
+    - after creating two or more subplots, if subplots are not drawn from the 1st one to the last one, it will leads to issues in plot options. Now the user have to draw a subplot before adding another.
+    - if multiple plots or subplots are created, deleted and created agains, all checkboxes belong to the same group.
+    - the saving of an image was leading to a crash. It has been fixed.
+    - if multiple subplots are created, and one of them is drawn, the deletion of one of the empty ones lead to a crash.
+    - if multiple subplots are created, the size of the first one legend is not well defined.
+    - an object was missing in the algorithm generator.
+    - the metadata 'standard_name' wasn't registered succesfully once a variable is created by an algorithm.
+    - output metadata during algorithm creation are now well formated.
+    - global and variable attributes are now sorted if displayed in the 'attributes' window.
+    - in the plot window, variables are now sorted in the different comboboxes.
+    - all toolbuttons weren't well disconnected when a file was closed and the GUI cleared.
+    - the text of the QLineEdin the data Display Window is now black.
+    - if multiple subplots are created and one or more are deleted, 'spines' option for all other subplots is set on fully visible.
+    - all new items in Processings menu have now the same style than other menu items.
+    - items in Processings menu weren't well sorted.
+    - variable list in the variable tab is now sorted by default.
+    
+  ADDED:
+    - a new window to create algorithm is now available.
+    - a new window is now available to confirm (or not) the success of the algorithm creation.
+    - all algorithms are now listed in the menu bar under 'Processings'. If user click on one algorithm, a window with algorithm information should open.
+    - 'Variable attributes' has been added to the Variable attributes window.
+    - an icon has been added to the plot window.
+    - in the plot window, if the pan or the zoom function is activated, the user will have to release it to modify or update the plot window.
+    - a splashscreen has been added with a EUFAR logo.
+    - a function to validate units has been added in the algorithm creation window.
+    - warning messages have been added if a user try to close a file or quit EGADS GUI and a file is already opened and modified.
+    - an information message has been added to inform that a variable can't be deleted from a netcdf file.
+    
+
+December 1 2016, Release version 0.8.1
+======================================
+  EGADS GUI has been separated from EGADS (core) and is now an independant module. Only fixes, additions and modifications for EGADS GUI will be written here. 
+
+
+September 1 2016, Release version 0.8.0
 =======================================
   Matplotlib package is used to generate all figures. A logging system has been introduced.
   As more bugs have been found in Nappy and to prevent future compatibility issues, a new function to read and write NASA Ames format will be coded.
-  Since version 0.7.0, EGADS and EGADS gui are divided into two entities based on the operating system : EGADS for Windows and EGADS for Linux.
   
   ADDED:
     - a simple function to plot data has been introduced.
@@ -16,7 +80,10 @@ July XX 2016, Release version 0.8.0
     - the user has the possibility to generate single plot or multiple subplots.
     - figure options have been expanded to include subplots.
     - plot options have been introduced to the plot window.
-    - a new function has been added to EGADS core to add new units not available in Quantities
+    - a new function has been added to EGADS core to add new units not available in Quantities.
+    - a new window has been added to display a changelog.
+    - a new window has been added to display information about EGADS.
+    - plot options have been expanded to include subplots.
 
   FIXED:
     - EGADS core couldn't process correctly variable units if the unit is 'unicode' and not 'str'.
@@ -32,7 +99,7 @@ July XX 2016, Release version 0.8.0
 
 February 16 2016, Release version 0.7.0
 =======================================
-  As Nappy, a module for python, calls CDMS2, it is incompatible with Window for now. A test with Pyinstaller for Linux is a success. A solution will be found for Windows.
+  As Nappy, a module for python, called CDMS2, is incompatible with Window for now. A test with Pyinstaller for Linux is a success. A solution will be found for Windows.
   
   FIXED:
     - in the variable metadata window, if "show other attributes" is clicked two times (to show and to hide), once Save is clicked, the program crashes. It has been fixed.

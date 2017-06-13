@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="129.99px" height="129.99px" viewBox="0 0 129.99 129.99" enable-background="new 0 0 129.99 129.99" xml:space="preserve">
+<g>
+	<g>
+		<path fill="#4D4B4B" d="M68.245,18.995h-6.5c-6.627,0-12,5.373-12,12v67.999c0,6.627,5.373,12,12,12h6.5c6.627,0,12-5.373,12-12
+			V30.995C80.245,24.368,74.872,18.995,68.245,18.995z M64.995,106.617c-6.397,0-11.583-5.186-11.583-11.584
+			c0-6.396,5.186-11.582,11.583-11.582c6.396,0,11.583,5.186,11.583,11.582C76.578,101.432,71.392,106.617,64.995,106.617z
+			 M64.995,45.951c-6.397,0-11.583-5.186-11.583-11.583s5.186-11.583,11.583-11.583c6.396,0,11.583,5.186,11.583,11.583
+			S71.392,45.951,64.995,45.951z"/>
+		<circle fill="none" cx="64.995" cy="34.368" r="11.583"/>
+		<circle fill="none" cx="64.995" cy="95.034" r="11.583"/>
+	</g>
+	<circle fill="#F28A19" cx="64.995" cy="64.701" r="11.583"/>
+</g>
+<circle fill="none" stroke="#4C4B4B" stroke-width="10" stroke-miterlimit="10" cx="64.995" cy="64.994" r="59.995"/>
+</svg>

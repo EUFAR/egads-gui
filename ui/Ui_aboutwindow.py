@@ -2,31 +2,17 @@
 
 # Form implementation generated from reading ui file 'aboutwindow.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_aboutWindow(object):
     def setupUi(self, aboutWindow):
-        aboutWindow.setObjectName(_fromUtf8("aboutWindow"))
-        aboutWindow.resize(452, 220)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        aboutWindow.setObjectName("aboutWindow")
+        aboutWindow.resize(450, 220)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(aboutWindow.sizePolicy().hasHeightForWidth())
@@ -34,7 +20,7 @@ class Ui_aboutWindow(object):
         aboutWindow.setMinimumSize(QtCore.QSize(450, 220))
         aboutWindow.setMaximumSize(QtCore.QSize(452, 16777215))
         font = QtGui.QFont()
-        font.setFamily(_fromUtf8("font/SourceSansPro-Regular.ttf"))
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
         font.setBold(False)
         font.setWeight(50)
@@ -42,76 +28,107 @@ class Ui_aboutWindow(object):
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         aboutWindow.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("icons/about_icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("icons/about_popup_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         aboutWindow.setWindowIcon(icon)
-        self.gridLayout = QtGui.QGridLayout(aboutWindow)
-        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.verticalLayout_2 = QtGui.QVBoxLayout()
-        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
-        self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.verticalLayout = QtGui.QVBoxLayout()
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.aw_label_2 = QtGui.QLabel(aboutWindow)
-        self.aw_label_2.setMinimumSize(QtCore.QSize(55, 55))
-        self.aw_label_2.setMaximumSize(QtCore.QSize(55, 55))
-        self.aw_label_2.setText(_fromUtf8(""))
-        self.aw_label_2.setPixmap(QtGui.QPixmap(_fromUtf8("icons/about_icon.png")))
+        aboutWindow.setStyleSheet("QWidget {\n"
+"    background-color: rgb(230,230,230);\n"
+"}")
+        self.gridLayout = QtWidgets.QGridLayout(aboutWindow)
+        self.gridLayout.setObjectName("gridLayout")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.aw_label_2 = QtWidgets.QLabel(aboutWindow)
+        self.aw_label_2.setMinimumSize(QtCore.QSize(50, 50))
+        self.aw_label_2.setMaximumSize(QtCore.QSize(50, 50))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        self.aw_label_2.setFont(font)
+        self.aw_label_2.setText("")
+        self.aw_label_2.setPixmap(QtGui.QPixmap("icons/about_popup_icon.svg"))
         self.aw_label_2.setScaledContents(True)
-        self.aw_label_2.setObjectName(_fromUtf8("aw_label_2"))
+        self.aw_label_2.setObjectName("aw_label_2")
         self.verticalLayout.addWidget(self.aw_label_2)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(10, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.horizontalLayout.addLayout(self.verticalLayout)
-        spacerItem1 = QtGui.QSpacerItem(10, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
-        self.aw_label_1 = QtGui.QLabel(aboutWindow)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        self.aw_label_1 = QtWidgets.QLabel(aboutWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.aw_label_1.sizePolicy().hasHeightForWidth())
         self.aw_label_1.setSizePolicy(sizePolicy)
         self.aw_label_1.setMinimumSize(QtCore.QSize(341, 170))
-        self.aw_label_1.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.aw_label_1.setMaximumSize(QtCore.QSize(341, 16777215))
         font = QtGui.QFont()
-        font.setFamily(_fromUtf8("font/SourceSansPro-Regular.ttf"))
-        font.setPointSize(10)
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
         font.setBold(False)
         font.setWeight(50)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.aw_label_1.setFont(font)
-        self.aw_label_1.setFrameShape(QtGui.QFrame.NoFrame)
-        self.aw_label_1.setFrameShadow(QtGui.QFrame.Plain)
+        self.aw_label_1.setStyleSheet("QLabel {\n"
+"    color: black;\n"
+"}")
+        self.aw_label_1.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.aw_label_1.setFrameShadow(QtWidgets.QFrame.Plain)
         self.aw_label_1.setLineWidth(1)
         self.aw_label_1.setMidLineWidth(0)
         self.aw_label_1.setTextFormat(QtCore.Qt.AutoText)
         self.aw_label_1.setScaledContents(False)
         self.aw_label_1.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignTop)
         self.aw_label_1.setWordWrap(True)
-        self.aw_label_1.setObjectName(_fromUtf8("aw_label_1"))
+        self.aw_label_1.setObjectName("aw_label_1")
         self.horizontalLayout.addWidget(self.aw_label_1)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
-        spacerItem2 = QtGui.QSpacerItem(20, 10, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_2.addItem(spacerItem2)
-        self.horizontalLayout_2 = QtGui.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem3)
-        self.aw_okButton = QtGui.QPushButton(aboutWindow)
-        self.aw_okButton.setMinimumSize(QtCore.QSize(50, 27))
-        self.aw_okButton.setMaximumSize(QtCore.QSize(50, 27))
+        self.aw_okButton = QtWidgets.QToolButton(aboutWindow)
+        self.aw_okButton.setMinimumSize(QtCore.QSize(93, 27))
+        self.aw_okButton.setMaximumSize(QtCore.QSize(93, 27))
         font = QtGui.QFont()
-        font.setFamily(_fromUtf8("font/SourceSansPro-Regular.ttf"))
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
         font.setBold(False)
         font.setWeight(50)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferDefault)
         self.aw_okButton.setFont(font)
-        self.aw_okButton.setObjectName(_fromUtf8("aw_okButton"))
+        self.aw_okButton.setStyleSheet("QToolButton {\n"
+"    border: 1px solid #acacac;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+"                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
+"    color: black;\n"
+"}\n"
+"\n"
+"QToolButton:hover {\n"
+"    border: 1px solid #7eb4ea;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+"                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
+"}\n"
+"\n"
+"\n"
+"QToolButton:pressed {\n"
+"    border: 1px solid #579de5;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                      stop: 0 #daecfc, stop: 1 #c4e0fc);\n"
+"}")
+        self.aw_okButton.setObjectName("aw_okButton")
         self.horizontalLayout_2.addWidget(self.aw_okButton)
-        spacerItem4 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem4)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.gridLayout.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
@@ -120,7 +137,8 @@ class Ui_aboutWindow(object):
         QtCore.QMetaObject.connectSlotsByName(aboutWindow)
 
     def retranslateUi(self, aboutWindow):
-        aboutWindow.setWindowTitle(_translate("aboutWindow", "About EGADS", None))
-        self.aw_label_1.setText(_translate("aboutWindow", "<html><head/><body><p><br/></p></body></html>", None))
-        self.aw_okButton.setText(_translate("aboutWindow", "OK", None))
+        _translate = QtCore.QCoreApplication.translate
+        aboutWindow.setWindowTitle(_translate("aboutWindow", "About EGADS"))
+        self.aw_label_1.setText(_translate("aboutWindow", "<html><head/><body><p><br/></p></body></html>"))
+        self.aw_okButton.setText(_translate("aboutWindow", "Ok"))
 

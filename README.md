@@ -3,16 +3,15 @@ EGADS GUI is a Python-based graphical user interface dedicated to EGADS. The pro
 
 Few functions are available through the GUI:
    - read/write NetCDF files
-   - read NASA/Ames files
+   - read/write NASA/Ames files
+   - conversion between different file format
    - use of algorithms
+   - creation of new algorithms
    - display/plot/print data
 
 Next functions (to be done):
-   - write NASA/Ames files
-   - conversion between different file format
-   - creation of new algorithms
    - work on a batch of files
    - light operations during plot (compute trend, standard deviation, mean, ...)
 
 Prerequisites:
-   - EGADS (0.5.5+) and dependencies have to be installed
+   - EGADS (0.8.0+) and dependencies have to be installed
