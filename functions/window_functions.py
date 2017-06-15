@@ -5527,6 +5527,38 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                                            self.cw_plain_4:self.cw_label_10,
                                            self.listWidget:self.cw_label_9}
         
+        self.unit_window_test()
+        
+        
+    def unit_window_test(self):
+        self.add_input()
+        self.add_input()
+        self.add_output()
+        self.cw_input_ln_1[0].setText('A')
+        self.cw_input_ln_2[0].setText('hPa')
+        self.cw_input_ln_3[0].setText('vector')
+        self.cw_input_ln_4[0].setText('une première variable de test')
+        self.cw_input_ln_1[1].setText('B')
+        self.cw_input_ln_2[1].setText('m*s^2')
+        self.cw_input_ln_3[1].setText('vector')
+        self.cw_input_ln_4[1].setText('une deuxième variable de test')
+        self.cw_output_ln_1[0].setText('C')
+        self.cw_output_ln_2[0].setText('variable')
+        self.cw_output_ln_3[0].setText('hPa/(m*s^2)')
+        self.cw_output_ln_4[0].setText('variable plus longue')
+        self.cw_output_ln_5[0].setText('vector')
+        self.cw_output_ln_6[0].setText('une troisième variable de test')
+        self.cw_output_lw_1[0].addItem('Aircraft State')
+        self.cw_line_1.setText('TestAlgorithm')
+        self.cw_line_3.setText('no sources')
+        self.cw_line_2.setText('Myself')
+        self.cw_line_4.setText('Myself')
+        self.cw_plain_2.setPlainText('To help developping algorithm creation window')
+        self.cw_plain_1.setPlainText('To help developping algorithm creation window')
+        self.listWidget.addItem('Test')
+        self.cw_plain_4.setPlainText('C = A * B\nreturn C')
+        
+        
     def add_input(self):
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
