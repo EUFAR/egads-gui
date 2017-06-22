@@ -53,7 +53,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         algorithm_list_menu_initialization(self)
         statusBar_loading(self)
         self.make_window_title()
-        self.open_ncfile_for_test()
         logging.info('MainWindow - GUI loaded')
         
     
@@ -135,27 +134,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_actionMigrateVariableBar_triggered(self):
         self.migrate_variable()
-    
-    
-    def open_ncfile_for_test(self):
-        self.open_file_name = '/home/henryo/Bureau/Datasets examples/fs-core_safire-fa20_TEST_FILE.nc'
-        self.open_file_ext = 'NetCDF Files (*.nc)'
-        self.file_is_opened = True
-        netcdf_gui_initialization(self)
-        update_icons_state(self, 'open_file')
-        netcdf_reading(self)
-        statusBar_updating(self, 'NetCDF')
-        
-        
-    def open_nafile_for_test(self):
-        self.open_file_name = '/home/henryo/Bureau/Datasets examples/main_example.na'
-        self.open_file_ext = 'NASA Ames Files (*.na)'
-        self.file_is_opened = True
-        nasaames_gui_initialization(self)
-        update_icons_state(self, 'open_file')
-        nasaames_reading(self)
-        statusBar_updating(self, 'NASA Ames')
-    
+
     
     def before_open_file(self):
         logging.info('MainWindow - Opening file')
