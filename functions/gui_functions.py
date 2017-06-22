@@ -161,6 +161,9 @@ def display_algorithm_information(self):
     
     print 'No function to display algorithms yet.'
     
+    # ajouter les metadonnées dans l'object EgadsMetadata de chaque algorithme, ainsi ce sera plus
+    # facile de lire les infos et des les afficher.
+    
     '''if 'embedded' in self.sender().objectName():
         second_index = self.sender().objectName().find('_', 9)
     elif 'user' in self.sender().objectName():

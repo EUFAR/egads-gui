@@ -5527,6 +5527,37 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                                            self.cw_plain_4:self.cw_label_10,
                                            self.listWidget:self.cw_label_9}
         
+        'self.unit_window_test()'
+        
+        
+    def unit_window_test(self):
+        self.add_input()
+        self.add_input()
+        self.add_output()
+        self.cw_input_ln_1[0].setText('A')
+        self.cw_input_ln_2[0].setText('hPa')
+        self.cw_input_ln_3[0].setText('vector')
+        self.cw_input_ln_4[0].setText('une première variable de test')
+        self.cw_input_ln_1[1].setText('B')
+        self.cw_input_ln_2[1].setText('m*s^2')
+        self.cw_input_ln_3[1].setText('vector')
+        self.cw_input_ln_4[1].setText('une deuxième variable de test')
+        self.cw_output_ln_1[0].setText('C')
+        self.cw_output_ln_2[0].setText('variable')
+        self.cw_output_ln_3[0].setText('hPa/(m*s^2)')
+        self.cw_output_ln_4[0].setText('variable plus longue')
+        self.cw_output_ln_5[0].setText('vector')
+        self.cw_output_ln_6[0].setText('une troisième variable de test')
+        self.cw_output_lw_1[0].addItem('Aircraft State')
+        self.cw_line_1.setText('TestAlgorithm')
+        self.cw_line_3.setText('no sources')
+        self.cw_line_2.setText('Myself')
+        self.cw_line_4.setText('Myself')
+        self.cw_plain_2.setPlainText('To help developping algorithm creation window')
+        self.cw_plain_1.setPlainText('To help developping algorithm creation window')
+        self.listWidget.addItem('Test')
+        self.cw_plain_4.setPlainText('C = A * B\nreturn C')
+        
         
     def add_input(self):
         font = QtGui.QFont()
@@ -6579,17 +6610,25 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
             self.listWidget.takeItem(self.listWidget.currentRow())
     
     
-    def prepare_algorithm(self):
+    def prepare_units_validation(self):
         cancel = self.check_all_fields()
         if cancel == True:
             return
-        self.unitWindow = MyUnit(self.validate_units())
-        x1, y1, w1, h1 = self.geometry().getRect()
-        x2, y2, w2, h2 = self.unitWindow.geometry().getRect()
-        self.unitWindow.setGeometry(x1 + w1/2 - w2/2, y1 + h1/2 - h2/2, w2, h2)
-        self.unitWindow.setMinimumSize(QtCore.QSize(550, self.unitWindow.sizeHint().height()))
-        self.unitWindow.setMaximumSize(QtCore.QSize(550, self.unitWindow.sizeHint().height()))
-        if self.unitWindow.exec_():
+        units_list = self.validate_units()
+        if units_list:
+            self.unitWindow = MyUnit(self.validate_units())
+            x1, y1, w1, h1 = self.geometry().getRect()
+            x2, y2, w2, h2 = self.unitWindow.geometry().getRect()
+            self.unitWindow.setGeometry(x1 + w1/2 - w2/2, y1 + h1/2 - h2/2, w2, h2)
+            self.unitWindow.setMinimumSize(QtCore.QSize(550, self.unitWindow.sizeHint().height()))
+            self.unitWindow.setMaximumSize(QtCore.QSize(550, self.unitWindow.sizeHint().height()))
+            if self.unitWindow.exec_():
+                self.prepare_algorithm()
+        else:
+            self.prepare_algorithm()
+    
+    
+    def prepare_algorithm(self):
             self.filenameWindow = MyFilename()
             x1, y1, w1, h1 = self.geometry().getRect()
             x2, y2, w2, h2 = self.filenameWindow.geometry().getRect()
@@ -6640,10 +6679,9 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                     alg_metadata = self.prepare_algorithm_metadata()
                     alg_run = self.prepare_algorithm_run()
                     algorithm = self.prepare_algorithm_text()
-                    alg_return = self.prepare_algorithm_return()
+                    'alg_return = self.prepare_algorithm_return()'
                     complete_string = (author + date + version + all + alg_imports + alg_class + alg_help
-                                       + alg_init + alg_out_metadata + alg_metadata + alg_run + algorithm
-                                       + alg_return)
+                                       + alg_init + alg_out_metadata + alg_metadata + alg_run + algorithm)
                     try:
                         self.write_algorithm(filename, complete_string, category, str(self.cw_line_2.text()))
                         self.success = True
@@ -6825,7 +6863,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                 input_types = '['
                 input_description = '['
             input_symbols += "'" + str(self.cw_input_ln_1[i].text()) + "',"
-            input_units += "'" + str(self.cw_input_ln_2[i].text()) + "',"
+            if self.cw_input_ln_2[i].text():
+                input_units += "'" + str(self.cw_input_ln_2[i].text()) + "',"
+            else:
+                input_units += "None,"
             input_types += "'" + str(self.cw_input_ln_3[i].text()) + "',"
             input_description += "'" + str(self.cw_input_ln_4[i].text()) + "',"
         input_symbols = input_symbols[:-1] + ']'
@@ -6870,11 +6911,19 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                     for j in range(self.cw_output_lw_1[i].count()):
                         category += "'" + self.cw_output_lw_1[i].item(j).text() + "',"
                     category = category[:-1] + ']'
+                
+                ##########################
+                #
+                # temporaire
+                #
+                ##########################
                 output_string += ("        self.output_metadata.append(egads_metadata.VariableMetadata({"
                                   + "'units':'" + units + "',\n"
                                   + ' ' * 63 + "'long_name':'" + long_name + "',\n"
                                   + ' ' * 63 + "'standard_name':'" + standard_name + "',\n"
                                   + ' ' * 63 + "'Category':" + category + "}))\n\n")
+                
+                
         elif len(self.cw_output_vl_1) == 1:
             units = str(self.cw_output_ln_3[0].text())
             long_name = str(self.cw_output_ln_4[0].text())
@@ -6885,11 +6934,18 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                 for j in range(self.cw_output_lw_1[0].count()):
                     category += "'" + self.cw_output_lw_1[0].item(j).text() + "',"
                 category = category[:-1] + ']'
+                
+            ##########################
+            #
+            # temporaire
+            #
+            #########################
             output_string += ("        self.output_metadata = egads_metadata.VariableMetadata({"
                                   + "'units':'" + units + "',\n"
                                   + ' ' * 63 + "'long_name':'" + long_name + "',\n"
                                   + ' ' * 63 + "'standard_name':'" + standard_name + "',\n"
                                   + ' ' * 63 + "'Category':" + category + "})\n\n")
+            
         return output_string
     
     
@@ -6914,14 +6970,14 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         return algorithm_string
     
     
-    def prepare_algorithm_return(self):
+    '''def prepare_algorithm_return(self):
         return_string = ''
         if self.cw_output_vl_1:
             return_string += '        return '
             for i in range(len(self.cw_output_vl_1)):
                 return_string += str(self.cw_output_ln_1[i].text()) + ', '
             return_string = return_string[:-2] + '\n\n'
-        return return_string
+        return return_string'''
     
     
     def check_string_max_length(self, string_list):

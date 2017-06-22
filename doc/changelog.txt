@@ -50,6 +50,7 @@ June 13 2017, Release version 0.9.0
     - items in Processings menu weren't well sorted.
     - variable list in the variable tab is now sorted by default.
     - fixed an issue with the function to list all algorithms: all folders were added twice.
+    - fixed an issue during the validation of units if an algorithm is created via the gui.
     
   ADDED:
     - a new window to create algorithm is now available.
