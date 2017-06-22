@@ -19,16 +19,17 @@ def prepare_algorithms_structure(self):
             if isinstance(getattr(getattr(egads.algorithms, folder), item), type):
                 algorithm_list.append(item)
         new_algorithm_structure[folder] = sorted(algorithm_list)
+    folder_list = []
     for item in os.walk(user_algorithm_path):
         index = item[0].find('user')
         if item[0][index + 5:]:
-            folder_list.append(item[0][index + 5:])
+            folder_list.append(item[0][index + 5:])   
     for folder in folder_list:
         algorithm_tmp_list = dir(getattr(egads.algorithms.user, folder))
         algorithm_list = []
         for item in algorithm_tmp_list:
             if isinstance(getattr(getattr(egads.algorithms.user, folder), item), type):
-                algorithm_list.append(item)
+                algorithm_list.append(item)     
         try:
             tmp_list = new_algorithm_structure[folder] + algorithm_list
             new_algorithm_structure[folder] = sorted(tmp_list)

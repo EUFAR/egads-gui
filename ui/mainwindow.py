@@ -53,7 +53,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         algorithm_list_menu_initialization(self)
         statusBar_loading(self)
         self.make_window_title()
-        #self.open_ncfile_for_test()
+        self.open_ncfile_for_test()
         logging.info('MainWindow - GUI loaded')
         
     
