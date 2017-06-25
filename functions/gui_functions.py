@@ -76,6 +76,8 @@ def icons_initialization(self):
 
 
 def algorithm_list_menu_initialization(self):
+    self.menuEmbedded_algorithms.clear()
+    self.menuUser_defined_algorithms.clear()
     self.algorithm_folder_menu = []
     self.algorithm_folder_actions = []
     self.user_folder_menu = []

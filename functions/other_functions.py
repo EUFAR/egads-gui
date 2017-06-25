@@ -2,7 +2,19 @@
 import egads
 import os
 
+def reload_user_directories(self):
+    reload(egads.algorithms.user.comparisons)
+    reload(egads.algorithms.user.corrections)
+    reload(egads.algorithms.user.mathematics)
+    reload(egads.algorithms.user.microphysics)
+    reload(egads.algorithms.user.radiation)
+    reload(egads.algorithms.user.thermodynamics)
+    reload(egads.algorithms.user.transforms)
+    # add folders created by user
+
+
 def prepare_algorithms_structure(self):
+    reload_user_directories(self)
     algorithm_path = egads.__path__[0] + '/algorithms'
     user_algorithm_path = egads.__path__[0] + '/algorithms/user'
     folder_list = []
