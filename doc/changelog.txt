@@ -8,6 +8,17 @@ To do in the next version:
   - rework the metadata windows to handle properly NASA Ames files
   - allow the simple save of a NASA Ames file
 
+  
+June 25 2017, Release version 0.9.1
+===================================
+  FIXED:
+    - when new variables were deleted or migrated, and if the tab for new variables disappeared, if a new variable is created, the tad for new variables wouldn't appear again. It has been fixed.
+    - when migrating a new variable to the variable list, the variable lost is EgadsData type for a Quantities type. It has been fixed.
+  
+  ADDED:
+    - new algorithms saved in one of the existing folders in the user folder are now loaded once created.
+    - new algorithms are now automatically added to the Processings menu.
+  
 
 June 13 2017, Release version 0.9.0
 ====================================
