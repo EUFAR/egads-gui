@@ -368,6 +368,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         try:
             if not self.new_listwidget:
                 self.tabWidget.removeTab(2)
+                self.new_variables = False
         except AttributeError:
             pass
         if not self.listWidget:
@@ -404,16 +405,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         logging.info('MainWindow - Migrating variable:')
         logging.info('                ' + str(self.new_listwidget.currentItem().text()))
         sublist = self.list_of_new_variables_and_attributes[str(self.new_listwidget.currentItem().text())]
-        self.list_of_variables_and_attributes[str(self.new_listwidget.currentItem().text())] = copy.deepcopy(sublist)
+        self.list_of_variables_and_attributes[str(self.new_listwidget.currentItem().text())] = sublist
         self.list_of_new_variables_and_attributes.pop(str(self.new_listwidget.currentItem().text()), 0)
         self.new_listwidget.takeItem(self.new_listwidget.currentRow())
         self.listWidget.addItem(sublist[1]["var_name"])
         try:
             if not self.new_listwidget:
                 self.tabWidget.removeTab(2)
+                self.new_variables = False
         except AttributeError:
             pass
-        
+
         
     def display_variable(self):
         logging.info('MainWindow - Display window invoked:')
@@ -487,7 +489,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.infoWindow.setMaximumSize(QtCore.QSize(450, self.infoWindow.sizeHint().height()))
             self.infoWindow.exec_()
         except AttributeError:
+            print 'an exception occured during the initialization of the algorithm information window.'
             pass
+        self.list_of_algorithms = prepare_algorithms_structure(self)
+        algorithm_list_menu_initialization(self)
         
         
     def about_egads(self):
