@@ -4,11 +4,14 @@ import ntpath
 import egads
 import os
 import inspect
+import logging
 from PyQt5 import QtWidgets, QtCore, QtGui
 from other_functions import check_compatibility_netcdf
+from algorithm_window_functions import MyAlgorithmDisplay
 
 
 def gui_position(self):
+    logging.debug('gui - gui_functions.py - gui_position')
     self.resize(1150, 544)
     screen_height = QtWidgets.QDesktopWidget().screenGeometry().height()
     screen_width = QtWidgets.QDesktopWidget().screenGeometry().width()
@@ -19,6 +22,7 @@ def gui_position(self):
     
 
 def gui_initialization(self):
+    logging.debug('gui - gui_functions.py - gui_initialization')
     self.actionSeparator.setText('')
     self.actionSeparator2.setText('')
     self.actionSeparator3.setText('')
@@ -31,24 +35,40 @@ def gui_initialization(self):
     
     
 def netcdf_gui_initialization(self):
+    logging.debug('gui - gui_functions.py - netcdf_gui_initialization')
     self.tabWidget.setEnabled(True)
     self.tabWidget.setVisible(True)
+    self.gm_details_lb.setVisible(True)
+    self.gm_compatibility_lb.setVisible(True)
+    self.gm_history_ln.setMinimumSize(QtCore.QSize(400, 150))
+    self.gm_history_ln.setMaximumSize(QtCore.QSize(16777215, 150))
     self.gm_history_ln_2.setVisible(False)
     self.gm_history_lb_2.setVisible(False)
     self.gm_button_6.setVisible(False)
+    self.gm_project_lb.setText('Project')
+    self.gm_history_lb.setText('History:')
+    self.va_longName_lb.setVisible(True)
+    self.va_category_lb.setVisible(True)
+    self.va_egadsProcessor_lb.setVisible(True)
+    self.va_longName_ln.setVisible(True)
+    self.va_category_ln.setVisible(True)
+    self.va_egadsProcessor_ln.setVisible(True)
+    self.va_button_2.setVisible(True)
+    self.va_button_3.setVisible(True)
     
     
 def nasaames_gui_initialization(self):
+    logging.debug('gui - gui_functions.py - nasaames_gui_initialization')
     self.tabWidget.setEnabled(True)
     self.tabWidget.setVisible(True)
     self.gm_details_lb.setVisible(False)
     self.gm_compatibility_lb.setVisible(False)
-    self.gm_history_ln.setMinimumSize(QtCore.QSize(420, 140))
+    self.gm_history_ln.setMinimumSize(QtCore.QSize(400, 140))
     self.gm_history_ln.setMaximumSize(QtCore.QSize(16777215, 140))
-    self.gm_history_ln_2.setMinimumSize(QtCore.QSize(420, 140))
+    self.gm_history_ln_2.setMinimumSize(QtCore.QSize(400, 140))
     self.gm_history_ln_2.setMaximumSize(QtCore.QSize(16777215, 140))
     self.gm_history_lb.setText('<html><head/><body><p>Normal<br>comments:</p></body></html>')
-    self.gm_project_lb.setText('Author(s)')
+    self.gm_project_lb.setText('Author(s):')
     self.va_longName_lb.setVisible(False)
     self.va_category_lb.setVisible(False)
     self.va_egadsProcessor_lb.setVisible(False)
@@ -60,6 +80,7 @@ def nasaames_gui_initialization(self):
      
 
 def icons_initialization(self):
+    logging.debug('gui - gui_functions.py - icons_initialization')
     self.actionOpenBar.setEnabled(True)
     self.actionSaveBar.setEnabled(False)
     self.actionSaveAsBar.setEnabled(False)
@@ -76,6 +97,7 @@ def icons_initialization(self):
 
 
 def algorithm_list_menu_initialization(self):
+    logging.debug('gui - gui_functions.py - algorithm_list_menu_initialization')
     self.menuEmbedded_algorithms.clear()
     self.menuUser_defined_algorithms.clear()
     self.algorithm_folder_menu = []
@@ -112,7 +134,8 @@ def algorithm_list_menu_initialization(self):
     for item in os.walk(user_algorithm_path):
         index = item[0].find('user')
         if item[0][index + 5:]:
-            folder_list.append(item[0][index + 5:])  
+            if not 'file_templates' in item[0][index + 5:]:
+                folder_list.append(item[0][index + 5:])  
     for folder in folder_list:
         algorithm_tmp_list = dir(getattr(egads.algorithms.user, folder))
         algorithm_list = []
@@ -160,130 +183,81 @@ def algorithm_list_menu_initialization(self):
     
 
 def display_algorithm_information(self):
-    
-    print 'No function to display algorithms yet.'
-    
-    # ajouter les metadonnées dans l'object EgadsMetadata de chaque algorithme, ainsi ce sera plus
-    # facile de lire les infos et des les afficher.
-    
-    '''if 'embedded' in self.sender().objectName():
+    logging.debug('gui - gui_functions.py - display_algorithm_information')
+    if 'embedded' in self.sender().objectName():
         second_index = self.sender().objectName().find('_', 9)
     elif 'user' in self.sender().objectName():
         second_index = self.sender().objectName().find('_', 5)
     first_index = self.sender().objectName().find('_')
-        
-    category = self.sender().objectName()[first_index + 1 : second_index]
+    algorithm_category = self.sender().objectName()[first_index + 1 : second_index]
     algorithm_name = self.sender().objectName()[second_index + 1 :]
     try:
-        algorithm = getattr(getattr(egads.algorithms, category), algorithm_name)
+        algorithm = getattr(getattr(egads.algorithms, algorithm_category), algorithm_name)
     except AttributeError:
-        algorithm = getattr(getattr(egads.algorithms.user, category), algorithm_name)
-    
+        algorithm = getattr(getattr(egads.algorithms.user, algorithm_category), algorithm_name)
     file_path = inspect.getfile(algorithm)[:-1]
-    
-    with open(file_path, 'r') as in_file:
-        init_file = in_file.readlines()
-    
-    author = init_file[0][14:-2]
-    creation_date = init_file[1][20:-4]
-    revision = init_file[2][27:-4].strip()
-    
-    file_index, version_index, category_index, purpose_index = None, None, None, None
-    description_index, input_index, output_index, reference_index = None, None, None, None
-    end_ref_index = None
-    
-    for index, line in enumerate(init_file):
-        if '__author__' in line:
-            author_index = index
-        elif '__date__ ' in line:
-            date_index = index
-        elif 'FILE' in line:
-            file_index = index
-        elif 'VERSION' in line:
-            version_index = index
-        elif 'CATEGORY' in line:
-            category_index = index
-        elif 'PURPOSE' in line:
-            purpose_index = index
-        elif 'DESCRIPTION' in line:
-            description_index = index
-        elif 'INPUT' in line:
-            input_index = index
-        elif 'OUTPUT' in line:
-            output_index = index
-        elif 'SOURCE' in line:
-            source_index = index
-        elif 'REFERENCE' in line:
-            reference_index = index
-        elif 'def _algorithm' in line:
-            algorithm_index = index + 1
-        elif 'return ' in line:
-            return_index = index
-        elif 'def __init__(self, return_Egads=True):' in line:
-            end_ref_index = index
-        
-    if (file_index == None or version_index == None or category_index == None or 
-        purpose_index == None or description_index == None or input_index == None or 
-        output_index == None or reference_index == None or end_ref_index == None or
-        author_index == None or date_index == None):
-        pass
-        
-    else:
-        file_text, revision_text, category_text, purpose_text, description_text = '', '', '', '', ''
-        input_text, output_text, source_text, reference_text, algorithm_text = '', '', '', '', ''
-        author_text, date_text = '', ''
-        
-        author_text = ' '.join(''.join(init_file[author_index : author_index + 1]).strip().split())[14:-1]
-        date_text = ' '.join(''.join(init_file[date_index : date_index + 1]).strip().split())[20:-3]
-        file_text = ' '.join(''.join(init_file[file_index : version_index]).strip().split())[5:]
-        revision_text = ' '.join(''.join(init_file[version_index : category_index]).strip().split())[19:-1]
-        category_text = ' '.join(''.join(init_file[category_index : purpose_index]).strip().split())[9:]
-        purpose_text = ' '.join(''.join(init_file[purpose_index : description_index]).strip().split())[8:]
-        description_text = ' '.join(''.join(init_file[description_index : input_index]).strip().split())[12:]
-        input_text = init_file[input_index : output_index]
-        output_text = init_file[output_index : source_index]
-        source_text = ' '.join(''.join(init_file[source_index : reference_index]).strip().split())[7:]
-        reference_text = ' '.join(''.join(init_file[reference_index : end_ref_index]).strip().split())[11:-3]
-        algorithm_text = ' '.join(''.join(init_file[algorithm_index : return_index]).strip().split())
-        
-        inputs = []
-        input_text[0] = input_text[0].split('INPUT',1)[1]
-        
-        i = 0
-        j = None
-        for line in input_text:
-            if len(line) - len(line.lstrip(' ')) > 20:
-                if j == None:
-                    j = i - 1
-                inputs[j][1][2] = inputs[j][1][2] + ' ' + ' '.join(line.split())
-            else:
-                j = None
-                tmp = line.split()
-                if tmp:
-                    inputs.append([tmp[0], [tmp[1], tmp[2], ' '.join(tmp[3:])]])
-            i += 1
-        
-        
-        outputs = []
-        output_text[0] = output_text[0].split('OUTPUT',1)[1]
-        
-        i = 0
-        j = None
-        for line in output_text:
-            if len(line) - len(line.lstrip(' ')) > 20:
-                if j == None:
-                    j = i - 1
-                outputs[j][1][2] = outputs[j][1][2] + ' ' + ' '.join(line.split())
-            else:
-                j = None
-                tmp = line.split()
-                if tmp:
-                    outputs.append([tmp[0], [tmp[1], tmp[2], ' '.join(tmp[3:])]])
-            i += 1'''
-        
+    algorithm_metadata = algorithm().metadata
+    output_metadata = algorithm().output_metadata
+    algorithm_dict = {}
+    algorithm_dict['Name'] = algorithm_metadata['Processor']
+    algorithm_dict['File'] = algorithm_name + '.py'
+    algorithm_dict['Purpose'] = algorithm_metadata['Purpose']
+    algorithm_dict['Description'] = algorithm_metadata['Description']
+    algorithm_dict['Source'] = algorithm_metadata['Source']
+    algorithm_dict['References'] = algorithm_metadata['References']
+    algorithm_dict['Version'] = algorithm_metadata['ProcessorVersion']
+    algorithm_dict['Date'] = algorithm_metadata['ProcessorDate']
+    inputs = algorithm_metadata['Inputs']
+    outputs = algorithm_metadata['Outputs']
+    algorithm_inputs = []
+    algorithm_outputs = []
+    for index, input in enumerate(inputs):
+        input_dict = {}
+        input_dict['Symbol'] = input
+        input_dict['Units'] = algorithm_metadata['InputUnits'][index]
+        input_dict['Type'] = algorithm_metadata['InputTypes'][index]
+        input_dict['Description'] = algorithm_metadata['InputDescription'][index]
+        algorithm_inputs.append(input_dict)
+    for index, output in enumerate(outputs):
+        output_dict = {}
+        output_dict['Symbol'] = output
+        output_dict['Units'] = algorithm_metadata['OutputUnits'][index]
+        output_dict['Type'] = algorithm_metadata['OutputTypes'][index]
+        output_dict['Description'] = algorithm_metadata['OutputDescription'][index]
+        try:
+            output_dict['StandardName'] = output_metadata[index]['standard_name']
+            output_dict['LongName'] = output_metadata[index]['long_name']
+            output_dict['Category'] = output_metadata[index]['Category']
+        except KeyError:
+            output_dict['StandardName'] = output_metadata['standard_name']
+            output_dict['LongName'] = output_metadata['long_name']
+            output_dict['Category'] = output_metadata['Category']
+        algorithm_outputs.append(output_dict)
+    algorithm_dict['Input'] = algorithm_inputs
+    algorithm_dict['Output'] = algorithm_outputs
+    lines = []
+    read = False
+    f = open(file_path, 'r')
+    for line in f:
+        if 'def _algorithm' in line:
+            read = True
+            continue
+        if read:
+            lines.append(line)
+    f.close()
+    algorithm_dict['Algorithm'] = ''.join(lines)
+    self.displayAlgorithmWindow = MyAlgorithmDisplay(algorithm_dict)
+    x1, y1, w1, h1 = self.geometry().getRect()
+    _, _, w2, h2 = self.displayAlgorithmWindow.geometry().getRect()
+    x2 = x1 + w1/2 - w2/2
+    y2 = y1 + h1/2 - h2/2
+    self.displayAlgorithmWindow.setGeometry(x2, y2, w2, h2)
+    self.displayAlgorithmWindow.exec_()
 
 
-def modify_attribute_gui(self):
+def modify_attribute_gui(self, string):
+    logging.debug('gui - gui_functions.py - modify_attribute_gui : sender().objectName() '
+                  + str(self.sender().objectName()))
     if self.sender().objectName() != "":
         value = self.buttons_lines_dict[str(self.sender().objectName())]
         widget = self.findChildren(QtWidgets.QLineEdit, value[0])
@@ -292,39 +266,80 @@ def modify_attribute_gui(self):
         list_widget = value[1]
         var_attr_list = value[2]
         if widget[0].isEnabled() == False:
-            widget[0].setEnabled(True)
-            icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("icons/save_as_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            self.sender().setIcon(icon)
+            if string == 'left':
+                widget[0].setEnabled(True)
+                icon = QtGui.QIcon()
+                icon.addPixmap(QtGui.QPixmap("icons/save_as_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.sender().setIcon(icon)
         else:
-            self.modified = True
-            self.make_window_title()
-            widget[0].setEnabled(False)
-            icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            self.sender().setIcon(icon)
-            value = self.objects_metadata_dict[str(widget[0].objectName())]
-            if isinstance(value, list):
-                if self.open_file_ext == 'NetCDF Files (*.nc)':
-                    value = value[0]
-                elif self.open_file_ext == 'NASA Ames Files (*.na)':
-                    value = value[1]
-            if list_widget is not None:
-                try:
-                    var_attr_list[str(list_widget.currentItem().text())][1][value] = str(widget[0].text())
-                except AttributeError:
-                    var_attr_list[str(list_widget.currentItem().text())][1][value] = str(widget[0].toPlainText())
-                if value == "var_name":
-                    var_attr_list[str(widget[0].text())] = var_attr_list.pop(str(list_widget.currentItem().text()))
-                    list_widget.currentItem().setText(str(widget[0].text()))
-            else:
-                try:
-                    var_attr_list[value] = str(widget[0].text())
-                except AttributeError:
-                    var_attr_list[value] = str(widget[0].toPlainText())
+            if string == 'left':
+                self.modified = True
+                self.make_window_title()
+                widget[0].setEnabled(False)
+                icon = QtGui.QIcon()
+                icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.sender().setIcon(icon)
+                value = self.objects_metadata_dict[str(widget[0].objectName())]
+                if isinstance(value, list):
+                    if self.open_file_ext == 'NetCDF Files (*.nc)':
+                        value = value[0]
+                    elif self.open_file_ext == 'NASA Ames Files (*.na)':
+                        value = value[1]
+                if list_widget is not None:
+                    try:
+                        var_attr_list[str(list_widget.currentItem().text())][1][value] = str(widget[0].text())
+                    except AttributeError:
+                        var_attr_list[str(list_widget.currentItem().text())][1][value] = str(widget[0].toPlainText())
+                    if value == "var_name":
+                        if self.open_file_ext == 'NASA Ames Files (*.na)':
+                            var_attr_list[str(list_widget.currentItem().text())][1]['standard_name'] = str(widget[0].text())
+                        var_attr_list[str(widget[0].text())] = var_attr_list.pop(str(list_widget.currentItem().text()))
+                        list_widget.currentItem().setText(str(widget[0].text()))  
+                else:
+                    try:
+                        var_attr_list[value] = str(widget[0].text())
+                    except AttributeError:
+                        var_attr_list[value] = str(widget[0].toPlainText())
+            elif string == 'right':
+                widget[0].setEnabled(False)
+                icon = QtGui.QIcon()
+                icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.sender().setIcon(icon)
+                value = self.objects_metadata_dict[str(widget[0].objectName())]
+                if isinstance(value, list):
+                    if self.open_file_ext == 'NetCDF Files (*.nc)':
+                        value = value[0]
+                    elif self.open_file_ext == 'NASA Ames Files (*.na)':
+                        value = value[1]
+                if list_widget is not None:
+                    try:
+                        widget[0].setText(var_attr_list[str(list_widget.currentItem().text())][1][value])
+                        widget[0].setCursorPosition(0)
+                    except AttributeError:
+                        widget[0].toPlainText(var_attr_list[str(list_widget.currentItem().text())][1][value])
+                else:
+                    if isinstance(var_attr_list[value], list):
+                        long_string = ''
+                        for string in var_attr_list[value]:
+                            if isinstance(string, int):
+                                long_string += str(string) + '-'
+                            else:
+                                long_string += string + ', '
+                        if long_string[-1:] == '-':
+                            text = long_string[:-1]
+                        else:
+                            text = long_string[:-2]
+                    else:
+                        text = var_attr_list[value]    
+                    try:
+                        widget[0].setText(text)
+                        widget[0].setCursorPosition(0)
+                    except AttributeError:
+                        widget[0].setPlainText(text)
             
 
 def update_global_attribute_gui(self, source):
+    logging.debug('gui - gui_functions.py - update_global_attribute_gui : source ' + str(source))
     if source == 'NetCDF':
         read_set_attribute_gui(self, self.gm_title_ln, 'title', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_institution_ln, 'institution', self.list_of_global_attributes)
@@ -343,6 +358,7 @@ def update_global_attribute_gui(self, source):
         
 
 def update_variable_attribute_gui(self, index=None):
+    logging.debug('gui - gui_functions.py - update_variable_attribute_gui : index ' + str(index))
     if self.tabWidget.currentIndex() == 1 or index == 1:
         list_object = self.listWidget
         variables_and_attributes = self.list_of_variables_and_attributes 
@@ -379,18 +395,21 @@ def update_variable_attribute_gui(self, index=None):
     
     
 def update_new_variable_list_gui(self):
+    logging.debug('gui - gui_functions.py - update_new_variable_list_gui')
     self.new_listwidget.clear()
     for _, sublist in self.list_of_new_variables_and_attributes.items():
         self.new_listwidget.addItem(sublist[0])
 
 
 def add_new_variable_gui(self):
+    logging.debug('gui - gui_functions.py - add_new_variable_gui')
     self.tabWidget.insertTab(2, self.tab_3, 'New variables')
     self.tabWidget.tabBar().setTabTextColor(2, QtGui.QColor(0,0,0))
     self.new_listwidget.itemClicked.connect(lambda: new_var_reading(self))
 
 
 def new_var_reading(self):
+    logging.debug('gui - gui_functions.py - new_var_reading : variable ' + str(self.new_listwidget.currentItem().text()))
     update_icons_state(self, 'new_var_reading')
     clear_gui(self, 'new_variable')
     all_lines_edit = self.tab_3.findChildren(QtWidgets.QLineEdit)
@@ -420,6 +439,7 @@ def new_var_reading(self):
 
 
 def statusBar_loading(self):
+    logging.debug('gui - gui_functions.py - statusBar_loading')
     self.sb_filename_lb = QtWidgets.QLabel()
     sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
     sizePolicy.setHorizontalStretch(0)
@@ -441,6 +461,7 @@ def statusBar_loading(self):
 
 
 def statusBar_updating(self, filetype):
+    logging.debug('gui - gui_functions.py - statusBar_updating : filetype ' + str(filetype))
     if filetype == 'close_file':
         string = ''
     else:
@@ -450,6 +471,7 @@ def statusBar_updating(self, filetype):
         try:
             conventions = self.list_of_global_attributes['Conventions']
         except KeyError:
+            logging.exception('gui - gui_functions.py - statusBar_updating : an exception occured')
             conventions =  'no conventions'
         if filetype == 'NASA Ames':
             conventions = 'NASA Ames file conventions'
@@ -458,6 +480,7 @@ def statusBar_updating(self, filetype):
 
 
 def update_icons_state(self, string=None):
+    logging.debug('gui - gui_functions.py - update_icons_state : string ' + str(string))
     if string == 'close_file':
         icons_initialization(self)
     if string == 'open_file':
@@ -537,6 +560,7 @@ def update_icons_state(self, string=None):
 
 
 def clear_gui(self, part=None):
+    logging.debug('gui - gui_functions.py - clear_gui : part ' + str(part))
     if part == None or part == 'global':
         self.gm_filename_ln.setText('')
         self.gm_title_ln.setText("")
@@ -568,6 +592,7 @@ def clear_gui(self, part=None):
  
        
 def update_compatibility_label(self, string=None):
+    logging.debug('gui - gui_functions.py - update_compatibility_label : string ' + str(string))
     if string is None:
         result = check_compatibility_netcdf(self, self.list_of_global_attributes, self.list_of_variables_and_attributes)
         sublist = self.compatibility_level[result]
@@ -586,6 +611,8 @@ def update_compatibility_label(self, string=None):
         
         
 def read_set_attribute_gui(self, gui_object, attr_name, attr_dict=None):
+    logging.debug('gui - gui_functions.py - read_set_attribute_gui : gui_object ' + str(gui_object)
+                  + ', attr_name ' + str(attr_name) + ', attr_dict ' + str(attr_dict))
     if attr_dict is not None:
         try:
             value = attr_dict[attr_name]
@@ -622,6 +649,7 @@ def read_set_attribute_gui(self, gui_object, attr_name, attr_dict=None):
 
 
 def clear_layout(self, layout):
+    logging.debut('gui - gui_functions.py - clear_layout')
     for i in reversed(range(layout.count())):   
         item = layout.itemAt(i)
         if isinstance(item, QtWidgets.QWidgetItem):
@@ -630,9 +658,9 @@ def clear_layout(self, layout):
             clear_layout(self, item.layout())
         layout.removeItem(item)
         
-        
 
 def humansize(self, nbytes):
+    logging.debug('gui - gui_functions.py - humansize : nbytes ' + str(nbytes))
     suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
     if nbytes == 0: return '0 B'
     i = 0

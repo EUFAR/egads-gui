@@ -5,11 +5,14 @@ import tempfile
 import collections
 import os
 import copy
+import logging
+import datetime
 
 
 def save_netcdf(self):
+    logging.debug('gui - saving_functions.py - save_netcdf')
     list_of_global_attributes = self.opened_file.get_attribute_list()
-    for key, value in self.list_of_global_attributes.iteritems():
+    for key, value in self.list_of_global_attributes.iteritems():   
         try:
             if list_of_global_attributes[key] != value:
                 if value == 'deleted':
@@ -79,6 +82,8 @@ def save_netcdf(self):
 
 
 def save_as_netcdf(self, save_file_name):
+    logging.debug('gui - saving_functions.py - save_as_netcdf : save_file_name ' + str(save_file_name)
+                  + ', open_file_ext ' + str(self.open_file_ext))
     if self.open_file_ext == "NetCDF Files (*.nc)":
         self.newFile = egads.input.NetCdf(save_file_name, 'w')
         for key, value in self.list_of_dimensions.iteritems():
@@ -121,7 +126,7 @@ def save_as_netcdf(self, save_file_name):
                 if sublist[0] != sublist[1]["var_name"]:
                     self.newFile.change_variable_name(str(sublist[0]), str(sublist[1]["var_name"]))
         except KeyError:
-            pass        
+            logging.exception('gui - saving_functions.py - save_as_netcdf : an exception occured')       
         for key, sublist in sorted(self.list_of_variables_and_attributes.iteritems()):
             if sublist[1] != "deleted" and key != 'time':
                 data = sublist[3].value
@@ -159,9 +164,16 @@ def save_as_netcdf(self, save_file_name):
         self.opened_file.convert_to_netcdf(save_file_name)
     if self.open_file_ext == "CSV Files (*.csv *.dat *.txt)":
         print "this function is not available yet"
+
+
+def save_nasaames(self):
+    logging.debug('gui - saving_functions.py - save_nasaames')
+    save_as_nasaames(self, self.open_file_name)
     
     
-def save_as_nasaaimes(self, save_file_name):
+def save_as_nasaames(self, save_file_name):
+    logging.debug('gui - saving_functions.py - save_as_nasaaimes : save_file_name ' + str(save_file_name)
+                  + ', open_file_ext ' + str(self.open_file_ext))
     if self.open_file_ext == "NetCDF Files (*.nc)":
         temp_file_name = tempfile.NamedTemporaryFile()
         tmp_name = str(temp_file_name.name) + '.nc'
@@ -171,12 +183,37 @@ def save_as_nasaaimes(self, save_file_name):
         f.close()
         os.remove(tmp_name)
     if self.open_file_ext == "NASA Ames Files (*.na)":
-        print "this function is not available yet"
+        list_of_variables = []
+        for key, _ in self.list_of_variables_and_attributes.iteritems():
+            list_of_variables.append(key)
+        list_of_variables = sorted(list_of_variables)
+        f = egads.input.NasaAmes()
+        na_dict = f.create_na_dict()
+        f.write_attribute_value('ONAME', self.list_of_global_attributes['ONAME'], na_dict = na_dict)
+        f.write_attribute_value('ORG', self.list_of_global_attributes['ORG'], na_dict = na_dict)
+        f.write_attribute_value('SNAME', self.list_of_global_attributes['SNAME'], na_dict = na_dict)
+        f.write_attribute_value('MNAME', self.list_of_global_attributes['MNAME'], na_dict = na_dict)
+        f.write_attribute_value('DATE', self.list_of_global_attributes['DATE'], na_dict = na_dict)
+        f.write_attribute_value('NIV', 1, na_dict = na_dict)
+        f.write_attribute_value('NSCOML', len(self.list_of_global_attributes['SCOM']), na_dict = na_dict)
+        f.write_attribute_value('NNCOML', len(self.list_of_global_attributes['NCOM']), na_dict = na_dict)
+        f.write_attribute_value('SCOM', self.list_of_global_attributes['SCOM'], na_dict = na_dict)
+        f.write_attribute_value('NCOM', self.list_of_global_attributes['NCOM'], na_dict = na_dict)
+        for name in list_of_variables:
+            var = self.list_of_variables_and_attributes[name]
+            if name == 'time':
+                f.write_variable(var[3], vartype="independant", na_dict = na_dict)
+            else:
+                f.write_variable(var[3], vartype="main", na_dict = na_dict)
+        f.save_na_file(save_file_name, na_dict, '%f')
+        f.close()
     if self.open_file_ext == "CSV Files (*.csv *.dat *.txt)":
         print "this function is not available yet"
 
 
 def save_as_csv(self, save_file_name):
+    logging.debug('gui - saving_functions.py - save_as_csv : save_file_name ' + str(save_file_name)
+                  + ', open_file_ext ' + str(self.open_file_ext))
     if self.open_file_ext == "NetCDF Files (*.nc)":
         temp_file_name = tempfile.NamedTemporaryFile()
         save_as_netcdf(self, temp_file_name.name + ".nc")
@@ -186,4 +223,6 @@ def save_as_csv(self, save_file_name):
         print "this function is not available yet"
     if self.open_file_ext == "CSV Files (*.csv *.dat *.txt)":
         print "this function is not available yet"
+
+
     

@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>downloadWindow</class>
+ <widget class="QWidget" name="downloadWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>230</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>500</width>
+    <height>230</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>500</width>
+    <height>230</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>FreeSans</family>
+    <pointsize>10</pointsize>
+    <stylestrategy>PreferAntialias</stylestrategy>
+    <kerning>true</kerning>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Information</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/info_popup_icon.svg</normaloff>icons/info_popup_icon.svg</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget {
+	background-color: rgb(230,230,230);
+}</string>
+  </property>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>11</y>
+     <width>478</width>
+     <height>208</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="dw_label_2">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap>icons/info_popup_icon.svg</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="dw_label_1">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>FreeSans</family>
+            <pointsize>10</pointsize>
+            <stylestrategy>PreferAntialias</stylestrategy>
+            <kerning>true</kerning>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel {
+	color: black;
+}</string>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>0</number>
+          </property>
+          <property name="midLineWidth">
+           <number>0</number>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A new version of the EGADS GUI is available on GitHub. Click on &lt;span style=&quot; font-weight:600;&quot;&gt;Download update&lt;/span&gt; to download it, or click on &lt;span style=&quot; font-weight:600;&quot;&gt;Visit GitHub&lt;/span&gt; to have a look at the EGADS GUI repository on GitHub.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::AutoText</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignJustify|Qt::AlignTop</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="dw_downloadButton">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>27</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>160</width>
+              <height>27</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>FreeSans</family>
+              <pointsize>10</pointsize>
+              <stylestrategy>PreferAntialias</stylestrategy>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QToolButton {
+    border: 1px solid #acacac;
+    border-radius: 1px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+								stop: 0 #f0f0f0, stop: 1 #e5e5e5);
+	color: black;
+}
+
+QToolButton:hover {
+	border: 1px solid #7eb4ea;
+    border-radius: 1px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+								stop: 0 #ecf4fc, stop: 1 #dcecfc);
+}
+
+
+QToolButton:pressed {
+	border: 1px solid #579de5;
+    border-radius: 1px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #daecfc, stop: 1 #c4e0fc);
+}</string>
+            </property>
+            <property name="text">
+             <string>Download update</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="dw_downloadButton_2">
+            <property name="minimumSize">
+             <size>
+              <width>140</width>
+              <height>27</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>140</width>
+              <height>27</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>FreeSans</family>
+              <pointsize>10</pointsize>
+              <stylestrategy>PreferAntialias</stylestrategy>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QToolButton {
+    border: 1px solid #acacac;
+    border-radius: 1px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+								stop: 0 #f0f0f0, stop: 1 #e5e5e5);
+	color: black;
+}
+
+QToolButton:hover {
+	border: 1px solid #7eb4ea;
+    border-radius: 1px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+								stop: 0 #ecf4fc, stop: 1 #dcecfc);
+}
+
+
+QToolButton:pressed {
+	border: 1px solid #579de5;
+    border-radius: 1px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #daecfc, stop: 1 #c4e0fc);
+}</string>
+            </property>
+            <property name="text">
+             <string>Visit GitHub</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>17</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="dw_okButton">
+        <property name="minimumSize">
+         <size>
+          <width>93</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>93</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>FreeSans</family>
+          <pointsize>10</pointsize>
+          <stylestrategy>PreferAntialias</stylestrategy>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QToolButton {
+    border: 1px solid #acacac;
+    border-radius: 1px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+								stop: 0 #f0f0f0, stop: 1 #e5e5e5);
+	color: black;
+}
+
+QToolButton:hover {
+	border: 1px solid #7eb4ea;
+    border-radius: 1px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+								stop: 0 #ecf4fc, stop: 1 #dcecfc);
+}
+
+
+QToolButton:pressed {
+	border: 1px solid #579de5;
+    border-radius: 1px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #daecfc, stop: 1 #c4e0fc);
+}</string>
+        </property>
+        <property name="text">
+         <string>Ok</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

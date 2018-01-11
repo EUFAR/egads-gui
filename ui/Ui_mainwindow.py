@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from functions.gui_elements import PushButtonRight
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -254,7 +255,7 @@ class Ui_MainWindow(object):
         self.gm_project_ln.setFrame(False)
         self.gm_project_ln.setObjectName("gm_project_ln")
         self.gridLayout_2.addWidget(self.gm_project_ln, 3, 1, 1, 1)
-        self.gm_button_4 = QtWidgets.QToolButton(self.tab)
+        self.gm_button_4 = PushButtonRight(self.tab)
         self.gm_button_4.setMinimumSize(QtCore.QSize(27, 27))
         self.gm_button_4.setMaximumSize(QtCore.QSize(27, 27))
         self.gm_button_4.setStyleSheet("QToolButton {\n"
@@ -359,7 +360,7 @@ class Ui_MainWindow(object):
         self.gm_title_ln.setFrame(False)
         self.gm_title_ln.setObjectName("gm_title_ln")
         self.gridLayout_2.addWidget(self.gm_title_ln, 0, 1, 1, 1)
-        self.gm_button_1 = QtWidgets.QToolButton(self.tab)
+        self.gm_button_1 = PushButtonRight(self.tab)
         self.gm_button_1.setMinimumSize(QtCore.QSize(27, 27))
         self.gm_button_1.setMaximumSize(QtCore.QSize(27, 27))
         self.gm_button_1.setStyleSheet("QToolButton {\n"
@@ -450,7 +451,7 @@ class Ui_MainWindow(object):
         self.gm_source_ln.setFrame(False)
         self.gm_source_ln.setObjectName("gm_source_ln")
         self.gridLayout_2.addWidget(self.gm_source_ln, 2, 1, 1, 1)
-        self.gm_button_3 = QtWidgets.QToolButton(self.tab)
+        self.gm_button_3 = PushButtonRight(self.tab)
         self.gm_button_3.setMinimumSize(QtCore.QSize(27, 27))
         self.gm_button_3.setMaximumSize(QtCore.QSize(27, 27))
         self.gm_button_3.setStyleSheet("QToolButton {\n"
@@ -468,7 +469,7 @@ class Ui_MainWindow(object):
         self.gm_button_3.setIconSize(QtCore.QSize(23, 23))
         self.gm_button_3.setObjectName("gm_button_3")
         self.gridLayout_2.addWidget(self.gm_button_3, 2, 2, 1, 1)
-        self.gm_button_2 = QtWidgets.QToolButton(self.tab)
+        self.gm_button_2 = PushButtonRight(self.tab)
         self.gm_button_2.setMinimumSize(QtCore.QSize(27, 27))
         self.gm_button_2.setMaximumSize(QtCore.QSize(27, 27))
         self.gm_button_2.setStyleSheet("QToolButton {\n"
@@ -630,6 +631,142 @@ class Ui_MainWindow(object):
 "    \n"
 "QPlainTextEdit:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"}\n"
+"\n"
+"QScrollBar:vertical {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  margin: 21px 0px 21px 0px;\n"
+"}\n"
+"\n"
+"QScrollBar:horizontal {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  margin: 0px 21px 0px 21px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-height: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:vertical:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-width: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:horizontal:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"  border-top: 1px solid rgb(240,240,240);\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: bottom;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: top;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical {\n"
+"  image: url(icons/up_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical {\n"
+"  image: url(icons/down_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid rgb(240,240,240);\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: right;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid rgb(240,240,240);\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: left;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal {\n"
+"  image: url(icons/left_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal {\n"
+"  image: url(icons/right_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
 "}")
         self.gm_history_ln.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.gm_history_ln.setPlainText("")
@@ -637,7 +774,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.gm_history_ln)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.gm_button_5 = QtWidgets.QToolButton(self.tab)
+        self.gm_button_5 = PushButtonRight(self.tab)
         self.gm_button_5.setMinimumSize(QtCore.QSize(27, 27))
         self.gm_button_5.setMaximumSize(QtCore.QSize(27, 27))
         self.gm_button_5.setStyleSheet("QToolButton {\n"
@@ -736,6 +873,142 @@ class Ui_MainWindow(object):
 "    \n"
 "QPlainTextEdit:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"}\n"
+"\n"
+"QScrollBar:vertical {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  margin: 21px 0px 21px 0px;\n"
+"}\n"
+"\n"
+"QScrollBar:horizontal {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  margin: 0px 21px 0px 21px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-height: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:vertical:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-width: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:horizontal:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"  border-top: 1px solid rgb(240,240,240);\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: bottom;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: top;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical {\n"
+"  image: url(icons/up_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical {\n"
+"  image: url(icons/down_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid rgb(240,240,240);\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: right;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid rgb(240,240,240);\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: left;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal {\n"
+"  image: url(icons/left_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal {\n"
+"  image: url(icons/right_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
 "}")
         self.gm_history_ln_2.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.gm_history_ln_2.setPlainText("")
@@ -743,7 +1016,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.gm_history_ln_2)
         self.verticalLayout_10 = QtWidgets.QVBoxLayout()
         self.verticalLayout_10.setObjectName("verticalLayout_10")
-        self.gm_button_6 = QtWidgets.QToolButton(self.tab)
+        self.gm_button_6 = PushButtonRight(self.tab)
         self.gm_button_6.setMinimumSize(QtCore.QSize(27, 27))
         self.gm_button_6.setMaximumSize(QtCore.QSize(27, 27))
         self.gm_button_6.setStyleSheet("QToolButton {\n"
@@ -1103,7 +1376,7 @@ class Ui_MainWindow(object):
         self.va_varName_ln.setFrame(False)
         self.va_varName_ln.setObjectName("va_varName_ln")
         self.gridLayout_3.addWidget(self.va_varName_ln, 0, 1, 1, 1)
-        self.va_button_1 = QtWidgets.QToolButton(self.tab_2)
+        self.va_button_1 = PushButtonRight(self.tab_2)
         self.va_button_1.setEnabled(False)
         self.va_button_1.setMinimumSize(QtCore.QSize(27, 27))
         self.va_button_1.setMaximumSize(QtCore.QSize(27, 27))
@@ -1199,7 +1472,7 @@ class Ui_MainWindow(object):
         self.va_longName_ln.setFrame(False)
         self.va_longName_ln.setObjectName("va_longName_ln")
         self.gridLayout_3.addWidget(self.va_longName_ln, 1, 1, 1, 1)
-        self.va_button_2 = QtWidgets.QToolButton(self.tab_2)
+        self.va_button_2 = PushButtonRight(self.tab_2)
         self.va_button_2.setEnabled(False)
         self.va_button_2.setMinimumSize(QtCore.QSize(27, 27))
         self.va_button_2.setMaximumSize(QtCore.QSize(27, 27))
@@ -1295,7 +1568,7 @@ class Ui_MainWindow(object):
         self.va_category_ln.setFrame(False)
         self.va_category_ln.setObjectName("va_category_ln")
         self.gridLayout_3.addWidget(self.va_category_ln, 2, 1, 1, 1)
-        self.va_button_3 = QtWidgets.QToolButton(self.tab_2)
+        self.va_button_3 = PushButtonRight(self.tab_2)
         self.va_button_3.setEnabled(False)
         self.va_button_3.setMinimumSize(QtCore.QSize(27, 27))
         self.va_button_3.setMaximumSize(QtCore.QSize(27, 27))
@@ -1391,7 +1664,7 @@ class Ui_MainWindow(object):
         self.va_units_ln.setFrame(False)
         self.va_units_ln.setObjectName("va_units_ln")
         self.gridLayout_3.addWidget(self.va_units_ln, 3, 1, 1, 1)
-        self.va_button_4 = QtWidgets.QToolButton(self.tab_2)
+        self.va_button_4 = PushButtonRight(self.tab_2)
         self.va_button_4.setEnabled(False)
         self.va_button_4.setMinimumSize(QtCore.QSize(27, 27))
         self.va_button_4.setMaximumSize(QtCore.QSize(27, 27))
@@ -1547,6 +1820,142 @@ class Ui_MainWindow(object):
 "    \n"
 "QPlainTextEdit:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"}\n"
+"\n"
+"QScrollBar:vertical {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  margin: 21px 0px 21px 0px;\n"
+"}\n"
+"\n"
+"QScrollBar:horizontal {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  margin: 0px 21px 0px 21px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-height: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:vertical:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-width: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:horizontal:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"  border-top: 1px solid rgb(240,240,240);\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: bottom;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: top;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical {\n"
+"  image: url(icons/up_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical {\n"
+"  image: url(icons/down_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid rgb(240,240,240);\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: right;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid rgb(240,240,240);\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: left;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal {\n"
+"  image: url(icons/left_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal {\n"
+"  image: url(icons/right_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
 "}")
         self.va_egadsProcessor_ln.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.va_egadsProcessor_ln.setPlainText("")
@@ -1701,7 +2110,7 @@ class Ui_MainWindow(object):
         self.new_varName_ln.setFrame(False)
         self.new_varName_ln.setObjectName("new_varName_ln")
         self.gridLayout_6.addWidget(self.new_varName_ln, 0, 1, 1, 1)
-        self.new_button_1 = QtWidgets.QToolButton(self.tab_3)
+        self.new_button_1 = PushButtonRight(self.tab_3)
         self.new_button_1.setEnabled(False)
         self.new_button_1.setMinimumSize(QtCore.QSize(27, 27))
         self.new_button_1.setMaximumSize(QtCore.QSize(27, 27))
@@ -1795,7 +2204,7 @@ class Ui_MainWindow(object):
         self.new_longName_ln.setFrame(False)
         self.new_longName_ln.setObjectName("new_longName_ln")
         self.gridLayout_6.addWidget(self.new_longName_ln, 1, 1, 1, 1)
-        self.new_button_2 = QtWidgets.QToolButton(self.tab_3)
+        self.new_button_2 = PushButtonRight(self.tab_3)
         self.new_button_2.setEnabled(False)
         self.new_button_2.setMinimumSize(QtCore.QSize(27, 27))
         self.new_button_2.setMaximumSize(QtCore.QSize(27, 27))
@@ -1889,7 +2298,7 @@ class Ui_MainWindow(object):
         self.new_category_ln.setFrame(False)
         self.new_category_ln.setObjectName("new_category_ln")
         self.gridLayout_6.addWidget(self.new_category_ln, 2, 1, 1, 1)
-        self.new_button_3 = QtWidgets.QToolButton(self.tab_3)
+        self.new_button_3 = PushButtonRight(self.tab_3)
         self.new_button_3.setEnabled(False)
         self.new_button_3.setMinimumSize(QtCore.QSize(27, 27))
         self.new_button_3.setMaximumSize(QtCore.QSize(27, 27))
@@ -1983,7 +2392,7 @@ class Ui_MainWindow(object):
         self.new_units_ln.setFrame(False)
         self.new_units_ln.setObjectName("new_units_ln")
         self.gridLayout_6.addWidget(self.new_units_ln, 3, 1, 1, 1)
-        self.new_button_4 = QtWidgets.QToolButton(self.tab_3)
+        self.new_button_4 = PushButtonRight(self.tab_3)
         self.new_button_4.setEnabled(False)
         self.new_button_4.setMinimumSize(QtCore.QSize(27, 27))
         self.new_button_4.setMaximumSize(QtCore.QSize(27, 27))
@@ -2129,6 +2538,142 @@ class Ui_MainWindow(object):
 "    \n"
 "QPlainTextEdit:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"}\n"
+"\n"
+"QScrollBar:vertical {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  margin: 21px 0px 21px 0px;\n"
+"}\n"
+"\n"
+"QScrollBar:horizontal {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  margin: 0px 21px 0px 21px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-height: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:vertical:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-width: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:horizontal:hover {\n"
+"  background-color: rgb(167, 167, 167);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"  border-top: 1px solid rgb(240,240,240);\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: bottom;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: top;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical {\n"
+"  image: url(icons/up_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical {\n"
+"  image: url(icons/down_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid rgb(240,240,240);\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: right;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid rgb(240,240,240);\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: left;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal {\n"
+"  image: url(icons/left_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal {\n"
+"  image: url(icons/right_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
 "}")
         self.new_egadsProcessor_ln.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.new_egadsProcessor_ln.setPlainText("")
@@ -2349,6 +2894,17 @@ class Ui_MainWindow(object):
         icon21.addPixmap(QtGui.QPixmap("icons/data_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionDisplayBar.setIcon(icon21)
         self.actionDisplayBar.setObjectName("actionDisplayBar")
+        self.actionOptions = QtWidgets.QAction(MainWindow)
+        icon22 = QtGui.QIcon()
+        icon22.addPixmap(QtGui.QPixmap("icons/option_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionOptions.setIcon(icon22)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.actionOptions.setFont(font)
+        self.actionOptions.setObjectName("actionOptions")
         self.menuFile.addAction(self.actionOpenBar)
         self.menuFile.addAction(self.actionSaveBar)
         self.menuFile.addAction(self.actionSaveAsBar)
@@ -2359,6 +2915,7 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionExit)
         self.menuProcessings.addAction(self.menuEmbedded_algorithms.menuAction())
         self.menuProcessings.addAction(self.menuUser_defined_algorithms.menuAction())
+        self.menuAbout.addAction(self.actionOptions)
         self.menuAbout.addAction(self.actionHelp)
         self.menuAbout.addAction(self.actionAbout_EGADS)
         self.menuAbout.addSeparator()
@@ -2418,7 +2975,7 @@ class Ui_MainWindow(object):
         self.new_egadsProcessor_lb.setText(_translate("MainWindow", "EGADS processor:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "New Variables"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.menuProcessings.setTitle(_translate("MainWindow", "Processings"))
+        self.menuProcessings.setTitle(_translate("MainWindow", "Processing"))
         self.menuEmbedded_algorithms.setTitle(_translate("MainWindow", "Embedded algorithms"))
         self.menuUser_defined_algorithms.setTitle(_translate("MainWindow", "User-defined algorithms"))
         self.menuAbout.setTitle(_translate("MainWindow", "About"))
@@ -2458,4 +3015,6 @@ class Ui_MainWindow(object):
         self.actionSaveAsBar.setToolTip(_translate("MainWindow", "Save to a new file"))
         self.actionDisplayBar.setText(_translate("MainWindow", "Display"))
         self.actionDisplayBar.setToolTip(_translate("MainWindow", "Display the selected variable"))
+        self.actionOptions.setText(_translate("MainWindow", "Options..."))
+        self.actionOptions.setToolTip(_translate("MainWindow", "EGADS GUI options"))
 

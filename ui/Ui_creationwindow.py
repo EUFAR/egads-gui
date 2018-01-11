@@ -1167,7 +1167,6 @@ class Ui_creationWindow(object):
 "    padding-left: 5px;\n"
 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
 "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-"    color: black;\n"
 "}\n"
 "\n"
 "QComboBox:disabled {\n"
@@ -1212,9 +1211,14 @@ class Ui_creationWindow(object):
 "}\n"
 "\n"
 "QComboBox QAbstractItemView {\n"
-"    selection-background-color: transparent;\n"
-"    selection-color: blue;\n"
-"    border: 0px, solid black;\n"
+"    selection-background-color: rgb(200,200,200);\n"
+"    selection-color: black;\n"
+"    background: #f0f0f0;\n"
+"    border: 0px solid #f0f0f0;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item {\n"
+"    margin: 5px 5px 5px 5px;\n"
 "}")
         self.cw_combobox_1.setFrame(False)
         self.cw_combobox_1.setObjectName("cw_combobox_1")
@@ -1641,7 +1645,7 @@ class Ui_creationWindow(object):
         self.gridLayout_11.addLayout(self.verticalLayout_11, 0, 0, 1, 1)
 
         self.retranslateUi(creationWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(creationWindow)
 
     def retranslateUi(self, creationWindow):

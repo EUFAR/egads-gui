@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
 import egads
 import os
+import logging
 
 def reload_user_directories(self):
-    reload(egads.algorithms.user.comparisons)
-    reload(egads.algorithms.user.corrections)
-    reload(egads.algorithms.user.mathematics)
-    reload(egads.algorithms.user.microphysics)
-    reload(egads.algorithms.user.radiation)
-    reload(egads.algorithms.user.thermodynamics)
-    reload(egads.algorithms.user.transforms)
-    # add folders created by user
+    logging.debug('gui - other_functions.py - reload_user_directories')
+    user_algorithm_path = egads.__path__[0] + '/algorithms/user'
+    folder_list = []
+    for item in os.walk(user_algorithm_path):
+        index = item[0].find('user')
+        if item[0][index + 5:]:
+            if not 'file_templates' in item[0][index + 5:]:
+                folder_list.append(item[0][index + 5:])
+    for folder in folder_list:
+        reload(getattr(egads.algorithms.user, folder))
 
 
 def prepare_algorithms_structure(self):
+    logging.debug('gui - other_functions.py - prepare_algorithms_structure')
     reload_user_directories(self)
     algorithm_path = egads.__path__[0] + '/algorithms'
     user_algorithm_path = egads.__path__[0] + '/algorithms/user'
@@ -35,7 +39,8 @@ def prepare_algorithms_structure(self):
     for item in os.walk(user_algorithm_path):
         index = item[0].find('user')
         if item[0][index + 5:]:
-            folder_list.append(item[0][index + 5:])   
+            if not 'file_templates' in item[0][index + 5:]:
+                folder_list.append(item[0][index + 5:])   
     for folder in folder_list:
         algorithm_tmp_list = dir(getattr(egads.algorithms.user, folder))
         algorithm_list = []
@@ -51,6 +56,7 @@ def prepare_algorithms_structure(self):
 
     
 def check_compatibility_netcdf(self, global_attributes, variable_attributes):
+    logging.debug('gui - other_functions.py - check_compatibility_netcdf')
     self.missing_global_attributes = []
     self.missing_variable_attributes = []
     self.missing_units = []
@@ -88,12 +94,12 @@ def check_compatibility_netcdf(self, global_attributes, variable_attributes):
 
 
 def add_global_attributes_to_buttons(self):
+    logging.debug('gui - other_functions.py - add_global_attributes_to_buttons')
     self.buttons_lines_dict['gm_button_1'][2] = self.list_of_global_attributes
     self.buttons_lines_dict['gm_button_2'][2] = self.list_of_global_attributes
     self.buttons_lines_dict['gm_button_3'][2] = self.list_of_global_attributes
     self.buttons_lines_dict['gm_button_4'][2] = self.list_of_global_attributes
     self.buttons_lines_dict['gm_button_5'][2] = self.list_of_global_attributes
-    
     
     
 

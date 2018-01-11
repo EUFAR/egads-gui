@@ -178,7 +178,6 @@ class Ui_processingWindow(object):
 "    padding-left: 5px;\n"
 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
 "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-"    color: black;\n"
 "}\n"
 "\n"
 "QComboBox:disabled {\n"
@@ -190,13 +189,6 @@ class Ui_processingWindow(object):
 "    border-radius: 1px;\n"
 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
 "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-"}\n"
-"\n"
-"QComboBox:pressed {\n"
-"    border: 1px solid #579de5;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                      stop: 0 #daecfc, stop: 1 #c4e0fc);\n"
 "}\n"
 "\n"
 "QComboBox::drop-down {\n"
@@ -230,9 +222,14 @@ class Ui_processingWindow(object):
 "}\n"
 "\n"
 "QComboBox QAbstractItemView {\n"
-"    selection-background-color: transparent;\n"
-"    selection-color: blue;\n"
-"    border: 0px, solid black;\n"
+"    selection-background-color: rgb(200,200,200);\n"
+"    selection-color: black;\n"
+"    background: #f0f0f0;\n"
+"    border: 0px solid #f0f0f0;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item {\n"
+"    margin: 5px 5px 5px 5px;\n"
 "}")
         self.aw_combobox_1.setFrame(False)
         self.aw_combobox_1.setObjectName("aw_combobox_1")
@@ -267,7 +264,6 @@ class Ui_processingWindow(object):
 "    padding-left: 5px;\n"
 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
 "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-"    color: black;\n"
 "}\n"
 "\n"
 "QComboBox:disabled {\n"
@@ -279,13 +275,6 @@ class Ui_processingWindow(object):
 "    border-radius: 1px;\n"
 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
 "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-"}\n"
-"\n"
-"QComboBox:pressed {\n"
-"    border: 1px solid #579de5;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                      stop: 0 #daecfc, stop: 1 #c4e0fc);\n"
 "}\n"
 "\n"
 "QComboBox::drop-down {\n"
@@ -319,9 +308,14 @@ class Ui_processingWindow(object):
 "}\n"
 "\n"
 "QComboBox QAbstractItemView {\n"
-"    selection-background-color: transparent;\n"
-"    selection-color: blue;\n"
-"    border: 0px, solid black;\n"
+"    selection-background-color: rgb(200,200,200);\n"
+"    selection-color: black;\n"
+"    background: #f0f0f0;\n"
+"    border: 0px solid #f0f0f0;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item {\n"
+"    margin: 5px 5px 5px 5px;\n"
 "}")
         self.aw_combobox_2.setFrame(False)
         self.aw_combobox_2.setObjectName("aw_combobox_2")
@@ -860,8 +854,8 @@ class Ui_processingWindow(object):
         self.horizontalLayout.addItem(spacerItem20)
         self.aw_okButton = QtWidgets.QToolButton(processingWindow)
         self.aw_okButton.setEnabled(False)
-        self.aw_okButton.setMinimumSize(QtCore.QSize(100, 27))
-        self.aw_okButton.setMaximumSize(QtCore.QSize(100, 27))
+        self.aw_okButton.setMinimumSize(QtCore.QSize(180, 27))
+        self.aw_okButton.setMaximumSize(QtCore.QSize(180, 27))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -929,5 +923,5 @@ class Ui_processingWindow(object):
         self.aw_label_7.setText(_translate("processingWindow", "<html><head/><body><p align=\"justify\">Please select the output(s). Once it has been done, please click on save to launch the processing.</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), _translate("processingWindow", "Output(s)"))
         self.aw_cancelButton.setText(_translate("processingWindow", "Cancel"))
-        self.aw_okButton.setText(_translate("processingWindow", "Save"))
+        self.aw_okButton.setText(_translate("processingWindow", "Launch processing"))
 

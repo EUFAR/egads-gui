@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
+import logging
 
 
 def objects_initialization(self):
+    logging.debug('gui - sql_functions.py - objects_initialization')
     self.modified = False
     self.open_file_name = ''
     self.open_file_ext = ''
     self.file_is_opened = False
     self.list_of_variables_and_attributes = {}
     self.list_of_new_variables_and_attributes = {}
+    self.list_of_unread_variables = []
     self.new_variables = False
     self.delete_first_variable = False
     self.compatibility_level = {
@@ -55,9 +58,9 @@ def objects_initialization(self):
                         }
     
     self.objects_metadata_dict = {
-                        "gm_title_ln":"title",
-                        "gm_institution_ln":"institution",
-                        "gm_source_ln":"source",
+                        "gm_title_ln":["title","MNAME"],
+                        "gm_institution_ln":["institution","ORG"],
+                        "gm_source_ln":["source","SNAME"],
                         "gm_project_ln":["project","ONAME"],
                         "gm_history_ln":["history","NCOM"],
                         "gm_history_ln_2":["","SCOM"],
