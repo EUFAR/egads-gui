@@ -14,4 +14,4 @@ Next functions (to be done):
    - light operations during plot (compute trend, standard deviation, mean, ...)
 
 Prerequisites:
-   - EGADS (0.8.8+) and dependencies have to be installed
+   - EGADS (0.8.8+) and its dependencies have to be installed

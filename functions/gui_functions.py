@@ -649,7 +649,7 @@ def read_set_attribute_gui(self, gui_object, attr_name, attr_dict=None):
 
 
 def clear_layout(self, layout):
-    logging.debut('gui - gui_functions.py - clear_layout')
+    logging.debug('gui - gui_functions.py - clear_layout')
     for i in reversed(range(layout.count())):   
         item = layout.itemAt(i)
         if isinstance(item, QtWidgets.QWidgetItem):

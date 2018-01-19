@@ -521,6 +521,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.list_of_new_variables_and_attributes.pop(str(self.new_listwidget.currentItem().text()), 0)
         self.new_listwidget.takeItem(self.new_listwidget.currentRow())
         self.listWidget.addItem(sublist[1]["var_name"])
+        self.modified = True
+        self.make_window_title()
         try:
             if not self.new_listwidget:
                 self.tabWidget.removeTab(2)

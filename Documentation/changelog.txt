@@ -2,6 +2,13 @@
 CHANGELOG
 =========
 
+
+January 19, Release version 0.9.3
+=================================
+  FIXED:
+    - when a new variable was created, the migration of the new variable to the list of variable didn't set the "modified" attribute of the GUI on True, thus it was no possible to save the file.
+    - a log message contained a mistake.
+
   
 January 11, Release version 0.9.2
 =================================
