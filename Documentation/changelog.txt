@@ -3,6 +3,12 @@ CHANGELOG
 =========
 
 
+January 31, Release version 0.9.4
+=================================
+  MODIFIED:
+    - documentation has been updated.
+
+
 January 19, Release version 0.9.3
 =================================
   FIXED:

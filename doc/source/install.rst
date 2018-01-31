@@ -2,7 +2,7 @@
 Installation
 =============
 
-The latest version of the EGADS GUI can be obtained from https://github.com/eufarn7sp/egads-gui
+The latest version of the EGADS GUI can be obtained from https://github.com/EUFAR/egads-gui
 
 
 *************
@@ -38,7 +38,7 @@ The EGADS GUI is actually available as a common Python script, thus it doesn't n
 
 In the future, a stand-alone version will be available, embedded or not the last version of EGADS core.
 
-To learn how to install EGADS, please read the EGADS documentation available at the following place: https://github.com/eufarn7sp/egads/blob/master/Documentation/
+To learn how to install EGADS, please read the EGADS documentation available at the following places: https://github.com/EUFAR/egads/blob/master/Documentation/ & http://egads.readthedocs.io/
 
 
 *******
