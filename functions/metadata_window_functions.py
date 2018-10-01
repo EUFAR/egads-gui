@@ -21,7 +21,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
         self.gw_button_1.clicked.connect(self.add_attribute)
         if self.open_file_ext == 'NetCDF Files (*.nc)':
             self.populate_attribute_netcdf()
-        elif self.open_file_ext == 'NASA Ames Files (*.na)':
+        '''elif self.open_file_ext == 'NASA Ames Files (*.na)':
             self.line.setVisible(False)
             self.gw_addAttribute_lb.setVisible(False)
             self.gw_addAttribute_rl.setVisible(False)
@@ -29,7 +29,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
             self.verticalLayout.removeItem(self.horizontalLayout_6)
             self.verticalLayout.removeItem(self.horizontalLayout_4)
             self.verticalLayout.removeWidget(self.line)
-            self.populate_attribute_nasaames()
+            self.populate_attribute_nasaames()'''
         self.add_list_label = []
         self.add_list_line = []
         self.add_list_del = []
@@ -53,12 +53,10 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
         self.populate_combobox()
         logging.info('gui - metadata_window_functions.py - MyGlobalAttributes - ready')
 
-
     def close_window(self):
         logging.debug('gui - metadata_window_functions.py - MyGlobalAttributes - close_window')
         del(self.global_attributes)
         self.close()
-        
         
     def close_window_save(self):
         try:
@@ -83,9 +81,12 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                 pass
             for index, widget in enumerate (self.add_list_label):
                 try:
-                    self.global_attributes[str(widget.text()[:-1])] = float(self.add_list_line[index].text())
-                except ValueError:
-                    self.global_attributes[str(widget.text()[:-1])] = str(self.add_list_line[index].text())
+                    self.global_attributes[str(widget.text())]
+                except KeyError:
+                    try:
+                        self.global_attributes[str(widget.text())] = float(self.add_list_line[index].text())
+                    except ValueError:
+                        self.global_attributes[str(widget.text())] = str(self.add_list_line[index].text())
             self.close()
         except Exception:
             logging.exception("gui - metadata_window_functions.py - MyGlobalAttributes - close_window_save : an exception occured")
@@ -121,7 +122,8 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
             if selected_attribute == "Other..." or selected_attribute == "long_name_<xx>":
                 self.add_list_label.append(QtWidgets.QLineEdit())
                 self.add_list_label[self.add_attribute_num].setFrame(False)
-                self.add_list_label[self.add_attribute_num].setStyleSheet("QLineEdit {border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240);}\n"
+                self.add_list_label[self.add_attribute_num].setStyleSheet("QLineEdit {"
+                + "border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240); color: rgb(45,45,45);}\n"
                 "\n"
                 "QLineEdit:disabled {background-color: rgb(200,200,200);}")
                 self.add_list_label[self.add_attribute_num].setFont(font2)
@@ -133,20 +135,25 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                 self.add_list_label[self.add_attribute_num].setFont(font)
                 self.add_list_label[self.add_attribute_num].setToolTip(selected_attribute)
                 self.add_list_label[self.add_attribute_num].setText(selected_attribute + ':')
-                self.add_list_label[self.add_attribute_num].setStyleSheet("QLabel {color: black;}")
+                self.add_list_label[self.add_attribute_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.add_list_label[self.add_attribute_num].setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
             self.add_list_label[self.add_attribute_num].setMinimumSize(QtCore.QSize(0, 27))
             self.add_list_label[self.add_attribute_num].setMaximumSize(QtCore.QSize(16777215, 27))
             self.add_list_label[self.add_attribute_num].setObjectName("add_label_" + str(self.add_attribute_num))
             self.gridLayout_3.addWidget(self.add_list_label[self.add_attribute_num], self.add_attribute_num, 0, 1, 1)
             self.add_list_line.append(QtWidgets.QLineEdit())
             self.add_list_line[self.add_attribute_num].setEnabled(True)
-            self.add_list_line[self.add_attribute_num].setMinimumSize(QtCore.QSize(400, 27))
+            self.add_list_line[self.add_attribute_num].setMinimumSize(QtCore.QSize(0, 27))
             self.add_list_line[self.add_attribute_num].setMaximumSize(QtCore.QSize(16777215, 27))
             self.add_list_line[self.add_attribute_num].setPalette(palette)
             self.add_list_line[self.add_attribute_num].setFrame(False)
             self.add_list_line[self.add_attribute_num].setObjectName("add_line_" + str(self.add_attribute_num))
             self.add_list_line[self.add_attribute_num].setFocus(True)
-            self.add_list_line[self.add_attribute_num].setStyleSheet("QLineEdit {border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240);}\n"
+            self.add_list_line[self.add_attribute_num].setStyleSheet("QLineEdit {"
+                                                                     + "border-radius: 3px;"
+                                                                     + "padding: 1px 4px 1px 4px;"
+                                                                     + "background-color: rgb(240, 240, 240);"
+                                                                     + "color: rgb(45,45,45);}\n"
             "\n"
             "QLineEdit:disabled {background-color: rgb(200,200,200);}")
             self.add_list_line[self.add_attribute_num].setFont(font2)
@@ -238,7 +245,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
             self.list_line = []
             self.list_del = []
             self.attribute_num = 0
-            for key, value in sorted(self.global_attributes.iteritems()):
+            for key, value in sorted(self.global_attributes.items()):
                 if (key != "Conventions" and key != "title" and key != "institution" and key != "source" and value != "deleted"
                     and key != "MNAME" and key != "ORG" and key != "SNAME"):
                     font = QtGui.QFont()
@@ -270,25 +277,34 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                     self.list_label[self.attribute_num].setObjectName("label_" + str(self.attribute_num))
                     self.list_label[self.attribute_num].setText(key + ':')
                     self.list_label[self.attribute_num].setToolTip(key)
-                    self.list_label[self.attribute_num].setStyleSheet("QLabel {color: black;}")
-                    self.gridLayout_2.addWidget(self.list_label[self.attribute_num], self.attribute_num, 0, 1, 1)
+                    self.list_label[self.attribute_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                    self.list_label[self.attribute_num].setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+                    self.other_attributes_layout.addWidget(self.list_label[self.attribute_num], self.attribute_num, 0, 1, 1)
                     if key == "SCOM" or key == "NCOM":
                         self.list_line.append(QtWidgets.QPlainTextEdit())
-                        self.list_line[self.attribute_num].setMinimumSize(QtCore.QSize(400, 100))
+                        self.list_line[self.attribute_num].setMinimumSize(QtCore.QSize(0, 100))
                         self.list_line[self.attribute_num].setMaximumSize(QtCore.QSize(16777215, 100))
                         self.list_line[self.attribute_num].setFrameShape(QtWidgets.QFrame.NoFrame)
                         self.list_line[self.attribute_num].setPlainText(str(value))
-                        self.list_line[self.attribute_num].setStyleSheet("QPlainTextEdit {border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240);}\n"
+                        self.list_line[self.attribute_num].setStyleSheet("QPlainTextEdit {"
+                                                                         + "color: rgb(45,45,45);"
+                                                                         + "border-radius: 3px;"
+                                                                         + "padding: 1px 4px 1px 4px;"
+                                                                         + "background-color: rgb(240, 240, 240);}\n"
                         "\n"
                         "QPlainTextEdit:disabled {background-color: rgb(200,200,200);}")
                     else:
                         self.list_line.append(QtWidgets.QLineEdit())
-                        self.list_line[self.attribute_num].setMinimumSize(QtCore.QSize(400, 27))
+                        self.list_line[self.attribute_num].setMinimumSize(QtCore.QSize(0, 27))
                         self.list_line[self.attribute_num].setMaximumSize(QtCore.QSize(16777215, 27))
                         self.list_line[self.attribute_num].setFrame(False)
                         self.list_line[self.attribute_num].setText(str(value))
                         self.list_line[self.attribute_num].setCursorPosition(0)
-                        self.list_line[self.attribute_num].setStyleSheet("QLineEdit {border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240);}\n"
+                        self.list_line[self.attribute_num].setStyleSheet("QLineEdit {"
+                                                                         + "color: rgb(45,45,45);"
+                                                                         + "border-radius: 3px;"
+                                                                         + "padding: 1px 4px 1px 4px;"
+                                                                         + "background-color: rgb(240, 240, 240);}\n"
                         "\n"
                         "QLineEdit:disabled {background-color: rgb(200,200,200);}")
                     self.list_line[self.attribute_num].setEnabled(True)
@@ -296,7 +312,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                     self.list_line[self.attribute_num].setObjectName("line_" + str(self.attribute_num))
                     self.list_line[self.attribute_num].setFocus(True)
                     self.list_line[self.attribute_num].setFont(font2)
-                    self.gridLayout_2.addWidget(self.list_line[self.attribute_num], self.attribute_num, 1, 1, 1)
+                    self.other_attributes_layout.addWidget(self.list_line[self.attribute_num], self.attribute_num, 1, 1, 1)
                     self.list_del.append(QtWidgets.QToolButton())
                     self.list_del[self.attribute_num].setMinimumSize(QtCore.QSize(27, 27))
                     self.list_del[self.attribute_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -315,7 +331,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                     "QToolButton:flat {\n"
                     "    border: none;\n"
                     "}")
-                    self.gridLayout_2.addWidget(self.list_del[self.attribute_num], self.attribute_num, 2, 1, 1)
+                    self.other_attributes_layout.addWidget(self.list_del[self.attribute_num], self.attribute_num, 2, 1, 1)
                     self.list_del[self.attribute_num].clicked.connect(self.delete_attribute)
                     if key == "missing_value":
                         self.list_line[self.attribute_num].setEnabled(False)
@@ -329,13 +345,13 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                 label.setMaximumSize(QtCore.QSize(200, 27))
                 label.setObjectName("label")
                 label.setText("No more attribute")
-                self.gridLayout_2.addWidget(label, 0, 0, 1, 1)
+                self.other_attributes_layout.addWidget(label, 0, 0, 1, 1)
         elif self.gw_showButton.text() == "Hide other attributes":
             self.list_label = []
             self.list_line = []
             self.list_del = []
             self.attribute_num = 0
-            self.clear_layout(self.gridLayout_2)
+            self.clear_layout(self.other_attributes_layout)
             self.gw_showButton.setText("Show other attributes")
 
             
@@ -379,7 +395,6 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
         self.gw_addAttribute_rl.addItem("Other...")
         for item in self.combobox_items:
             try:
-                self.global_attributes[item]
                 if self.global_attributes[item] == "deleted":
                     self.gw_addAttribute_rl.addItem(item)
             except KeyError:
@@ -465,9 +480,12 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
             logging.exception('gui - metadata_window_functions.py - MyVariableAttributes - close_window_save : an exception occured')
         for index, widget in enumerate (self.add_list_label):
             try:
-                self.attributes[str(widget.text()[:-1])] = float(self.add_list_line[index].text())
-            except ValueError:
-                self.attributes[str(widget.text()[:-1])] = str(self.add_list_line[index].text())
+                self.attributes[str(widget.text())]
+            except KeyError:
+                try:
+                    self.attributes[str(widget.text())] = float(self.add_list_line[index].text())
+                except ValueError:
+                    self.attributes[str(widget.text())] = str(self.add_list_line[index].text())
         self.close()
         
     
@@ -495,7 +513,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
             self.list_line = []
             self.list_del = []
             self.attribute_num = 0
-            for key, value in sorted(self.attributes.iteritems()):
+            for key, value in sorted(self.attributes.items()):
                 if key != "units" and key != "_FillValue" and key != "var_name" and value != "deleted":
                     if isinstance(value, list):
                         value_string = ""
@@ -531,11 +549,12 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                     self.list_label[self.attribute_num].setObjectName("label_" + str(self.attribute_num))
                     self.list_label[self.attribute_num].setText(key + ':')
                     self.list_label[self.attribute_num].setToolTip(key)
-                    self.list_label[self.attribute_num].setStyleSheet("QLabel {color: black;}")
-                    self.gridLayout_2.addWidget(self.list_label[self.attribute_num], self.attribute_num, 0, 1, 1)
+                    self.list_label[self.attribute_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                    self.list_label[self.attribute_num].setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+                    self.other_attributes_layout.addWidget(self.list_label[self.attribute_num], self.attribute_num, 0, 1, 1)
                     self.list_line.append(QtWidgets.QLineEdit())
                     self.list_line[self.attribute_num].setEnabled(True)
-                    self.list_line[self.attribute_num].setMinimumSize(QtCore.QSize(400, 27))
+                    self.list_line[self.attribute_num].setMinimumSize(QtCore.QSize(0, 27))
                     self.list_line[self.attribute_num].setMaximumSize(QtCore.QSize(16777215, 27))
                     self.list_line[self.attribute_num].setPalette(palette)
                     self.list_line[self.attribute_num].setFrame(False)
@@ -543,11 +562,15 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                     self.list_line[self.attribute_num].setText(str(value))
                     self.list_line[self.attribute_num].setCursorPosition(0)
                     self.list_line[self.attribute_num].setFocus(True)
-                    self.list_line[self.attribute_num].setStyleSheet("QLineEdit {border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240);}\n"
+                    self.list_line[self.attribute_num].setStyleSheet("QLineEdit {"
+                                                                     + "border-radius: 3px; "
+                                                                     + "padding: 1px 4px 1px 4px; "
+                                                                     + "background-color: rgb(240, 240, 240);"
+                                                                     + "color: rgb(45,45,45);}\n"
                     "\n"
                     "QLineEdit:disabled {background-color: rgb(200,200,200);}")
                     self.list_line[self.attribute_num].setFont(font2)
-                    self.gridLayout_2.addWidget(self.list_line[self.attribute_num], self.attribute_num, 1, 1, 1)
+                    self.other_attributes_layout.addWidget(self.list_line[self.attribute_num], self.attribute_num, 1, 1, 1)
                     self.list_del.append(QtWidgets.QToolButton())
                     self.list_del[self.attribute_num].setMinimumSize(QtCore.QSize(27, 27))
                     self.list_del[self.attribute_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -566,7 +589,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                     "QToolButton:flat {\n"
                     "    border: none;\n"
                     "}")
-                    self.gridLayout_2.addWidget(self.list_del[self.attribute_num], self.attribute_num, 2, 1, 1)
+                    self.other_attributes_layout.addWidget(self.list_del[self.attribute_num], self.attribute_num, 2, 1, 1)
                     self.list_del[self.attribute_num].clicked.connect(self.delete_attribute)
                     if key == "missing_value":
                         self.list_line[self.attribute_num].setEnabled(False)
@@ -580,13 +603,14 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                 label.setMaximumSize(QtCore.QSize(200, 27))
                 label.setObjectName("label")
                 label.setText("No more attribute")
-                self.gridLayout_2.addWidget(label, 0, 0, 1, 1)
+                label.setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.other_attributes_layout.addWidget(label, 0, 0, 1, 1)
         elif self.vw_showButton.text() == "Hide other attributes":
             self.list_label = []
             self.list_line = []
             self.list_del = []
             self.attribute_num = 0
-            self.clear_layout(self.gridLayout_2)
+            self.clear_layout(self.other_attributes_layout)
             self.vw_showButton.setText("Show other attributes")
     
     
@@ -622,7 +646,11 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
             if selected_attribute == "Other..." or selected_attribute == "long_name_<xx>":
                 self.add_list_label.append(QtWidgets.QLineEdit())
                 self.add_list_label[self.add_attribute_num].setFrame(False)
-                self.add_list_label[self.add_attribute_num].setStyleSheet("QLineEdit {border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240);}\n"
+                self.add_list_label[self.add_attribute_num].setStyleSheet("QLineEdit {"
+                                                                          + "border-radius: 3px; "
+                                                                          + "padding: 1px 4px 1px 4px; "
+                                                                          + "background-color: rgb(240, 240, 240);"
+                                                                          + "color: rgb(45,45,45);}\n"
                 "\n"
                 "QLineEdit:disabled {background-color: rgb(200,200,200);}")
                 self.add_list_label[self.add_attribute_num].setFont(font2)
@@ -634,11 +662,12 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                 self.add_list_label[self.add_attribute_num].setFont(font)
                 self.add_list_label[self.add_attribute_num].setToolTip(selected_attribute)
                 self.add_list_label[self.add_attribute_num].setText(selected_attribute + ':')
-                self.add_list_label[self.add_attribute_num].setStyleSheet("QLabel {color: black;}")
+                self.add_list_label[self.add_attribute_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.add_list_label[self.add_attribute_num].setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
             self.add_list_label[self.add_attribute_num].setMinimumSize(QtCore.QSize(0, 27))
             self.add_list_label[self.add_attribute_num].setMaximumSize(QtCore.QSize(16777215, 27))
             self.add_list_label[self.add_attribute_num].setObjectName("add_label_" + str(self.add_attribute_num))
-            self.gridLayout_3.addWidget(self.add_list_label[self.add_attribute_num], self.add_attribute_num, 0, 1, 1)
+            self.add_attribute_layout.addWidget(self.add_list_label[self.add_attribute_num], self.add_attribute_num, 0, 1, 1)
             self.add_list_line.append(QtWidgets.QLineEdit())
             self.add_list_line[self.add_attribute_num].setEnabled(True)
             self.add_list_line[self.add_attribute_num].setMinimumSize(QtCore.QSize(400, 27))
@@ -647,11 +676,15 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
             self.add_list_line[self.add_attribute_num].setFrame(False)
             self.add_list_line[self.add_attribute_num].setObjectName("add_line_" + str(self.add_attribute_num))
             self.add_list_line[self.add_attribute_num].setFocus(True)
-            self.add_list_line[self.add_attribute_num].setStyleSheet("QLineEdit {border-radius: 3px; padding: 1px 4px 1px 4px; background-color: rgb(240, 240, 240);}\n"
+            self.add_list_line[self.add_attribute_num].setStyleSheet("QLineEdit {"
+                                                                     + "border-radius: 3px; "
+                                                                     + "padding: 1px 4px 1px 4px; "
+                                                                     + "background-color: rgb(240, 240, 240);"
+                                                                     + "color: rgb(45,45,45);}\n"
             "\n"
             "QLineEdit:disabled {background-color: rgb(200,200,200);}")
             self.add_list_line[self.add_attribute_num].setFont(font2)
-            self.gridLayout_3.addWidget(self.add_list_line[self.add_attribute_num], self.add_attribute_num, 1, 1, 1)
+            self.add_attribute_layout.addWidget(self.add_list_line[self.add_attribute_num], self.add_attribute_num, 1, 1, 1)
             self.add_list_del.append(QtWidgets.QToolButton())
             self.add_list_del[self.add_attribute_num].setMinimumSize(QtCore.QSize(27, 27))
             self.add_list_del[self.add_attribute_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -670,7 +703,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
             "QToolButton:flat {\n"
             "    border: none;\n"
             "}")
-            self.gridLayout_3.addWidget(self.add_list_del[self.add_attribute_num], self.add_attribute_num, 2, 1, 1)
+            self.add_attribute_layout.addWidget(self.add_list_del[self.add_attribute_num], self.add_attribute_num, 2, 1, 1)
             self.add_list_del[self.add_attribute_num].clicked.connect(self.delete_attribute)
             self.add_attribute_num += 1
     
@@ -680,9 +713,9 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                       + str(self.sender().objectName()))
         if "add" in self.sender().objectName():
             index = int(self.sender().objectName()[13:])
-            self.gridLayout_3.removeWidget(self.add_list_label[index])
-            self.gridLayout_3.removeWidget(self.add_list_line[index])
-            self.gridLayout_3.removeWidget(self.add_list_del[index])
+            self.add_attribute_layout.removeWidget(self.add_list_label[index])
+            self.add_attribute_layout.removeWidget(self.add_list_line[index])
+            self.add_attribute_layout.removeWidget(self.add_list_del[index])
             self.add_list_label[index].deleteLater()
             self.add_list_label.pop(index)
             self.add_list_line[index].deleteLater()
@@ -690,7 +723,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
             self.add_list_del[index].deleteLater()
             self.add_list_del.pop(index)
             self.add_attribute_num -= 1
-            row_number = self.gridLayout_3.count() / 3
+            row_number = self.add_attribute_layout.count() / 3
             if row_number > 0:
                 for i in range(0, row_number):
                     self.add_list_line[i].setObjectName("add_line_" + str(i))
@@ -699,9 +732,9 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
         else:
             index = int(self.sender().objectName()[9:])
             self.attributes[str(self.list_label[index].text()[:-1])] = "deleted"
-            self.gridLayout_2.removeWidget(self.list_label[index])
-            self.gridLayout_2.removeWidget(self.list_line[index])
-            self.gridLayout_2.removeWidget(self.list_del[index])
+            self.other_attributes_layout.removeWidget(self.list_label[index])
+            self.other_attributes_layout.removeWidget(self.list_line[index])
+            self.other_attributes_layout.removeWidget(self.list_del[index])
             self.list_label[index].deleteLater()
             self.list_label.pop(index)
             self.list_line[index].deleteLater()
@@ -738,4 +771,3 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                     self.vw_addAttribute_rl.addItem(item)
             except KeyError:
                 self.vw_addAttribute_rl.addItem(item)
-                

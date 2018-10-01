@@ -1,30 +1,22 @@
-# -*- coding: utf-8 -*-
-
-from egads import input, EgadsData
 import ntpath
 import logging
-from PyQt5 import QtCore, QtWidgets
-from gui_functions import modify_attribute_gui
-from gui_functions import update_icons_state
-from gui_functions import clear_gui
-from gui_functions import update_compatibility_label
-from gui_functions import read_set_attribute_gui
-from gui_functions import update_global_attribute_gui
-from gui_functions import update_variable_attribute_gui
-from other_functions import add_global_attributes_to_buttons
-try:
-    from netcdftime._netcdftime import utime
-    logging.debug('gui - reading_functions.py : _netcdftime as utime has been loaded')
-except ImportError:
-    from netcdftime.netcdftime import utime
-    logging.debug('gui - reading_functions.py : netcdftime as utime has been loaded')
 import copy
+from egads import input, EgadsData
+from PyQt5 import QtCore, QtWidgets
+from functions.gui_functions import modify_attribute_gui
+from functions.gui_functions import update_icons_state
+from functions.gui_functions import clear_gui
+from functions.gui_functions import read_set_attribute_gui
+from functions.gui_functions import update_global_attribute_gui
+from functions.gui_functions import update_variable_attribute_gui
+from functions.material_functions import add_global_attributes_to_buttons
+
 
 
 def netcdf_reading(self):
-    logging.debug('gui - reading_functions.py - netcdf_reading: open_file_name ' + str(self.open_file_name))
+    logging.debug('gui - reading_functions.py - netcdf_reading')
     clear_gui(self)
-    self.opened_file = input.EgadsNetCdf(self.open_file_name, 'a')
+    self.opened_file = input.EgadsNetCdf(self.file_name, 'a')
     list_of_variables = sorted(self.opened_file.get_variable_list())
     self.list_of_global_attributes = self.opened_file.get_attribute_list()
     self.list_of_dimensions = self.opened_file.get_dimension_list()
@@ -41,18 +33,18 @@ def netcdf_reading(self):
             self.list_of_unread_variables.append(var)
             logging.exception('gui - reading_functions.py - : an error occured during the re'
                               + 'ading of a variable, variable ' + str(var))
-    update_compatibility_label(self)
-    out_file_base, out_file_ext = ntpath.splitext(ntpath.basename(self.open_file_name))
-    read_set_attribute_gui(self, self.gm_filename_ln, out_file_base + out_file_ext)
     update_global_attribute_gui(self, 'NetCDF')
-    self.listWidget.addItems(list_of_variables)
-    self.listWidget.itemClicked.connect(lambda: var_reading(self))
-    self.tabWidget.currentChanged.connect(lambda: update_icons_state(self))
-    all_buttons = self.tabWidget.findChildren(QtWidgets.QToolButton)
+    self.variable_list.addItems(list_of_variables)
+    self.variable_list.itemClicked.connect(lambda: var_reading(self))
+    self.tab_view.currentChanged.connect(lambda: update_icons_state(self))
+    all_buttons = self.tab_view.findChildren(QtWidgets.QToolButton)
     for widget in all_buttons:
-        if widget.objectName() != '' and widget.objectName() != 'gm_button_7':
+        if widget.objectName() != '':
             widget.clicked.connect(lambda: modify_attribute_gui(self, 'left'))
-            widget.rightClick.connect(lambda: modify_attribute_gui(self, 'right'))
+            try:
+                widget.rightClick.connect(lambda: modify_attribute_gui(self, 'right'))
+            except AttributeError:
+                pass
     logging.debug('gui - reading_functions.py - netcdf_reading: netcdf file loaded')
     
 
@@ -100,7 +92,7 @@ def nasaames_reading(self):
 
 
 def var_reading(self):
-    logging.debug('gui - reading_functions.py - var_reading : variable ' + str(self.listWidget.currentItem().text()))
+    logging.debug('gui - reading_functions.py - var_reading : variable ' + str(self.variable_list.currentItem().text()))
     update_icons_state(self, 'var_reading')
     clear_gui(self, 'variable')
     all_lines_edit = self.tab_2.findChildren(QtWidgets.QLineEdit)

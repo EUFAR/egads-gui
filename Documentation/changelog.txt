@@ -1,6 +1,34 @@
-=========
-CHANGELOG
-=========
+==========================
+CHANGELOG | LINEAGE BRANCH
+==========================
+
+To do list:
+-----------
+  - when a user bring modifications to the plot window, and if the zoom or pan button is in action, release it when Update button is pushed to avoid issues.
+  - add the possibility for the user to change subplot positions.
+  - check nasa ames file handling in the GUI.
+  
+To fix list:
+------------
+
+
+October 1 2018, Release version 0.10.0
+======================================
+  First design of the new GUI dedicated to EGADS Lineage.
+  EGADS GUI is now compatible with Python 3.5 and above.
+  
+  ADDED:
+    - the branch and the minimum version of EGADS accepted by the GUI has been added to the egads_gui.ini file. If an older version and/or a different branch of EGADS is/are found, a warning is displayed.
+    - the branch version has been added to the '_version.py' file.
+    
+  MODIFIED:
+    - the window to display data has been totally redone. If a variable with dimension equal to time, longitude and/or latitude, the variable will be parsed accordingly (latitude as col, latitude as row, and time as col). For now only variable with 2 dimensions (or 3 if the length of a dimension is equal to 1) can be parsed in the window. Not all date are parsed during init, the scroll bars include a method to load new data during scrolling.
+    - the window to plot data has been totally rework. It is possible to plot timeseries and gridded data (maps). In the last case, for now, the function is still beta and needs to finalized. Thus options have been disabled.
+    - the global and variable attributes windows have been reworked.
+  
+  FIXED:
+    - when a user creates a new metadata (global or variable), the name of the metadata is truncated when it is saved. It has been fixed.
+    - if a user try to add a metadata (global or variable) which already exists, the metadata was added multiple times or replaced. It has been fixed.
 
 
 January 31, Release version 0.9.4
@@ -211,4 +239,3 @@ December 1 2015 - 4 January 2016
 ================================
   First design of the new GUI dedicated to EGADS.
   EGADS version is currently 0.5.8. It appears to have critical issues with Nappy, as this one calls old numpy functions which have been discarded from newer versions.
-

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
-_gui_version = '0.9.4'
-_eclipse_version = '4.6.3'
-_qt_version = '5.8'
-_python_version = '2.7.10'
+_gui_version = '0.10.0'
+_gui_branch = 'Lineage'
+_eclipse_version = '4.7.3'
+_qt_version = '5.10'
+_python_version = '3.5.4'

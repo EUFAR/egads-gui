@@ -1,20 +1,23 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import webbrowser
+import numpy
+import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_infowindow import Ui_infoWindow
 from ui.Ui_displaywindow import Ui_displayWindow
-from ui.Ui_logwindow import Ui_Changelog
-from ui.Ui_aboutwindow import Ui_aboutWindow
-from ui.Ui_addcategory import Ui_Addcategory
-from ui.Ui_fillwindow import Ui_fillWindow
-from ui.Ui_filenamewindow import Ui_Addfilename
-from ui.Ui_unitwindow import Ui_unitWindow
-from ui.Ui_presavewindow import Ui_presaveWindow
+#from ui.Ui_logwindow import Ui_Changelog
+from ui.Ui_aboutlogwindow import Ui_aboutlogWindow
+#from ui.Ui_addcategory import Ui_Addcategory
+#from ui.Ui_fillwindow import Ui_fillWindow
+#from ui.Ui_filenamewindow import Ui_Addfilename
+#from ui.Ui_unitwindow import Ui_unitWindow
+#from ui.Ui_presavewindow import Ui_presaveWindow
 from ui.Ui_optionwindow import Ui_optionWindow
-from ui.Ui_downloadwindow import Ui_downloadWindow
-from functions.thread_functions import CheckEGADSGuiUpdateOnline
+from ui.Ui_waitwindow import Ui_waitWindow
+#from ui.Ui_downloadwindow import Ui_downloadWindow
+#from functions.thread_functions import CheckEGADSGuiUpdateOnline
+from functions.gui_elements import VerticalLabel
+from functions.waitingspinnerwidget import QtWaitingSpinner
 
  
 class MyInfo(QtWidgets.QDialog, Ui_infoWindow):
@@ -32,85 +35,245 @@ class MyInfo(QtWidgets.QDialog, Ui_infoWindow):
 
 
 class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
-    def __init__(self, variable):
-        logging.debug('gui - other_window_functions.py - MyDisplay - __init__ : variable ' + str(variable[1]["var_name"]) )
+    def __init__(self, var_name, var_units, fill_value, var_values, dimensions):
+        logging.debug('gui - other_window_functions.py - MyDisplay - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        self.variable = variable
-        self.dw_line_1.setText(self.variable[1]["var_name"])
-        self.dw_line_2.setText(self.variable[1]["units"])
+        self.fill_value = fill_value
+        self.var = var_values
+        self.dimensions = dimensions
+        self.splitter.setSizes([100,200])
+        self.dw_line_1.setText(var_name)
+        self.dw_line_2.setText(var_units)
         self.dw_okButton.clicked.connect(self.closeWindow)
+        self.current_row = 0
+        self.current_col = 0
+        self.dw_label_4.setVisible(False)
+        self.dw_label_5.setText('')
+        self.dw_label_5.setVisible(False)
+        self.gridLayout_2.removeWidget(self.dw_label_5)
+        self.dw_label_5.deleteLater()
+        self.populate_dimensions()
         self.populate_table()
         logging.info('gui - other_window_functions.py - MyDisplay ready')
 
+    def connect_scrollbars(self):
+        h_scrollbar = self.dw_table.horizontalScrollBar()
+        v_scrollbar = self.dw_table.verticalScrollBar()
+        h_scrollbar.valueChanged.connect(lambda val: self.load_more_data(val, col=True))
+        v_scrollbar.valueChanged.connect(lambda val: self.load_more_data(val, row=True))
         
-    def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyDisplay - closeWindow')
-        self.close()
-        
+    def load_more_data(self, val, row=False, col=False):
+        if row:
+            self.current_row = val
+        elif col:
+            self.current_col = val
+        for x in range(self.current_col - 20, self.current_col + 20):
+            for y in range(self.current_row - 20, self.current_row + 20):
+                try:     
+                    if not self.dw_table.item(y, x):
+                        self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[y, x])))
+                except (IndexError):
+                    pass
+
+    def populate_dimensions(self):
+        dimensions_str = ''
+        for key, value in self.dimensions.items():
+            dimensions_str = dimensions_str + str(value['length']) + ' (' + key + '), '
+        self.dw_line_3.setText(dimensions_str[:-2])
         
     def populate_table(self):
         logging.debug('gui - other_window_functions.py - MyDisplay - populate_table')
-        col, row = 1, 1
-        try:
-            col = self.variable[3].value.shape[0]
-            row = self.variable[3].value.shape[1]
-        except IndexError:
-            col = self.variable[3].value.shape[0]
-        self.dw_table.setRowCount(row)
-        self.dw_table.setColumnCount(col)
-        if row == 1:
-            for x in range(col):
-                try:
-                    if self.variable[3].value[x] == self.variable[1]["_FillValue"]:
-                        self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem("NaN"))
-                    else:
-                        self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem(str(self.variable[3].value[x])))
-                except KeyError:
-                    logging.exception('gui - other_window_functions.py - MyDisplay - populate_table : no _FillValue')
-                    try: 
-                        if self.variable[3].value[x] == self.variable[1]["missing_value"]:
-                            self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem("NaN"))
-                        else:
-                            self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem(str(self.variable[3].value[x])))
-                    except KeyError:
-                        logging.exception('gui - other_window_functions.py - MyDisplay - populate_table : no missing_value')
-                        self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem(str(self.variable[3].value[x])))
+        if self.fill_value is not None:
+            try:
+                self.var[self.var == self.fill_value] = numpy.nan
+            except ValueError:
+                pass
+        data_shape = self.var.shape
+        row, col = None, None
+        if len(data_shape) >= 3 and data_shape[0] > 1 and data_shape[1] > 1 and data_shape[2] > 1:
+            print('It is not possible to display data with 3 dimensions and more yet.')
         else:
-            for y in range(row):
+            row, col = self.populate_headers()
+        if row is not None:
+            data_shape = self.var.shape
+            if len(data_shape) > 1:
+                connect = False
+                if data_shape[0] > 50:
+                    row = 50
+                    connect = True
+                if data_shape[1] > 50:
+                    col = 50
+                    connect = True
+                if connect:
+                    self.connect_scrollbars()
                 for x in range(col):
-                    self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.variable[3].value[y][x])))
+                    for y in range(row):
+                        self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[y, x])))
+            else:
+                for x in range(col):
+                    self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem(str(self.var[x])))
 
-        
-class MyLog(QtWidgets.QDialog, Ui_Changelog):
-    def __init__(self):
-        logging.debug('gui - other_window_functions.py - MyLog - __init__')
-        QtWidgets.QWidget.__init__(self)
-        self.setupUi(self)
-        self.log_txBrower.setPlainText(open("Documentation/changelog.txt").read())
-        self.lg_okButton.clicked.connect(self.closeWindow)
-        logging.info('gui - other_window_functions.py - MyLog ready')
-        
+    def populate_headers(self):
+        dim_num = len(self.var.shape)
+        if dim_num == 1:
+            col_size, row_size = self.var.shape[0], 1
+            self.dw_table.setColumnCount(col_size)
+            self.dw_table.setRowCount(row_size) 
+            for dim, value in self.dimensions.items():
+                self.dw_label_4.setVisible(True)
+                if 'time' in dim.lower():
+                    self.dw_label_4.setText('Time')
+                    units = value['units']
+                    if 'since' in units:
+                        if 'days' in units or 'day' in units:
+                            date = units[units.index('since') + 6:]
+                            value['values'] = [str((datetime.datetime(int(date[:4]),int(date[5:7]),int(date[8:10]),0,0)
+                                        + datetime.timedelta(i - 1)).strftime("%Y-%m-%d")) for i in value['values']]
+                elif dim.lower() in ['longitude', 'lon', 'long']:
+                    self.dw_label_4.setText('Longitude')
+                elif dim.lower() in ['latitude', 'lat']:
+                    self.dw_label_4.setText('Latitude')
+                val_list = [str(i) for i in value['values']]
+                self.dw_table.setHorizontalHeaderLabels(val_list)
+        elif dim_num == 2:
+            time_in, lon_in, lat_in = False, False, False
+            time_name = None
+            lon_name = None
+            for dim, value in self.dimensions.items():
+                if 'time' in dim.lower():
+                    time_in = True
+                    time_name = dim
+                if dim.lower() in ['longitude', 'lon', 'long']:
+                    lon_in = True
+                    lon_name = dim
+            if time_in:
+                if self.dimensions[time_name]['axis'] == 0:
+                    self.var = numpy.transpose(self.var)
+                row_size, col_size = self.var.shape
+                self.dw_table.setColumnCount(col_size)
+                self.dw_table.setRowCount(row_size)
+                val_list = [str(i) for i in self.dimensions[time_name]['values']]
+                self.dw_label_4.setVisible(True)
+                self.dw_label_4.setText('Time')
+                self.dw_table.setHorizontalHeaderLabels(val_list)
+                self.dimensions.pop(time_name)
+                for key, value in self.dimensions.items():
+                    val_list = [str(i) for i in value['values']]
+                    self.dw_table.setVerticalHeaderLabels(val_list)
+                    self.set_row_label(key.title())
+            else:
+                if lon_in:
+                    if self.dimensions[lon_name]['axis'] == 0:
+                        self.var = numpy.transpose(self.var)
+                    row_size, col_size = self.var.shape
+                    self.dw_table.setColumnCount(col_size)
+                    self.dw_table.setRowCount(row_size)
+                    val_list = [str(i) for i in self.dimensions[lon_name]['values']]
+                    self.dw_label_4.setVisible(True)
+                    self.dw_label_4.setText('Longitude')
+                    self.dw_table.setHorizontalHeaderLabels(val_list)
+                    self.dimensions.pop(lon_name)
+                    for key, value in self.dimensions.items():
+                        val_list = [str(i) for i in value['values']]
+                        self.dw_table.setVerticalHeaderLabels(val_list)
+                        self.set_row_label(key.title())
+                else:
+                    row_size, col_size = self.var.shape
+                    self.dw_table.setColumnCount(col_size)
+                    self.dw_table.setRowCount(row_size)
+        elif dim_num == 3:
+            time_in, lon_in, lat_in = False, False, False
+            time_name = None
+            lon_name = None
+            for dim, value in self.dimensions.items():
+                if value['length'] == 1:
+                    self.var = numpy.squeeze(self.var, value['axis'])
+                    break
+            self.dimensions.pop(dim)
+            for dim, value in self.dimensions.items():
+                if 'time' in dim.lower():
+                    time_in = True
+                    time_name = dim
+                if dim.lower() in ['longitude', 'lon', 'long']:
+                    lon_in = True
+                    lon_name = dim
+            if time_in:
+                if self.dimensions[time_name]['axis'] == 0:
+                    self.var = numpy.transpose(self.var)
+                val_list = [str(i) for i in self.dimensions[time_name]['values']]
+                row_size, col_size = self.var.shape
+                self.dw_table.setColumnCount(col_size)
+                self.dw_table.setRowCount(row_size)
+                self.dw_label_4.setVisible(True)
+                self.dw_label_4.setText('Time')
+                self.dw_table.setHorizontalHeaderLabels(val_list)
+                self.dimensions.pop(time_name)
+                for key, value in self.dimensions.items():
+                    val_list = [str(i) for i in value['values']]
+                    self.dw_table.setVerticalHeaderLabels(val_list)
+                    self.set_row_label(key.title())
+            else:
+                if lon_in:
+                    if self.dimensions[lon_name]['axis'] == 0:
+                        self.var = numpy.transpose(self.var)
+                    val_list = [str(i) for i in self.dimensions[lon_name]['values']]
+                    row_size, col_size = self.var.shape
+                    self.dw_table.setColumnCount(col_size)
+                    self.dw_table.setRowCount(row_size)
+                    self.dw_label_4.setVisible(True)
+                    self.dw_label_4.setText('Longitude')
+                    self.dw_table.setHorizontalHeaderLabels(val_list)
+                    self.dimensions.pop(lon_name)
+                    for key, value in self.dimensions.items():
+                        val_list = [str(i) for i in value['values']]
+                        self.dw_table.setVerticalHeaderLabels(val_list)
+                        self.set_row_label(key.title())
+                else:
+                    row_size, col_size = self.var.shape
+                    self.dw_table.setColumnCount(col_size)
+                    self.dw_table.setRowCount(row_size)   
+        return row_size, col_size
+            
+    def set_row_label(self, text):
+        self.dw_label_5 = VerticalLabel()
+        self.dw_label_5
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.dw_label_5.setFont(font)
+        self.dw_label_5.setStyleSheet("QLabel {\n"
+        "    color: rgb(45,45,45);\n"
+        "    margin-bottom: 5px;\n"
+        "}")
+        self.dw_label_5.setText(text)
+        self.dw_label_5.setAlignment(QtCore.Qt.AlignCenter)
+        self.dw_label_5.setObjectName("dw_label_5")
+        self.gridLayout_2.addWidget(self.dw_label_5, 1, 0, 1, 1)
+
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyLog - closeWindow')
+        logging.debug('gui - other_window_functions.py - MyDisplay - closeWindow')
         self.close()
     
     
-class MyAbout(QtWidgets.QDialog, Ui_aboutWindow):
-    def __init__(self, aboutText):
-        logging.debug('gui - other_window_functions.py - MyAbout - __init__')
+class MyAbout(QtWidgets.QDialog, Ui_aboutlogWindow):
+    def __init__(self, text):
+        logging.info('gui - other_window_functions.py - MyAbout - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        self.aw_label_1.setText(aboutText)
-        self.aw_okButton.clicked.connect(self.closeWindow)
-        logging.info('gui - other_window_functions.py - MyAbout ready')
+        self.browser_1.setHtml(text)
+        self.browser_2.setPlainText(open("documentation/changelog.txt").read())
+        self.button.clicked.connect(self.closeWindow)
+        self.splitter.setSizes([170,130])
 
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyAbout - closeWindow')
+        logging.info('gui - other_window_functions.py - MyAbout - closeWindow')
         self.close()
 
 
-class MyCategory(QtWidgets.QDialog, Ui_Addcategory):
+'''class MyCategory(QtWidgets.QDialog, Ui_Addcategory):
     def __init__(self):
         logging.debug('gui - other_window_functions.py - MyCategory - __init__')
         QtWidgets.QWidget.__init__(self)
@@ -125,10 +288,10 @@ class MyCategory(QtWidgets.QDialog, Ui_Addcategory):
 
     def submitBox(self):
         logging.debug('gui - other_window_functions.py - MyCategory - submitBox')
-        self.accept() 
+        self.accept() '''
         
         
-class MyFilename(QtWidgets.QDialog, Ui_Addfilename):
+'''class MyFilename(QtWidgets.QDialog, Ui_Addfilename):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         logging.debug('gui - other_window_functions.py - MyFilename - __init__')
@@ -143,10 +306,10 @@ class MyFilename(QtWidgets.QDialog, Ui_Addfilename):
 
     def submitBox(self):
         logging.debug('gui - other_window_functions.py - MyFilename - submitBox')
-        self.accept()        
+        self.accept()     '''   
         
         
-class MyFill(QtWidgets.QDialog, Ui_fillWindow):
+'''class MyFill(QtWidgets.QDialog, Ui_fillWindow):
     def __init__(self):
         logging.debug('gui - other_window_functions.py - MyFill - __init__')
         QtWidgets.QWidget.__init__(self)
@@ -159,10 +322,10 @@ class MyFill(QtWidgets.QDialog, Ui_fillWindow):
     def cancelWindow(self):
         logging.debug('gui - other_window_functions.py - MyFill - cancelWindow')
         self.cancel = True
-        self.close()
+        self.close()'''
         
         
-class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
+'''class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
     def __init__(self, units_list):
         logging.debug('gui - other_window_functions.py - MyUnit - __init__ : unit_list ' + str(unit_list))
         QtWidgets.QWidget.__init__(self)
@@ -206,9 +369,9 @@ class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
     def submitBox(self):
         logging.debug('gui - other_window_functions.py - MyUnit - submitBox')
         self.accept()  
+        '''
         
-        
-class MyWarning(QtWidgets.QDialog, Ui_presaveWindow):
+'''class MyWarning(QtWidgets.QDialog, Ui_presaveWindow):
     def __init__(self, button_string, title_string):
         logging.debug('gui - other_window_functions.py - MyWarning - __init__ : button_string ' + str(button_string)
                       + ', title_string ' + str(title_string))
@@ -226,31 +389,31 @@ class MyWarning(QtWidgets.QDialog, Ui_presaveWindow):
         logging.debug('gui - other_window_functions.py - MyWarning - closeWindow : sender().objectName() '
                       + str(self.sender().objectName()))
         self.buttonName = self.sender().objectName()
-        self.close()
+        self.close()'''
 
 
 class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
     def __init__(self, config_dict):
-        logging.debug('gui - other_window_functions.py - MyOptions - __init__ ')
+        logging.info('gui - other_window_functions.py - MyOptions - __init__ ')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        itemDelegate = QtWidgets.QStyledItemDelegate()
-        self.ow_comboBox_1.setItemDelegate(itemDelegate)
         self.config_dict = config_dict
-        self.ow_okButton.clicked.connect(self.save_config_dict)
-        self.ow_cancelButton.clicked.connect(self.closeWindow)
-        self.ow_checkButton.clicked.connect(self.check_gui_update)
+        itemDelegate = QtWidgets.QStyledItemDelegate()
+        self.combobox_1.setItemDelegate(itemDelegate)
+        self.ok_button.clicked.connect(self.save_config_dict)
+        self.cancel_button.clicked.connect(self.closeWindow)
+        #self.check_button.clicked.connect(self.check_gui_update)
         self.cancel = True
         self.read_config_dict()
-        logging.info('gui - other_window_functions.py - MyOptions ready')
 
     def read_config_dict(self):
-        self.ow_comboBox_1.setCurrentIndex(self.ow_comboBox_1.findText(self.config_dict.get('LOG', 'level')))
-        self.ow_lineEdit.setText(self.config_dict.get('LOG', 'path'))
-        self.ow_checkBox_1.setChecked(self.config_dict.getboolean('OPTIONS', 'check_update'))
+        logging.debug('gui - other_window_functions.py - MyOptions - read_config_dict')
+        self.combobox_1.setCurrentIndex(self.combobox_1.findText(self.config_dict.get('LOG', 'level')))
+        self.line_1.setText(self.config_dict.get('LOG', 'path'))
+        self.checkbox_1.setChecked(self.config_dict.getboolean('OPTIONS', 'check_update'))
 
 
-    def check_gui_update(self):
+    '''def check_gui_update(self):
         logging.debug('gui - other_window_functions.py - MyOptions - check_gui_update')
         self.check_gui_update = CheckEGADSGuiUpdateOnline()
         self.check_gui_update.start()
@@ -266,7 +429,7 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
             y2 = y1 + h1/2 - h2/2
             self.updade_window.setGeometry(x2, y2, w2, h2)
             self.updade_window.setModal(True)
-            self.updade_window.exec_()
+            self.updade_window.exec_()'''
 
 
     def save_config_dict(self):
@@ -277,13 +440,12 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         self.config_dict.set('OPTIONS','check_update', self.ow_checkBox_1.isChecked())
         self.closeWindow()
 
-
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyOptions - closeWindow')
+        logging.info('gui - other_window_functions.py - MyOptions - closeWindow')
         self.close()
 
 
-class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):
+'''class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):
     def __init__(self, url):
         logging.debug('gui - other_window_functions.py - MyUpdate - __init__ ')
         QtWidgets.QWidget.__init__(self)
@@ -305,7 +467,34 @@ class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):
 
     def closeWindow(self):
         logging.debug('gui - other_window_functions.py - MyUpdate - closeWindow')
+        self.close()'''
+
+
+class MyWait(QtWidgets.QDialog, Ui_waitWindow):
+    def __init__(self):
+        logging.debug('gui - other_window_functions.py - MyWait - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.setup_spinner()
+        
+    def setup_spinner(self):
+        self.spinner = QtWaitingSpinner(self, centerOnParent=False)
+        self.verticalLayout.addWidget(self.spinner)
+        self.spinner.setRoundness(70.0)
+        self.spinner.setMinimumTrailOpacity(15.0)
+        self.spinner.setTrailFadePercentage(70.0)
+        self.spinner.setNumberOfLines(12)
+        self.spinner.setLineLength(10)
+        self.spinner.setLineWidth(5)
+        self.spinner.setInnerRadius(10)
+        self.spinner.setRevolutionsPerSecond(1)
+        self.spinner.setColor(QtGui.QColor(45, 45, 45))
+        self.spinner.start()
+
+    
+
+    def closeWindow(self):
+        logging.debug('gui - other_window_functions.py - MyWait - closeWindow')
         self.close()
 
-
-        
+ 

@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import sys
 import os
 from PyQt5 import QtWidgets, QtGui, QtCore
 from ui.mainwindow import MainWindow
 from ui._version import _gui_version
-from egads._version import __version__ as egads_version
-import ConfigParser
+#from egads._version import __version__ as egads_version
+import configparser
 
 
 def launch_egads_gui(path):
@@ -16,7 +14,7 @@ def launch_egads_gui(path):
     splash = QtWidgets.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()
-    config_dict = ConfigParser.ConfigParser()
+    config_dict = configparser.ConfigParser()
     if not os.path.exists(os.path.join(path, 'egads_gui.ini')):
         ini_file = open(os.path.join(path, 'egads_gui.ini'), 'w')
         config_dict.add_section('LOG')
@@ -24,9 +22,25 @@ def launch_egads_gui(path):
         config_dict.set('LOG','level','DEBUG')
         config_dict.set('LOG','path', '')
         config_dict.set('OPTIONS','check_update','False')
+        config_dict.set('OPTIONS','min_egads_version','0.9.1')
+        config_dict.set('OPTIONS','egads_branch','Lineage')
         config_dict.write(ini_file)
         ini_file.close()   
     config_dict.read(os.path.join(path, 'egads_gui.ini'))
+    
+    if not config_dict['OPTIONS'].get('min_egads_version') or config_dict['OPTIONS'].get('min_egads_version') != '0.9.1':
+        config_dict.set('OPTIONS', 'min_egads_version', '0.9.1')
+        with open(os.path.join(path, 'egads_gui.ini'), 'w') as configfile:
+            config_dict.write(configfile)
+    
+    if not config_dict['OPTIONS'].get('egads_branch'):
+        config_dict.set('OPTIONS', 'egads_branch', 'Lineage')
+        with open(os.path.join(path, 'egads_gui.ini'), 'w') as configfile:
+            config_dict.write(configfile)
+    
+    config_dict.read(os.path.join(path, 'egads_gui.ini'))
+    
+    
     log_filename = os.path.join(config_dict.get('LOG', 'path'),'egads_gui.log')
     logging.getLogger('').handlers = []
     logging.basicConfig(filename = log_filename,
@@ -44,7 +58,7 @@ def launch_egads_gui(path):
     logging.info('gui - operating system: ' + str(sys.platform))
     python_version = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
     logging.info('gui - python version: ' + python_version)
-    logging.info('gui - egads version: ' + egads_version)
+    
     
     ui = MainWindow(path, config_dict)
     ui.show()

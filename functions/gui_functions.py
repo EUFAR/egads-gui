@@ -1,24 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import ntpath
 import egads
 import os
 import inspect
 import logging
 from PyQt5 import QtWidgets, QtCore, QtGui
-from other_functions import check_compatibility_netcdf
-from algorithm_window_functions import MyAlgorithmDisplay
-
-
-def gui_position(self):
-    logging.debug('gui - gui_functions.py - gui_position')
-    self.resize(1150, 544)
-    screen_height = QtWidgets.QDesktopWidget().screenGeometry().height()
-    screen_width = QtWidgets.QDesktopWidget().screenGeometry().width()
-    _, _, w, h = self.geometry().getRect()
-    x = screen_width / 2 - w / 2
-    y = screen_height / 2 - h / 2
-    self.setGeometry(x, y, w, h)
+#from algorithm_window_functions import MyAlgorithmDisplay
     
 
 def gui_initialization(self):
@@ -27,60 +13,25 @@ def gui_initialization(self):
     self.actionSeparator2.setText('')
     self.actionSeparator3.setText('')
     self.actionSeparator4.setText('')
-    for i in range(self.tabWidget.count()):
-        self.tabWidget.tabBar().setTabTextColor(i, QtGui.QColor(0,0,0))
-    self.tabWidget.removeTab(2)
-    self.tabWidget.setEnabled(False)
-    self.tabWidget.setVisible(False)
-    
-    
-def netcdf_gui_initialization(self):
-    logging.debug('gui - gui_functions.py - netcdf_gui_initialization')
-    self.tabWidget.setEnabled(True)
-    self.tabWidget.setVisible(True)
-    self.gm_details_lb.setVisible(True)
-    self.gm_compatibility_lb.setVisible(True)
-    self.gm_history_ln.setMinimumSize(QtCore.QSize(400, 150))
-    self.gm_history_ln.setMaximumSize(QtCore.QSize(16777215, 150))
-    self.gm_history_ln_2.setVisible(False)
-    self.gm_history_lb_2.setVisible(False)
-    self.gm_button_6.setVisible(False)
-    self.gm_project_lb.setText('Project')
-    self.gm_history_lb.setText('History:')
-    self.va_longName_lb.setVisible(True)
-    self.va_category_lb.setVisible(True)
-    self.va_egadsProcessor_lb.setVisible(True)
-    self.va_longName_ln.setVisible(True)
-    self.va_category_ln.setVisible(True)
-    self.va_egadsProcessor_ln.setVisible(True)
-    self.va_button_2.setVisible(True)
-    self.va_button_3.setVisible(True)
-    
-    
-def nasaames_gui_initialization(self):
-    logging.debug('gui - gui_functions.py - nasaames_gui_initialization')
-    self.tabWidget.setEnabled(True)
-    self.tabWidget.setVisible(True)
-    self.gm_details_lb.setVisible(False)
-    self.gm_compatibility_lb.setVisible(False)
-    self.gm_history_ln.setMinimumSize(QtCore.QSize(400, 140))
-    self.gm_history_ln.setMaximumSize(QtCore.QSize(16777215, 140))
-    self.gm_history_ln_2.setMinimumSize(QtCore.QSize(400, 140))
-    self.gm_history_ln_2.setMaximumSize(QtCore.QSize(16777215, 140))
-    self.gm_history_lb.setText('<html><head/><body><p>Normal<br>comments:</p></body></html>')
-    self.gm_project_lb.setText('Author(s):')
-    self.va_longName_lb.setVisible(False)
-    self.va_category_lb.setVisible(False)
-    self.va_egadsProcessor_lb.setVisible(False)
-    self.va_longName_ln.setVisible(False)
-    self.va_category_ln.setVisible(False)
-    self.va_egadsProcessor_ln.setVisible(False)
-    self.va_button_2.setVisible(False)
-    self.va_button_3.setVisible(False)
-     
-
-def icons_initialization(self):
-    logging.debug('gui - gui_functions.py - icons_initialization')
+    self.tab_view.removeTab(2)
+    self.tab_view.setEnabled(False)
+    self.tab_view.setVisible(False)
+    self.sb_filename_lb = QtWidgets.QLabel()
+    self.sb_filename_lb.setMinimumSize(QtCore.QSize(0, 20))
+    self.sb_filename_lb.setMaximumSize(QtCore.QSize(16777215, 20))
+    font = QtGui.QFont()
+    font.setFamily("font/SourceSansPro-Regular.ttf")
+    font.setPointSize(9)
+    font.setItalic(True)
+    font.setKerning(True)
+    font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+    self.sb_filename_lb.setFont(font)
+    self.sb_filename_lb.setObjectName("sb_filename_lb")
+    self.sb_filename_lb.setText("")
+    self.sb_filename_lb.setStyleSheet("QLabel {\n"
+                                      "    color: rgb(45,45,45);\n"
+                                      "}")
+    self.statusBar.addWidget(self.sb_filename_lb)
     self.actionOpenBar.setEnabled(True)
     self.actionSaveBar.setEnabled(False)
     self.actionSaveAsBar.setEnabled(False)
@@ -97,7 +48,8 @@ def icons_initialization(self):
 
 
 def algorithm_list_menu_initialization(self):
-    logging.debug('gui - gui_functions.py - algorithm_list_menu_initialization')
+    logging.debug('gui - gui_functions.py - algorithm_list_initialization')
+    self.list_of_algorithms = {}
     self.menuEmbedded_algorithms.clear()
     self.menuUser_defined_algorithms.clear()
     self.algorithm_folder_menu = []
@@ -124,12 +76,14 @@ def algorithm_list_menu_initialization(self):
             if not 'file_templates' in item[0][index + 11:] and not 'user' in item[0][index + 11:]:
                 folder_list.append(item[0][index + 11:])
     for folder in folder_list:
-        algorithm_tmp_list = dir(getattr(egads.algorithms, folder))
-        algorithm_list = []
-        for item in algorithm_tmp_list:
-            if isinstance(getattr(getattr(egads.algorithms, folder), item), type):
-                algorithm_list.append(item)
-        algorithm_structure.append([folder, sorted(algorithm_list)])
+        if '__pycache__' not in folder:
+            algorithm_tmp_list = dir(getattr(egads.algorithms, folder))
+            algorithm_list = []
+            for item in algorithm_tmp_list:
+                if isinstance(getattr(getattr(egads.algorithms, folder), item), type):
+                    algorithm_list.append(item)
+            algorithm_structure.append([folder, sorted(algorithm_list)])
+            self.list_of_algorithms[folder] = sorted(algorithm_list)      
     folder_list = []
     for item in os.walk(user_algorithm_path):
         index = item[0].find('user')
@@ -137,13 +91,19 @@ def algorithm_list_menu_initialization(self):
             if not 'file_templates' in item[0][index + 5:]:
                 folder_list.append(item[0][index + 5:])  
     for folder in folder_list:
-        algorithm_tmp_list = dir(getattr(egads.algorithms.user, folder))
-        algorithm_list = []
-        for item in algorithm_tmp_list:
-            if isinstance(getattr(getattr(egads.algorithms.user, folder), item), type):
-                algorithm_list.append(item)
-        user_algorithm_structure.append([folder, sorted(algorithm_list)])
-    i = 0 
+        if '__pycache__' not in folder:
+            algorithm_tmp_list = dir(getattr(egads.algorithms.user, folder))
+            algorithm_list = []
+            for item in algorithm_tmp_list:
+                if isinstance(getattr(getattr(egads.algorithms.user, folder), item), type):
+                    algorithm_list.append(item)
+            user_algorithm_structure.append([folder, sorted(algorithm_list)])
+            try:
+                tmp_list = self.list_of_algorithms[folder] + algorithm_list
+                self.list_of_algorithms[folder] = sorted(tmp_list)
+            except KeyError:
+                self.list_of_algorithms[folder] = sorted(algorithm_list) 
+    i = 0
     for sublist in sorted(algorithm_structure):
         self.algorithm_folder_menu.append(QtWidgets.QMenu(self.menuEmbedded_algorithms))
         self.algorithm_folder_menu[i].setObjectName('embedded_category_' + sublist[0])
@@ -180,6 +140,55 @@ def algorithm_list_menu_initialization(self):
                 self.user_folder_menu[i].addAction(self.user_folder_actions[i][j])
                 j += 1
             i += 1
+
+    
+def netcdf_gui_initialization(self):
+    logging.debug('gui - gui_functions.py - netcdf_gui_initialization')
+    self.tab_view.setEnabled(True)
+    self.tab_view.setVisible(True)
+    self.gm_comments_ln.setVisible(False)
+    self.gm_comments_lb.setVisible(False)
+    self.gm_button_6.setVisible(False)
+    self.gm_project_lb.setText('Project')
+    self.gm_history_lb.setText('History:')
+    self.va_longName_lb.setVisible(True)
+    self.va_category_lb.setVisible(True)
+    self.va_egadsProcessor_lb.setVisible(True)
+    self.va_longName_ln.setVisible(True)
+    self.va_category_ln.setVisible(True)
+    self.va_egadsProcessor_ln.setVisible(True)
+    self.va_button_2.setVisible(True)
+    self.va_button_3.setVisible(True)
+    self.variable_list.setVisible(True)
+    self.variable_list.setEnabled(True)
+    
+    
+def nasaames_gui_initialization(self):
+    logging.debug('gui - gui_functions.py - nasaames_gui_initialization')
+    self.tab_view.setEnabled(True)
+    self.tab_view.setVisible(True)
+    self.gm_details_lb.setVisible(False)
+    self.gm_compatibility_lb.setVisible(False)
+    self.gm_history_ln.setMinimumSize(QtCore.QSize(400, 140))
+    self.gm_history_ln.setMaximumSize(QtCore.QSize(16777215, 140))
+    self.gm_history_ln_2.setMinimumSize(QtCore.QSize(400, 140))
+    self.gm_history_ln_2.setMaximumSize(QtCore.QSize(16777215, 140))
+    self.gm_history_lb.setText('<html><head/><body><p>Normal<br>comments:</p></body></html>')
+    self.gm_project_lb.setText('Author(s):')
+    self.va_longName_lb.setVisible(False)
+    self.va_category_lb.setVisible(False)
+    self.va_egadsProcessor_lb.setVisible(False)
+    self.va_longName_ln.setVisible(False)
+    self.va_category_ln.setVisible(False)
+    self.va_egadsProcessor_ln.setVisible(False)
+    self.va_button_2.setVisible(False)
+    self.va_button_3.setVisible(False)
+     
+
+
+
+
+
     
 
 def display_algorithm_information(self):
@@ -195,7 +204,7 @@ def display_algorithm_information(self):
         algorithm = getattr(getattr(egads.algorithms, algorithm_category), algorithm_name)
     except AttributeError:
         algorithm = getattr(getattr(egads.algorithms.user, algorithm_category), algorithm_name)
-    file_path = inspect.getfile(algorithm)[:-1]
+    file_path = inspect.getfile(algorithm)
     algorithm_metadata = algorithm().metadata
     output_metadata = algorithm().output_metadata
     algorithm_dict = {}
@@ -246,18 +255,21 @@ def display_algorithm_information(self):
             lines.append(line)
     f.close()
     algorithm_dict['Algorithm'] = ''.join(lines)
-    self.displayAlgorithmWindow = MyAlgorithmDisplay(algorithm_dict)
+    '''self.displayAlgorithmWindow = MyAlgorithmDisplay(algorithm_dict)
     x1, y1, w1, h1 = self.geometry().getRect()
     _, _, w2, h2 = self.displayAlgorithmWindow.geometry().getRect()
     x2 = x1 + w1/2 - w2/2
     y2 = y1 + h1/2 - h2/2
     self.displayAlgorithmWindow.setGeometry(x2, y2, w2, h2)
-    self.displayAlgorithmWindow.exec_()
+    self.displayAlgorithmWindow.exec_()'''
 
 
 def modify_attribute_gui(self, string):
     logging.debug('gui - gui_functions.py - modify_attribute_gui : sender().objectName() '
-                  + str(self.sender().objectName()))
+                  + str(self.sender().objectName()) + ' ; ' + string)
+    
+
+    
     if self.sender().objectName() != "":
         value = self.buttons_lines_dict[str(self.sender().objectName())]
         widget = self.findChildren(QtWidgets.QLineEdit, value[0])
@@ -281,9 +293,9 @@ def modify_attribute_gui(self, string):
                 self.sender().setIcon(icon)
                 value = self.objects_metadata_dict[str(widget[0].objectName())]
                 if isinstance(value, list):
-                    if self.open_file_ext == 'NetCDF Files (*.nc)':
+                    if self.file_ext == 'NetCDF Files (*.nc)':
                         value = value[0]
-                    elif self.open_file_ext == 'NASA Ames Files (*.na)':
+                    elif self.file_ext == 'NASA Ames Files (*.na)':
                         value = value[1]
                 if list_widget is not None:
                     try:
@@ -307,9 +319,9 @@ def modify_attribute_gui(self, string):
                 self.sender().setIcon(icon)
                 value = self.objects_metadata_dict[str(widget[0].objectName())]
                 if isinstance(value, list):
-                    if self.open_file_ext == 'NetCDF Files (*.nc)':
+                    if self.file_ext == 'NetCDF Files (*.nc)':
                         value = value[0]
-                    elif self.open_file_ext == 'NASA Ames Files (*.na)':
+                    elif self.file_ext == 'NASA Ames Files (*.na)':
                         value = value[1]
                 if list_widget is not None:
                     try:
@@ -345,13 +357,15 @@ def update_global_attribute_gui(self, source):
         read_set_attribute_gui(self, self.gm_institution_ln, 'institution', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_source_ln, 'source', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_project_ln, 'project', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_dateCreation_ln, 'date_created', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_history_ln, 'history', self.list_of_global_attributes)
+        dimension_str = ''
+        for key, value in self.list_of_dimensions.items():
+            dimension_str += key + ': ' + str(value) + ' ; '
+        self.va_dimensionList_ln.setPlainText(dimension_str[:-3])
     elif source == 'NASA Ames':
         read_set_attribute_gui(self, self.gm_title_ln, 'MNAME', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_institution_ln, 'ORG', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_source_ln, 'SNAME', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_dateCreation_ln, 'DATE', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_history_ln, 'NCOM', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_history_ln_2, 'SCOM', self.list_of_global_attributes)
         read_set_attribute_gui(self, self.gm_project_ln, 'ONAME', self.list_of_global_attributes)
@@ -359,25 +373,25 @@ def update_global_attribute_gui(self, source):
 
 def update_variable_attribute_gui(self, index=None):
     logging.debug('gui - gui_functions.py - update_variable_attribute_gui : index ' + str(index))
-    if self.tabWidget.currentIndex() == 1 or index == 1:
-        list_object = self.listWidget
+    if self.tab_view.currentIndex() == 1 or index == 1:
+        list_object = self.variable_list
         variables_and_attributes = self.list_of_variables_and_attributes 
         varName_ln = self.va_varName_ln
         longName_ln = self.va_longName_ln
         category_ln = self.va_category_ln
         processor_ln = self.va_egadsProcessor_ln
         units_ln = self.va_units_ln
-        fillValue_ln = self.va_fillValue_ln
+        fillValue_ln = self.va_fill_ln
         dimensions_ln = self.va_dimensions_ln
-    elif self.tabWidget.currentIndex() == 2 or index == 2:
-        list_object = self.new_listwidget
+    elif self.tab_view.currentIndex() == 2 or index == 2:
+        list_object = self.new_variable_list
         variables_and_attributes = self.list_of_new_variables_and_attributes
         varName_ln = self.new_varName_ln
         longName_ln = self.new_longName_ln
         category_ln = self.new_category_ln
         processor_ln = self.new_egadsProcessor_ln
         units_ln = self.new_units_ln
-        fillValue_ln = self.new_fillValue_ln
+        fillValue_ln = self.new_fill_ln
         dimensions_ln = self.new_dimensions_ln
     sublist = variables_and_attributes[str(list_object.currentItem().text())]
     read_set_attribute_gui(self, varName_ln, 'var_name', sublist[1])
@@ -389,7 +403,7 @@ def update_variable_attribute_gui(self, index=None):
     if not fillValue_ln.text():
         read_set_attribute_gui(self, fillValue_ln, 'missing_value', sublist[1])
     dimensions_str = ''
-    for key, value in sublist[2].iteritems():
+    for key, value in sublist[2].items():
         dimensions_str = dimensions_str + str(value) + ' (' + key + '), '
     read_set_attribute_gui(self, dimensions_ln, dimensions_str[:-2])
     
@@ -438,55 +452,52 @@ def new_var_reading(self):
     read_set_attribute_gui(self, self.new_dimensions_ln, dimensions_str[:-2])
 
 
-def statusBar_loading(self):
-    logging.debug('gui - gui_functions.py - statusBar_loading')
-    self.sb_filename_lb = QtWidgets.QLabel()
-    sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-    sizePolicy.setHorizontalStretch(0)
-    sizePolicy.setVerticalStretch(0)
-    sizePolicy.setHeightForWidth(self.sb_filename_lb.sizePolicy().hasHeightForWidth())
-    self.sb_filename_lb.setSizePolicy(sizePolicy)
-    self.sb_filename_lb.setMinimumSize(QtCore.QSize(0, 20))
-    self.sb_filename_lb.setMaximumSize(QtCore.QSize(16777215, 20))
-    font = QtGui.QFont()
-    font.setFamily("font/SourceSansPro-Regular.ttf")
-    font.setPointSize(9)
-    font.setItalic(True)
-    font.setKerning(True)
-    font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-    self.sb_filename_lb.setFont(font)
-    self.sb_filename_lb.setObjectName("sb_filename_lb")
-    self.sb_filename_lb.setText("")
-    self.statusBar.addWidget(self.sb_filename_lb)
-
-
-def statusBar_updating(self, filetype):
-    logging.debug('gui - gui_functions.py - statusBar_updating : filetype ' + str(filetype))
-    if filetype == 'close_file':
-        string = ''
-    else:
-        out_file_base, out_file_ext = ntpath.splitext(ntpath.basename(self.open_file_name))
-        open_file_size = humansize(self, ntpath.getsize(self.open_file_name))
+def status_bar_update(self):
+    logging.debug('gui - gui_functions.py - status_bar_update')
+    if self.file_is_opened:
+        out_file_base, out_file_ext = ntpath.splitext(ntpath.basename(self.file_name))
+        open_file_size = humansize(self, ntpath.getsize(self.file_name))
         filename = out_file_base + out_file_ext
         try:
             conventions = self.list_of_global_attributes['Conventions']
         except KeyError:
             logging.exception('gui - gui_functions.py - statusBar_updating : an exception occured')
             conventions =  'no conventions'
-        if filetype == 'NASA Ames':
+        if self.file_ext == 'NetCDF Files (*.nc)':
+            filetype = 'NetCDF'
+        elif self.file_ext == 'NASA Ames Files (*.na)':
+            filetype = 'NASA Ames'
             conventions = 'NASA Ames file conventions'
         string = filename + '   |   ' + open_file_size + '   |   ' + filetype + '   |   ' + conventions
+    else:
+        string = ''
     self.sb_filename_lb.setText(string)
 
 
 def update_icons_state(self, string=None):
     logging.debug('gui - gui_functions.py - update_icons_state : string ' + str(string))
     if string == 'close_file':
-        icons_initialization(self)
+        self.actionOpenBar.setEnabled(True)
+        self.actionSaveBar.setEnabled(False)
+        self.actionSaveAsBar.setEnabled(False)
+        self.actionCloseBar.setEnabled(False)
+        self.actionAlgorithmsBar.setEnabled(False)
+        
+        
+        self.actionCreatealgorithmBar.setEnabled(False)
+        
+        
+        self.actionCreateVariableBar.setEnabled(False)
+        self.actionDeleteVariableBar.setEnabled(False)
+        self.actionMigrateVariableBar.setEnabled(False)
+        self.actionGlobalAttributesBar.setEnabled(False)
+        self.actionVariableAttributesBar.setEnabled(False)
+        self.actionDisplayBar.setEnabled(False)
+        self.actionPlotBar.setEnabled(False)
     if string == 'open_file':
         self.actionSaveAsBar.setEnabled(True)
         self.actionCloseBar.setEnabled(True)
-        self.actionCreateVariableBar.setEnabled(True)
+        #self.actionCreateVariableBar.setEnabled(True)
         self.actionGlobalAttributesBar.setEnabled(True)
     if string == 'var_reading':
         self.va_button_1.setEnabled(True)
@@ -499,8 +510,8 @@ def update_icons_state(self, string=None):
         self.va_button_2.setIcon(icon)
         self.va_button_3.setIcon(icon)
         self.va_button_4.setIcon(icon)
-        self.actionAlgorithmsBar.setEnabled(True)
-        self.actionDeleteVariableBar.setEnabled(True)
+        #self.actionAlgorithmsBar.setEnabled(True)
+        #self.actionDeleteVariableBar.setEnabled(True)
         self.actionVariableAttributesBar.setEnabled(True)
         self.actionPlotBar.setEnabled(True)
         self.actionDisplayBar.setEnabled(True)
@@ -509,12 +520,12 @@ def update_icons_state(self, string=None):
         self.new_button_2.setEnabled(True)
         self.new_button_3.setEnabled(True)
         self.new_button_4.setEnabled(True)
-        self.actionAlgorithmsBar.setEnabled(True)
-        self.actionDeleteVariableBar.setEnabled(True)
+        #self.actionAlgorithmsBar.setEnabled(True)
+        #self.actionDeleteVariableBar.setEnabled(True)
         self.actionVariableAttributesBar.setEnabled(True)
         self.actionPlotBar.setEnabled(True)
         self.actionDisplayBar.setEnabled(True)
-        self.actionMigrateVariableBar.setEnabled(True)
+        #self.actionMigrateVariableBar.setEnabled(True)
     if string == None:
         self.actionAlgorithmsBar.setEnabled(False)
         self.actionDeleteVariableBar.setEnabled(False)
@@ -522,60 +533,70 @@ def update_icons_state(self, string=None):
         self.actionPlotBar.setEnabled(False)
         self.actionDisplayBar.setEnabled(False)
         self.actionMigrateVariableBar.setEnabled(False)
-        if self.tabWidget.currentIndex() == 1:
-            self.actionAlgorithmsBar.setEnabled(True)
-            self.actionPlotBar.setEnabled(True)
+        if self.tab_view.currentIndex() == 1:
+            '''self.actionAlgorithmsBar.setEnabled(True)
+            self.actionPlotBar.setEnabled(True)'''
             try:
-                if self.listWidget.currentItem().text() == "":
+                if self.variable_list.currentItem().text() == "":
                     self.actionDisplayBar.setEnabled(False)
                     self.actionVariableAttributesBar.setEnabled(False)
                     self.actionDeleteVariableBar.setEnabled(False)
+                    self.actionAlgorithmsBar.setEnabled(False)
+                    self.actionPlotBar.setEnabled(False)
                 else:
                     self.actionDisplayBar.setEnabled(True)
                     self.actionVariableAttributesBar.setEnabled(True)
-                    self.actionDeleteVariableBar.setEnabled(True)
+                    #self.actionDeleteVariableBar.setEnabled(True)
+                    #self.actionAlgorithmsBar.setEnabled(True)
+                    self.actionPlotBar.setEnabled(True)
             except AttributeError:
                 self.actionDisplayBar.setEnabled(False)
                 self.actionVariableAttributesBar.setEnabled(False)
                 self.actionDeleteVariableBar.setEnabled(False)
-        elif self.tabWidget.currentIndex() == 2:
-            self.actionAlgorithmsBar.setEnabled(True)
-            self.actionPlotBar.setEnabled(True)
+                self.actionAlgorithmsBar.setEnabled(False)
+                self.actionPlotBar.setEnabled(False)
+        elif self.tab_view.currentIndex() == 2:
+            '''self.actionAlgorithmsBar.setEnabled(True)
+            self.actionPlotBar.setEnabled(True)'''
             try:
-                if self.new_listwidget.currentItem().text() == "":
+                if self.new_variable_list.currentItem().text() == "":
                     self.actionDisplayBar.setEnabled(False)
                     self.actionVariableAttributesBar.setEnabled(False)
                     self.actionDeleteVariableBar.setEnabled(False)
                     self.actionMigrateVariableBar.setEnabled(False)
+                    self.actionAlgorithmsBar.setEnabled(False)
+                    self.actionPlotBar.setEnabled(False)
                 else:
                     self.actionDisplayBar.setEnabled(True)
                     self.actionVariableAttributesBar.setEnabled(True)
-                    self.actionDeleteVariableBar.setEnabled(True)
-                    self.actionMigrateVariableBar.setEnabled(True)
+                    #self.actionDeleteVariableBar.setEnabled(True)
+                    #self.actionMigrateVariableBar.setEnabled(True)
+                    #self.actionAlgorithmsBar.setEnabled(True)
+                    self.actionPlotBar.setEnabled(True)
             except AttributeError:
                 self.actionDisplayBar.setEnabled(False)
                 self.actionVariableAttributesBar.setEnabled(False)
                 self.actionDeleteVariableBar.setEnabled(False)
                 self.actionMigrateVariableBar.setEnabled(False)
+                self.actionAlgorithmsBar.setEnabled(False)
+                self.actionPlotBar.setEnabled(False)
 
 
 def clear_gui(self, part=None):
     logging.debug('gui - gui_functions.py - clear_gui : part ' + str(part))
     if part == None or part == 'global':
-        self.gm_filename_ln.setText('')
         self.gm_title_ln.setText("")
         self.gm_institution_ln.setText("")
         self.gm_source_ln.setText("")
         self.gm_project_ln.setText("")
-        self.gm_dateCreation_ln.setText("")
         self.gm_history_ln.setPlainText("")
-        update_compatibility_label(self, 'clear')
+        self.va_dimensionList_ln.setPlainText('')
     if part == None or part == 'variable':
         self.va_varName_ln.setText("")
         self.va_longName_ln.setText("")
         self.va_category_ln.setText("")
         self.va_units_ln.setText("")
-        self.va_fillValue_ln.setText("")
+        self.va_fill_ln.setText("")
         self.va_dimensions_ln.setText("")
         self.va_egadsProcessor_ln.setPlainText("")
     if part == None or part == 'new_variable':
@@ -583,36 +604,16 @@ def clear_gui(self, part=None):
         self.new_longName_ln.setText("")
         self.new_category_ln.setText("")
         self.new_units_ln.setText("")
-        self.new_fillValue_ln.setText("")
+        self.new_fill_ln.setText("")
         self.new_dimensions_ln.setText("")
         self.new_egadsProcessor_ln.setPlainText("")
     if part == None:
-        self.listWidget.clear()
-        self.new_listwidget.clear()
- 
-       
-def update_compatibility_label(self, string=None):
-    logging.debug('gui - gui_functions.py - update_compatibility_label : string ' + str(string))
-    if string is None:
-        result = check_compatibility_netcdf(self, self.list_of_global_attributes, self.list_of_variables_and_attributes)
-        sublist = self.compatibility_level[result]
-        self.gm_compatibility_lb.setEnabled(True)
-        self.gm_compatibility_lb.setVisible(True)
-        self.gm_compatibility_lb.setPixmap(QtGui.QPixmap(sublist[1]))
-        self.gm_details_lb.setText(sublist[2])
-        self.gm_button_7.setEnabled(sublist[3])
-        self.gm_button_7.setVisible(sublist[3])
-    else:
-        self.gm_compatibility_lb.setEnabled(False)
-        self.gm_compatibility_lb.setVisible(False)
-        self.gm_details_lb.setText('')
-        self.gm_button_7.setEnabled(False)
-        self.gm_button_7.setVisible(False)
-        
+        self.variable_list.clear()
+        self.new_variable_list.clear()
+   
         
 def read_set_attribute_gui(self, gui_object, attr_name, attr_dict=None):
-    logging.debug('gui - gui_functions.py - read_set_attribute_gui : gui_object ' + str(gui_object)
-                  + ', attr_name ' + str(attr_name) + ', attr_dict ' + str(attr_dict))
+    logging.debug('gui - gui_functions.py - read_set_attribute_gui')
     if attr_dict is not None:
         try:
             value = attr_dict[attr_name]
