@@ -38,32 +38,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         objects_initialization(self)
         algorithm_list_menu_initialization(self)
         self.make_window_title()
-        
-        self.test_file()
-        
-        
         self.check_egads_version()
         logging.info('gui - mainwindow.py - MainWindow ready')
-        
-        
-    
-    
-    def test_file(self):
-        file_in = 'D:\\Temp\\dt_global_allsat_phy_l4_20180118_20180516_with_fake.nc'
-        #file_in = 'D:\\Temp\\grepv1_gl1_201601.nc'
-        #file_in = 'C:\\Users\\Olivier\\Downloads\\MSL_Serie_MERGED_Global_AVISO_GIA_Adjust_Filter2m_with_fake.nc'
-        self.file_ext = 'NetCDF Files (*.nc)'
-        self.file_name = file_in
-        self.file_is_opened = True
-        netcdf_gui_initialization(self)
-        netcdf_reading(self)
-        update_icons_state(self, 'open_file')
-        status_bar_update(self)
-        
-        
-        
-        
-    
     
     @QtCore.pyqtSlot()
     def on_actionExit_triggered(self):
