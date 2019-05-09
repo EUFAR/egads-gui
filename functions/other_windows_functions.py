@@ -1,48 +1,47 @@
 import logging
-import webbrowser
 import numpy
 import datetime
+import webbrowser
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_infowindow import Ui_infoWindow
 from ui.Ui_displaywindow import Ui_displayWindow
-#from ui.Ui_logwindow import Ui_Changelog
 from ui.Ui_aboutlogwindow import Ui_aboutlogWindow
-#from ui.Ui_addcategory import Ui_Addcategory
-#from ui.Ui_fillwindow import Ui_fillWindow
-#from ui.Ui_filenamewindow import Ui_Addfilename
-#from ui.Ui_unitwindow import Ui_unitWindow
-#from ui.Ui_presavewindow import Ui_presaveWindow
+from ui.Ui_addcategorywindow import Ui_Addcategory
+from ui.Ui_fillwindow import Ui_fillWindow
+from ui.Ui_filenamewindow import Ui_Addfilename
+from ui.Ui_unitwindow import Ui_unitWindow
+# from ui.Ui_presavewindow import Ui_presaveWindow
 from ui.Ui_optionwindow import Ui_optionWindow
 from ui.Ui_waitwindow import Ui_waitWindow
-#from ui.Ui_downloadwindow import Ui_downloadWindow
-#from functions.thread_functions import CheckEGADSGuiUpdateOnline
-from functions.gui_elements import VerticalLabel
+from ui.Ui_downloadwindow import Ui_downloadWindow
+from functions.thread_functions import CheckEGADSGuiUpdateOnline
 from functions.waitingspinnerwidget import QtWaitingSpinner
+from ui._version import _gui_version
 
  
 class MyInfo(QtWidgets.QDialog, Ui_infoWindow):
-    def __init__(self, infoText):
-        logging.debug('gui - other_window_functions.py - MyInfo - __init__ : infoText ' + str(infoText))
+    def __init__(self, info_text):
+        logging.debug('gui - other_windows_functions.py - MyInfo - __init__ : infoText ' + str(info_text))
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        self.iw_label_1.setText(infoText)
+        self.iw_label_1.setText(info_text)
         self.iw_okButton.clicked.connect(self.closeWindow)
-        logging.info('gui - other_window_functions.py - MyInfo ready')
+        logging.info('gui - other_windows_functions.py - MyInfo ready')
 
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyInfo - closeWindow')
+        logging.debug('gui - other_windows_functions.py - MyInfo - closeWindow')
         self.close()
 
 
 class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
     def __init__(self, var_name, var_units, fill_value, var_values, dimensions):
-        logging.debug('gui - other_window_functions.py - MyDisplay - __init__')
+        logging.debug('gui - other_windows_functions.py - MyDisplay - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.fill_value = fill_value
         self.var = var_values
         self.dimensions = dimensions
-        self.splitter.setSizes([100,200])
+        self.splitter.setSizes([100, 200])
         self.dw_line_1.setText(var_name)
         self.dw_line_2.setText(var_units)
         self.dw_okButton.clicked.connect(self.closeWindow)
@@ -55,7 +54,7 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
         self.dw_label_5.deleteLater()
         self.populate_dimensions()
         self.populate_table()
-        logging.info('gui - other_window_functions.py - MyDisplay ready')
+        logging.info('gui - other_windows_functions.py - MyDisplay ready')
 
     def connect_scrollbars(self):
         h_scrollbar = self.dw_table.horizontalScrollBar()
@@ -73,7 +72,7 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                 try:     
                     if not self.dw_table.item(y, x):
                         self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[y, x])))
-                except (IndexError):
+                except IndexError:
                     pass
 
     def populate_dimensions(self):
@@ -83,7 +82,7 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
         self.dw_line_3.setText(dimensions_str[:-2])
         
     def populate_table(self):
-        logging.debug('gui - other_window_functions.py - MyDisplay - populate_table')
+        logging.debug('gui - other_windows_functions.py - MyDisplay - populate_table')
         if self.fill_value is not None:
             try:
                 self.var[self.var == self.fill_value] = numpy.nan
@@ -116,6 +115,7 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
 
     def populate_headers(self):
         dim_num = len(self.var.shape)
+        row_size, col_size = None, None
         if dim_num == 1:
             col_size, row_size = self.var.shape[0], 1
             self.dw_table.setColumnCount(col_size)
@@ -128,8 +128,9 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                     if 'since' in units:
                         if 'days' in units or 'day' in units:
                             date = units[units.index('since') + 6:]
-                            value['values'] = [str((datetime.datetime(int(date[:4]),int(date[5:7]),int(date[8:10]),0,0)
-                                        + datetime.timedelta(i - 1)).strftime("%Y-%m-%d")) for i in value['values']]
+                            value['values'] = [str((datetime.datetime(int(date[:4]), int(date[5:7]), int(date[8:10]),
+                                                                      0, 0) + datetime.timedelta(i - 1)).strftime(
+                                "%Y-%m-%d")) for i in value['values']]
                 elif dim.lower() in ['longitude', 'lon', 'long']:
                     self.dw_label_4.setText('Longitude')
                 elif dim.lower() in ['latitude', 'lat']:
@@ -184,8 +185,7 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                     self.dw_table.setRowCount(row_size)
         elif dim_num == 3:
             time_in, lon_in, lat_in = False, False, False
-            time_name = None
-            lon_name = None
+            time_name, lon_name = None, None
             for dim, value in self.dimensions.items():
                 if value['length'] == 1:
                     self.var = numpy.squeeze(self.var, value['axis'])
@@ -236,8 +236,7 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
         return row_size, col_size
             
     def set_row_label(self, text):
-        self.dw_label_5 = VerticalLabel()
-        self.dw_label_5
+        self.dw_label_5 = QtWidgets.QLabel()
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(9)
@@ -245,135 +244,176 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.dw_label_5.setFont(font)
         self.dw_label_5.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "    margin-bottom: 5px;\n"
-        "}")
+                                      "    color: rgb(45,45,45);\n"
+                                      "    margin-bottom: 5px;\n"
+                                      "}")
         self.dw_label_5.setText(text)
         self.dw_label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.dw_label_5.setObjectName("dw_label_5")
         self.gridLayout_2.addWidget(self.dw_label_5, 1, 0, 1, 1)
 
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyDisplay - closeWindow')
+        logging.debug('gui - other_windows_functions.py - MyDisplay - closeWindow')
         self.close()
     
     
 class MyAbout(QtWidgets.QDialog, Ui_aboutlogWindow):
     def __init__(self, text):
-        logging.info('gui - other_window_functions.py - MyAbout - __init__')
+        logging.info('gui - other_windows_functions.py - MyAbout - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.browser_1.setHtml(text)
         self.browser_2.setPlainText(open("documentation/changelog.txt").read())
         self.button.clicked.connect(self.closeWindow)
-        self.splitter.setSizes([170,130])
+        self.splitter.setSizes([170, 130])
 
     def closeWindow(self):
-        logging.info('gui - other_window_functions.py - MyAbout - closeWindow')
+        logging.info('gui - other_windows_functions.py - MyAbout - closeWindow')
         self.close()
 
 
-'''class MyCategory(QtWidgets.QDialog, Ui_Addcategory):
+class MyCategory(QtWidgets.QDialog, Ui_Addcategory):
     def __init__(self):
-        logging.debug('gui - other_window_functions.py - MyCategory - __init__')
+        logging.debug('gui - other_windows_functions.py - MyCategory - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        self.ac_cancelButton.clicked.connect(self.closeWindow)
+        self.ac_cancelButton.clicked.connect(self.close_window)
         self.ac_submitButton.clicked.connect(self.submitBox)
-        logging.info('gui - other_window_functions.py - MyCategory ready')
-        
-    def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyCategory - closeWindow')
+        logging.info('gui - other_windows_functions.py - MyCategory ready')
+
+    def close_window(self):
+        logging.debug('gui - other_windows_functions.py - MyCategory - closeWindow')
         self.close()
 
     def submitBox(self):
-        logging.debug('gui - other_window_functions.py - MyCategory - submitBox')
-        self.accept() '''
+        logging.debug('gui - other_windows_functions.py - MyCategory - submitBox')
+        self.accept()
         
         
-'''class MyFilename(QtWidgets.QDialog, Ui_Addfilename):
+class MyFilename(QtWidgets.QDialog, Ui_Addfilename):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
-        logging.debug('gui - other_window_functions.py - MyFilename - __init__')
+        logging.debug('gui - other_windows_functions.py - MyFilename - __init__')
         self.setupUi(self)
         self.ac_cancelButton.clicked.connect(self.closeWindow)
         self.ac_submitButton.clicked.connect(self.submitBox)
-        logging.info('gui - other_window_functions.py - MyFilename ready')
-        
+        logging.info('gui - other_windows_functions.py - MyFilename ready')
+
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyFilename - closeWindow')
+        logging.debug('gui - other_windows_functions.py - MyFilename - closeWindow')
         self.close()
 
     def submitBox(self):
-        logging.debug('gui - other_window_functions.py - MyFilename - submitBox')
-        self.accept()     '''   
+        logging.debug('gui - other_windows_functions.py - MyFilename - submitBox')
+        self.accept()
+
+
+class MyOverwriteFilename(QtWidgets.QDialog, Ui_Addfilename):
+    def __init__(self, old_filename, category):
+        QtWidgets.QWidget.__init__(self)
+        logging.debug('gui - other_windows_functions.py - MyOverwriteFilename - __init__')
+        self.setupUi(self)
+        self.old_filename = old_filename
+        self.ac_label.setText('A file with the same name already exists in the ' + category + ' folder. You can '
+                              + 'overwrite the file, or choose another name.')
+        self.ac_submitButton.setText('Overwrite')
+        self.ac_line.setText(self.old_filename)
+        self.ac_line.textChanged.connect(self.check_filename)
+        self.ac_cancelButton.clicked.connect(self.closeWindow)
+        self.ac_submitButton.clicked.connect(self.submitBox)
+        logging.info('gui - other_windows_functions.py - MyOverwriteFilename ready')
+
+    def check_filename(self):
+        new_filename = str(self.ac_line.text())
+        if self.old_filename == new_filename or self.old_filename == new_filename + '.py':
+            self.ac_submitButton.setText('Overwrite')
+        else:
+            self.ac_submitButton.setText('Submit')
+
+    def closeWindow(self):
+        logging.debug('gui - other_windows_functions.py - MyOverwriteFilename - closeWindow')
+        self.close()
+
+    def submitBox(self):
+        logging.debug('gui - other_windows_functions.py - MyOverwriteFilename - submitBox')
+        self.accept()
         
         
-'''class MyFill(QtWidgets.QDialog, Ui_fillWindow):
+class MyFill(QtWidgets.QDialog, Ui_fillWindow):
     def __init__(self):
-        logging.debug('gui - other_window_functions.py - MyFill - __init__')
+        logging.debug('gui - other_windows_functions.py - MyFill - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        self.fw_cancelButton.clicked.connect(self.cancelWindow)
+        self.fw_cancelButton.clicked.connect(self.cancel_window)
+        self.fw_okButton.clicked.connect(self.closeWindow)
         self.cancel = False
         self.fw_cancelButton.setFocus(True)
-        logging.info('gui - other_window_functions.py - MyFill ready')
+        logging.info('gui - other_windows_functions.py - MyFill ready')
 
-    def cancelWindow(self):
-        logging.debug('gui - other_window_functions.py - MyFill - cancelWindow')
+    def cancel_window(self):
+        logging.debug('gui - other_windows_functions.py - MyFill - cancel_window')
         self.cancel = True
-        self.close()'''
+        self.closeWindow()
+
+    def closeWindow(self):
+        logging.debug('gui - other_windows_functions.py - MyFill - closeWindow')
+        self.close()
         
         
-'''class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
+class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
     def __init__(self, units_list):
-        logging.debug('gui - other_window_functions.py - MyUnit - __init__ : unit_list ' + str(unit_list))
+        logging.debug('gui - other_windows_functions.py - MyUnit - __init__ : unit_list ' + str(units_list))
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.units_list = units_list
         self.uw_label.setText(self.prepare_text())
         self.uw_cancelButton.clicked.connect(self.closeWindow)
         self.uw_okButton.clicked.connect(self.submitBox)
-        logging.info('gui - other_window_functions.py - MyUnit ready')
+        logging.info('gui - other_windows_functions.py - MyUnit ready')
     
     def prepare_text(self):
-        logging.debug('gui - other_window_functions.py - MyUnit - prepare_text')
+        logging.debug('gui - other_windows_functions.py - MyUnit - prepare_text')
         if len(self.units_list) > 1:
             text = ('<p>Too handle units properly, EGADS must validate and, probably, rewrite input and out'
                     + 'put units. Please check the <b>proposals</b> made by EGADS, and click Continue if you '
                     + 'are agree with the results. if <i>dimensionless</i> is proposed, then EGADS coul'
                     + 'dn\'t validate the unit. In that case, try to modify it to make it understandable '
-                    + 'by EGADS.</p><ul><li>Inputs:<ul>')
+                    + 'by EGADS.</p><ul><li><u>Inputs:</u><ul>')
             for sublist in self.units_list:
                 if sublist[3] == 'input':
-                    text += '<li>' + sublist[0] + ':&nbsp;&nbsp;&nbsp;' + sublist[1] + '&nbsp;&nbsp;&nbsp;->&nbsp;&nbsp;&nbsp;<b>' + sublist[2] + '</b></li>'
-            text += '</ul></li><br><li>Outputs:<ul>'
+                    text += '<li>' + sublist[0] + ':&nbsp;&nbsp;&nbsp;' + sublist[1] + '&nbsp;&nbsp;&nbsp;->&nbsp;' \
+                                                                                       '&nbsp;&nbsp;<b>' + sublist[2]\
+                            + '</b></li>'
+            text += '</ul></li><br><li><u>Outputs:</u><ul>'
             for sublist in self.units_list:
                 if sublist[3] == 'output':
-                    text += '<li>' + sublist[0] + ':&nbsp;&nbsp;&nbsp;' + sublist[1] + '&nbsp;&nbsp;&nbsp;->&nbsp;&nbsp;&nbsp;<b>' + sublist[2] + '</b></li>'
+                    text += '<li>' + sublist[0] + ':&nbsp;&nbsp;&nbsp;' + sublist[1] + '&nbsp;&nbsp;&nbsp;->&nbsp;' \
+                                                                                       '&nbsp;&nbsp;<b>' + sublist[2]\
+                            + '</b></li>'
             text += '</ul></li></ul>'
         else:
             text = ('<p>Too handle units properly, EGADS must validate units in the current window. '
                     + 'Please check the <b>proposal</b> made by EGADS, and click Continue if you '
                     + 'are agree with the results. if <i>dimensionless</i> is proposed, then EGADS coul'
                     + 'dn\'t validate the unit. In that case, try to modify it to make it understandable '
-                    + 'by EGADS.</p><p>Proposal:<br>')
-            text += ('&nbsp;&nbsp;&nbsp;&nbsp;' + self.units_list[0][0] + ':&nbsp;&nbsp;&nbsp;&nbsp;' + self.units_list[0][1] 
-                     + '&nbsp;&nbsp;&nbsp;&nbsp;->&nbsp;&nbsp;&nbsp;&nbsp;<b>' + self.units_list[0][2] + '</b></p>')
+                    + 'by EGADS.</p><p><u>Proposal:</u><br>')
+            text += ('&nbsp;&nbsp;&nbsp;&nbsp;' + self.units_list[0][0] + ':&nbsp;&nbsp;&nbsp;&nbsp;' +
+                     self.units_list[0][1] + '&nbsp;&nbsp;&nbsp;&nbsp;->&nbsp;&nbsp;&nbsp;&nbsp;<b>' +
+                     self.units_list[0][2] + '</b></p>')
         return text
     
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyUnit - closeWindow')
+        logging.debug('gui - other_windows_functions.py - MyUnit - closeWindow')
         self.close()
 
     def submitBox(self):
-        logging.debug('gui - other_window_functions.py - MyUnit - submitBox')
+        logging.debug('gui - other_windows_functions.py - MyUnit - submitBox')
         self.accept()  
-        '''
+
         
 '''class MyWarning(QtWidgets.QDialog, Ui_presaveWindow):
     def __init__(self, button_string, title_string):
-        logging.debug('gui - other_window_functions.py - MyWarning - __init__ : button_string ' + str(button_string)
+        logging.debug('gui - other_windows_functions.py - MyWarning - __init__ : button_string ' + str(button_string)
                       + ', title_string ' + str(title_string))
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
@@ -383,10 +423,10 @@ class MyAbout(QtWidgets.QDialog, Ui_aboutlogWindow):
             widget.clicked.connect(lambda: self.closeWindow())
         self.iw_nosaveButton.setText(button_string + " without saving")
         self.setWindowTitle(title_string)
-        logging.info('gui - other_window_functions.py - MyWarning ready')
+        logging.info('gui - other_windows_functions.py - MyWarning ready')
 
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyWarning - closeWindow : sender().objectName() '
+        logging.debug('gui - other_windows_functions.py - MyWarning - closeWindow : sender().objectName() '
                       + str(self.sender().objectName()))
         self.buttonName = self.sender().objectName()
         self.close()'''
@@ -394,87 +434,78 @@ class MyAbout(QtWidgets.QDialog, Ui_aboutlogWindow):
 
 class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
     def __init__(self, config_dict):
-        logging.info('gui - other_window_functions.py - MyOptions - __init__ ')
+        logging.info('gui - other_windows_functions.py - MyOptions - __init__ ')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.config_dict = config_dict
-        itemDelegate = QtWidgets.QStyledItemDelegate()
-        self.combobox_1.setItemDelegate(itemDelegate)
+        self.combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.ok_button.clicked.connect(self.save_config_dict)
         self.cancel_button.clicked.connect(self.closeWindow)
-        #self.check_button.clicked.connect(self.check_gui_update)
+        self.check_button.clicked.connect(self.check_gui_update)
         self.cancel = True
         self.read_config_dict()
 
     def read_config_dict(self):
-        logging.debug('gui - other_window_functions.py - MyOptions - read_config_dict')
+        logging.debug('gui - other_windows_functions.py - MyOptions - read_config_dict')
         self.combobox_1.setCurrentIndex(self.combobox_1.findText(self.config_dict.get('LOG', 'level')))
         self.line_1.setText(self.config_dict.get('LOG', 'path'))
         self.checkbox_1.setChecked(self.config_dict.getboolean('OPTIONS', 'check_update'))
 
-
-    '''def check_gui_update(self):
-        logging.debug('gui - other_window_functions.py - MyOptions - check_gui_update')
-        self.check_gui_update = CheckEGADSGuiUpdateOnline()
-        self.check_gui_update.start()
-        self.check_gui_update.finished.connect(self.parse_egads_gui_update)
+    def check_gui_update(self):
+        logging.debug('gui - other_windows_functions.py - MyOptions - check_gui_update')
+        self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version)
+        self.check_gui_update_thread.start()
+        self.check_gui_update_thread.finished.connect(self.parse_egads_gui_update)
         
     def parse_egads_gui_update(self, val):
-        logging.debug('gui - other_window_functions.py - MyOptions - parse_egads_gui_update - val ' + str(val))
+        logging.debug('gui - other_windows_functions.py - MyOptions - parse_egads_gui_update - val ' + str(val))
         if val != 'no new version':
             self.updade_window = MyUpdate(val)
-            x1, y1, w1, h1 = self.geometry().getRect()
-            _, _, w2, h2 = self.updade_window.geometry().getRect()
-            x2 = x1 + w1/2 - w2/2
-            y2 = y1 + h1/2 - h2/2
-            self.updade_window.setGeometry(x2, y2, w2, h2)
-            self.updade_window.setModal(True)
-            self.updade_window.exec_()'''
-
+            self.updade_window.exec_()
 
     def save_config_dict(self):
-        logging.debug('gui - other_window_functions.py - MyOptions - save_config_dict')
+        logging.debug('gui - other_windows_functions.py - MyOptions - save_config_dict')
         self.cancel = False
-        self.config_dict.set('LOG','level',self.ow_comboBox_1.currentText())
-        self.config_dict.set('LOG','path', self.ow_lineEdit.text())
-        self.config_dict.set('OPTIONS','check_update', self.ow_checkBox_1.isChecked())
+        self.config_dict.set('LOG', 'level', self.ow_comboBox_1.currentText())
+        self.config_dict.set('LOG', 'path', self.ow_lineEdit.text())
+        self.config_dict.set('OPTIONS', 'check_update', self.ow_checkBox_1.isChecked())
         self.closeWindow()
 
     def closeWindow(self):
-        logging.info('gui - other_window_functions.py - MyOptions - closeWindow')
+        logging.info('gui - other_windows_functions.py - MyOptions - closeWindow')
         self.close()
 
 
-'''class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):
+class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):
     def __init__(self, url):
-        logging.debug('gui - other_window_functions.py - MyUpdate - __init__ ')
+        logging.debug('gui - other_windows_functions.py - MyUpdate - __init__ ')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.url = url
         self.dw_okButton.clicked.connect(self.closeWindow)
         self.dw_downloadButton.clicked.connect(self.download_file)
         self.dw_downloadButton_2.clicked.connect(self.visit_github)
-        logging.info('gui - other_window_functions.py - MyUpdate ready')
+        logging.info('gui - other_windows_functions.py - MyUpdate ready')
 
     def visit_github(self):
-        webbrowser.open('https://github.com/eufarn7sp/egads-gui')
-
+        webbrowser.open('https://github.com/EUFAR/egads-gui/tree/Lineage')
 
     def download_file(self):
-        logging.debug('gui - other_window_functions.py - MyUpdate - download_file')
+        logging.debug('gui - other_windows_functions.py - MyUpdate - download_file')
         webbrowser.open(self.url)
 
-
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyUpdate - closeWindow')
-        self.close()'''
+        logging.debug('gui - other_windows_functions.py - MyUpdate - closeWindow')
+        self.close()
 
 
 class MyWait(QtWidgets.QDialog, Ui_waitWindow):
-    def __init__(self):
-        logging.debug('gui - other_window_functions.py - MyWait - __init__')
+    def __init__(self, info_text):
+        logging.debug('gui - other_windows_functions.py - MyWait - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
+        self.label.setText(info_text)
+        self.spinner = None
         self.setup_spinner()
         
     def setup_spinner(self):
@@ -491,10 +522,6 @@ class MyWait(QtWidgets.QDialog, Ui_waitWindow):
         self.spinner.setColor(QtGui.QColor(45, 45, 45))
         self.spinner.start()
 
-    
-
     def closeWindow(self):
-        logging.debug('gui - other_window_functions.py - MyWait - closeWindow')
+        logging.debug('gui - other_windows_functions.py - MyWait - closeWindow')
         self.close()
-
- 

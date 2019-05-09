@@ -12,7 +12,6 @@ from functions.gui_functions import update_variable_attribute_gui
 from functions.material_functions import add_global_attributes_to_buttons
 
 
-
 def netcdf_reading(self):
     logging.debug('gui - reading_functions.py - netcdf_reading')
     clear_gui(self)
@@ -25,14 +24,19 @@ def netcdf_reading(self):
         dimensions = self.opened_file.get_dimension_list(str(var))
         list_of_var_attributes = self.opened_file.get_attribute_list(str(var))
         list_of_var_attributes['var_name'] = str(var)
-        list_of_var_attributes = add_correct_units(self, list_of_var_attributes)
+        list_of_var_attributes = add_correct_units(list_of_var_attributes)
         try:
             egads_instance = self.opened_file.read_variable(var)
             self.list_of_variables_and_attributes[var] = [var, list_of_var_attributes, dimensions, egads_instance]
-        except Exception:
-            self.list_of_unread_variables.append(var)
-            logging.exception('gui - reading_functions.py - : an error occured during the re'
-                              + 'ading of a variable, variable ' + str(var))
+        except Exception as e:
+            if 'dimensionality' in str(e):
+                reason = 'unit was not handled properly by EGADS'
+            else:
+                reason = 'no reason detected'
+
+            self.list_of_unread_variables[var] = reason
+            logging.exception('gui - reading_functions.py - : an error occured during the reading of a variable, '
+                              'variable ' + str(var))
     update_global_attribute_gui(self, 'NetCDF')
     self.variable_list.addItems(list_of_variables)
     self.variable_list.itemClicked.connect(lambda: var_reading(self))
@@ -52,7 +56,8 @@ def nasaames_reading(self):
     logging.debug('gui - reading_functions.py - nasaames_reading : open_file_name ' + str(self.open_file_name))
     clear_gui(self)
     self.opened_file = input.NasaAmes(self.open_file_name, 'r')
-    list_of_variables = sorted(self.opened_file.get_variable_list(vartype='independant') + self.opened_file.get_variable_list(vartype='main'))
+    list_of_variables = sorted(self.opened_file.get_variable_list(vartype='independant') +
+                               self.opened_file.get_variable_list(vartype='main'))
     list_of_attributes = self.opened_file.get_attribute_list()
     self.list_of_global_attributes = {}
     for attribute in list_of_attributes:
@@ -74,7 +79,7 @@ def nasaames_reading(self):
             except ValueError:
                 list_of_var_attributes[attribute] = self.opened_file.get_attribute_value(attribute, var, 'independant')
         list_of_var_attributes['var_name'] = str(var)
-        list_of_var_attributes = add_correct_units(self, list_of_var_attributes)
+        list_of_var_attributes = add_correct_units(list_of_var_attributes)
         egads_instance = self.opened_file.read_variable(var)
         self.list_of_variables_and_attributes[var] = [var, list_of_var_attributes, dimensions, egads_instance]
     out_file_base, out_file_ext = ntpath.splitext(ntpath.basename(self.open_file_name))
@@ -95,16 +100,39 @@ def var_reading(self):
     logging.debug('gui - reading_functions.py - var_reading : variable ' + str(self.variable_list.currentItem().text()))
     update_icons_state(self, 'var_reading')
     clear_gui(self, 'variable')
-    all_lines_edit = self.tab_2.findChildren(QtWidgets.QLineEdit)
-    for widget in all_lines_edit:
-        widget.setEnabled(False)
-    all_text_edit = self.tab_2.findChildren(QtWidgets.QPlainTextEdit)
-    for widget in all_text_edit:
-        widget.setEnabled(False)
-    update_variable_attribute_gui(self, 1)
+    if len(self.variable_list.selectedItems()) == 1:
+        all_lines_edit = self.tab_2.findChildren(QtWidgets.QLineEdit)
+        for widget in all_lines_edit:
+            widget.setEnabled(False)
+        all_text_edit = self.tab_2.findChildren(QtWidgets.QPlainTextEdit)
+        for widget in all_text_edit:
+            widget.setEnabled(False)
+        update_variable_attribute_gui(self, 1)
     
-    
-def add_correct_units(self, attr_list, egads_instance=None):
+
+def add_new_variable_gui(self):
+    logging.debug('gui - gui_functions.py - add_new_variable_gui')
+    self.tab_view.insertTab(2, self.tab_3, 'New variables')
+    self.new_variable_list.setEnabled(True)
+    self.new_variable_list.itemClicked.connect(lambda: new_var_reading(self))
+
+
+def new_var_reading(self):
+    logging.debug('gui - gui_functions.py - new_var_reading : variable ' + str(self.new_variable_list.currentItem(
+    ).text()))
+    update_icons_state(self, 'new_var_reading')
+    clear_gui(self, 'new_variable')
+    if len(self.new_variable_list.selectedItems()) == 1:
+        all_lines_edit = self.tab_3.findChildren(QtWidgets.QLineEdit)
+        for widget in all_lines_edit:
+            widget.setEnabled(False)
+        all_text_edit = self.tab_3.findChildren(QtWidgets.QPlainTextEdit)
+        for widget in all_text_edit:
+            widget.setEnabled(False)
+        update_variable_attribute_gui(self, 2)
+
+
+def add_correct_units(attr_list, egads_instance=None):
     logging.debug(' gui - reading_functions.py - add_correct_units')
     if "units" not in attr_list.keys():
         if "Units" in attr_list.keys():
@@ -114,7 +142,7 @@ def add_correct_units(self, attr_list, egads_instance=None):
         elif "unit" in attr_list.keys():
             attr_list["units"] = attr_list["unit"]
         else:
-            if isinstance(egads_instance, EgadsData) and egads_instance != None:
+            if isinstance(egads_instance, EgadsData) and egads_instance is not None:
                 try:
                     attr_list["units"] = egads_instance.units
                 except AttributeError:
@@ -122,5 +150,3 @@ def add_correct_units(self, attr_list, egads_instance=None):
             else:
                 attr_list["units"] = 'no units'
     return attr_list
-
-    

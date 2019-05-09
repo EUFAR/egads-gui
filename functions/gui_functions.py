@@ -4,7 +4,8 @@ import os
 import inspect
 import logging
 from PyQt5 import QtWidgets, QtCore, QtGui
-#from algorithm_window_functions import MyAlgorithmDisplay
+from functions.algorithm_windows_functions import MyAlgorithmDisplay
+from functions.utils import humansize
     
 
 def gui_initialization(self):
@@ -13,6 +14,9 @@ def gui_initialization(self):
     self.actionSeparator2.setText('')
     self.actionSeparator3.setText('')
     self.actionSeparator4.setText('')
+    self.actionSeparator5.setText('')
+    self.actionSeparator5.setVisible(False)
+    self.actionUpdateBar.setVisible(False)
     self.tab_view.removeTab(2)
     self.tab_view.setEnabled(False)
     self.tab_view.setVisible(False)
@@ -33,7 +37,6 @@ def gui_initialization(self):
                                       "}")
     self.statusBar.addWidget(self.sb_filename_lb)
     self.actionOpenBar.setEnabled(True)
-    self.actionSaveBar.setEnabled(False)
     self.actionSaveAsBar.setEnabled(False)
     self.actionCloseBar.setEnabled(False)
     self.actionAlgorithmsBar.setEnabled(False)
@@ -64,7 +67,7 @@ def algorithm_list_menu_initialization(self):
     icon1 = QtGui.QIcon()
     icon1.addPixmap(QtGui.QPixmap("icons/new_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     icon2 = QtGui.QIcon()
-    icon2   .addPixmap(QtGui.QPixmap("icons/create_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    icon2.addPixmap(QtGui.QPixmap("icons/create_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     algorithm_path = egads.__path__[0] + '/algorithms'
     user_algorithm_path = egads.__path__[0] + '/algorithms/user'
     folder_list = []
@@ -73,7 +76,7 @@ def algorithm_list_menu_initialization(self):
     for item in os.walk(algorithm_path):
         index = item[0].find('algorithms')
         if item[0][index + 11:]:
-            if not 'file_templates' in item[0][index + 11:] and not 'user' in item[0][index + 11:]:
+            if 'file_templates' not in item[0][index + 11:] and 'user' not in item[0][index + 11:]:
                 folder_list.append(item[0][index + 11:])
     for folder in folder_list:
         if '__pycache__' not in folder:
@@ -88,7 +91,7 @@ def algorithm_list_menu_initialization(self):
     for item in os.walk(user_algorithm_path):
         index = item[0].find('user')
         if item[0][index + 5:]:
-            if not 'file_templates' in item[0][index + 5:]:
+            if 'file_templates' not in item[0][index + 5:]:
                 folder_list.append(item[0][index + 5:])  
     for folder in folder_list:
         if '__pycache__' not in folder:
@@ -185,21 +188,16 @@ def nasaames_gui_initialization(self):
     self.va_button_3.setVisible(False)
      
 
-
-
-
-
-    
-
 def display_algorithm_information(self):
     logging.debug('gui - gui_functions.py - display_algorithm_information')
+    second_index = 0
     if 'embedded' in self.sender().objectName():
         second_index = self.sender().objectName().find('_', 9)
     elif 'user' in self.sender().objectName():
         second_index = self.sender().objectName().find('_', 5)
     first_index = self.sender().objectName().find('_')
-    algorithm_category = self.sender().objectName()[first_index + 1 : second_index]
-    algorithm_name = self.sender().objectName()[second_index + 1 :]
+    algorithm_category = self.sender().objectName()[first_index + 1: second_index]
+    algorithm_name = self.sender().objectName()[second_index + 1:]
     try:
         algorithm = getattr(getattr(egads.algorithms, algorithm_category), algorithm_name)
     except AttributeError:
@@ -207,7 +205,7 @@ def display_algorithm_information(self):
     file_path = inspect.getfile(algorithm)
     algorithm_metadata = algorithm().metadata
     output_metadata = algorithm().output_metadata
-    algorithm_dict = {}
+    algorithm_dict = dict()
     algorithm_dict['Name'] = algorithm_metadata['Processor']
     algorithm_dict['File'] = algorithm_name + '.py'
     algorithm_dict['Purpose'] = algorithm_metadata['Purpose']
@@ -220,16 +218,16 @@ def display_algorithm_information(self):
     outputs = algorithm_metadata['Outputs']
     algorithm_inputs = []
     algorithm_outputs = []
-    for index, input in enumerate(inputs):
-        input_dict = {}
-        input_dict['Symbol'] = input
+    for index, str_input in enumerate(inputs):
+        input_dict = dict()
+        input_dict['Symbol'] = str_input
         input_dict['Units'] = algorithm_metadata['InputUnits'][index]
         input_dict['Type'] = algorithm_metadata['InputTypes'][index]
         input_dict['Description'] = algorithm_metadata['InputDescription'][index]
         algorithm_inputs.append(input_dict)
-    for index, output in enumerate(outputs):
-        output_dict = {}
-        output_dict['Symbol'] = output
+    for index, str_output in enumerate(outputs):
+        output_dict = dict()
+        output_dict['Symbol'] = str_output
         output_dict['Units'] = algorithm_metadata['OutputUnits'][index]
         output_dict['Type'] = algorithm_metadata['OutputTypes'][index]
         output_dict['Description'] = algorithm_metadata['OutputDescription'][index]
@@ -255,21 +253,13 @@ def display_algorithm_information(self):
             lines.append(line)
     f.close()
     algorithm_dict['Algorithm'] = ''.join(lines)
-    '''self.displayAlgorithmWindow = MyAlgorithmDisplay(algorithm_dict)
-    x1, y1, w1, h1 = self.geometry().getRect()
-    _, _, w2, h2 = self.displayAlgorithmWindow.geometry().getRect()
-    x2 = x1 + w1/2 - w2/2
-    y2 = y1 + h1/2 - h2/2
-    self.displayAlgorithmWindow.setGeometry(x2, y2, w2, h2)
-    self.displayAlgorithmWindow.exec_()'''
+    self.displayAlgorithmWindow = MyAlgorithmDisplay(algorithm_dict)
+    self.displayAlgorithmWindow.exec_()
 
 
 def modify_attribute_gui(self, string):
     logging.debug('gui - gui_functions.py - modify_attribute_gui : sender().objectName() '
                   + str(self.sender().objectName()) + ' ; ' + string)
-    
-
-    
     if self.sender().objectName() != "":
         value = self.buttons_lines_dict[str(self.sender().objectName())]
         widget = self.findChildren(QtWidgets.QLineEdit, value[0])
@@ -277,7 +267,7 @@ def modify_attribute_gui(self, string):
             widget = self.findChildren(QtWidgets.QPlainTextEdit, value[0])
         list_widget = value[1]
         var_attr_list = value[2]
-        if widget[0].isEnabled() == False:
+        if not widget[0].isEnabled():
             if string == 'left':
                 widget[0].setEnabled(True)
                 icon = QtGui.QIcon()
@@ -303,8 +293,9 @@ def modify_attribute_gui(self, string):
                     except AttributeError:
                         var_attr_list[str(list_widget.currentItem().text())][1][value] = str(widget[0].toPlainText())
                     if value == "var_name":
-                        if self.open_file_ext == 'NASA Ames Files (*.na)':
-                            var_attr_list[str(list_widget.currentItem().text())][1]['standard_name'] = str(widget[0].text())
+                        if self.file_ext == 'NASA Ames Files (*.na)':
+                            var_attr_list[str(list_widget.currentItem().text())][1]['standard_name'] = str(widget[0]
+                                                                                                           .text())
                         var_attr_list[str(widget[0].text())] = var_attr_list.pop(str(list_widget.currentItem().text()))
                         list_widget.currentItem().setText(str(widget[0].text()))  
                 else:
@@ -353,116 +344,83 @@ def modify_attribute_gui(self, string):
 def update_global_attribute_gui(self, source):
     logging.debug('gui - gui_functions.py - update_global_attribute_gui : source ' + str(source))
     if source == 'NetCDF':
-        read_set_attribute_gui(self, self.gm_title_ln, 'title', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_institution_ln, 'institution', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_source_ln, 'source', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_project_ln, 'project', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_history_ln, 'history', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_title_ln, 'title', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_institution_ln, 'institution', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_source_ln, 'source', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_project_ln, 'project', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_history_ln, 'history', self.list_of_global_attributes)
         dimension_str = ''
         for key, value in self.list_of_dimensions.items():
             dimension_str += key + ': ' + str(value) + ' ; '
         self.va_dimensionList_ln.setPlainText(dimension_str[:-3])
+        self.new_dimensionList_ln.setPlainText(dimension_str[:-3])
     elif source == 'NASA Ames':
-        read_set_attribute_gui(self, self.gm_title_ln, 'MNAME', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_institution_ln, 'ORG', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_source_ln, 'SNAME', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_history_ln, 'NCOM', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_history_ln_2, 'SCOM', self.list_of_global_attributes)
-        read_set_attribute_gui(self, self.gm_project_ln, 'ONAME', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_title_ln, 'MNAME', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_institution_ln, 'ORG', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_source_ln, 'SNAME', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_history_ln, 'NCOM', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_history_ln_2, 'SCOM', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_project_ln, 'ONAME', self.list_of_global_attributes)
         
 
 def update_variable_attribute_gui(self, index=None):
     logging.debug('gui - gui_functions.py - update_variable_attribute_gui : index ' + str(index))
+    list_object, variables_and_attributes, var_name, long_name = None, None, None, None
+    fill_value, units, category, processor, dimensions = None, None, None, None, None
     if self.tab_view.currentIndex() == 1 or index == 1:
         list_object = self.variable_list
         variables_and_attributes = self.list_of_variables_and_attributes 
-        varName_ln = self.va_varName_ln
-        longName_ln = self.va_longName_ln
-        category_ln = self.va_category_ln
-        processor_ln = self.va_egadsProcessor_ln
-        units_ln = self.va_units_ln
-        fillValue_ln = self.va_fill_ln
-        dimensions_ln = self.va_dimensions_ln
+        var_name = self.va_varName_ln
+        long_name = self.va_longName_ln
+        category = self.va_category_ln
+        processor = self.va_egadsProcessor_ln
+        units = self.va_units_ln
+        fill_value = self.va_fill_ln
+        dimensions = self.va_dimensions_ln
     elif self.tab_view.currentIndex() == 2 or index == 2:
         list_object = self.new_variable_list
         variables_and_attributes = self.list_of_new_variables_and_attributes
-        varName_ln = self.new_varName_ln
-        longName_ln = self.new_longName_ln
-        category_ln = self.new_category_ln
-        processor_ln = self.new_egadsProcessor_ln
-        units_ln = self.new_units_ln
-        fillValue_ln = self.new_fill_ln
-        dimensions_ln = self.new_dimensions_ln
+        var_name = self.new_varName_ln
+        long_name = self.new_longName_ln
+        category = self.new_category_ln
+        processor = self.new_egadsProcessor_ln
+        units = self.new_units_ln
+        fill_value = self.new_fill_ln
+        dimensions = self.new_dimensions_ln
     sublist = variables_and_attributes[str(list_object.currentItem().text())]
-    read_set_attribute_gui(self, varName_ln, 'var_name', sublist[1])
-    read_set_attribute_gui(self, longName_ln, 'long_name', sublist[1])
-    read_set_attribute_gui(self, units_ln, 'units', sublist[1])
-    read_set_attribute_gui(self, category_ln, 'Category', sublist[1])
-    read_set_attribute_gui(self, processor_ln, 'Processor', sublist[1])
-    read_set_attribute_gui(self, fillValue_ln, '_FillValue', sublist[1])
-    if not fillValue_ln.text():
-        read_set_attribute_gui(self, fillValue_ln, 'missing_value', sublist[1])
+    read_set_attribute_gui(var_name, 'var_name', sublist[1])
+    read_set_attribute_gui(long_name, 'long_name', sublist[1])
+    read_set_attribute_gui(units, 'units', sublist[1])
+    read_set_attribute_gui(category, 'Category', sublist[1])
+    read_set_attribute_gui(processor, 'Processor', sublist[1])
+    read_set_attribute_gui(fill_value, '_FillValue', sublist[1])
+    if not fill_value.text():
+        read_set_attribute_gui(fill_value, 'missing_value', sublist[1])
     dimensions_str = ''
     for key, value in sublist[2].items():
         dimensions_str = dimensions_str + str(value) + ' (' + key + '), '
-    read_set_attribute_gui(self, dimensions_ln, dimensions_str[:-2])
+    read_set_attribute_gui(dimensions, dimensions_str[:-2])
     
     
 def update_new_variable_list_gui(self):
     logging.debug('gui - gui_functions.py - update_new_variable_list_gui')
-    self.new_listwidget.clear()
+    self.new_variable_list.clear()
     for _, sublist in self.list_of_new_variables_and_attributes.items():
-        self.new_listwidget.addItem(sublist[0])
-
-
-def add_new_variable_gui(self):
-    logging.debug('gui - gui_functions.py - add_new_variable_gui')
-    self.tabWidget.insertTab(2, self.tab_3, 'New variables')
-    self.tabWidget.tabBar().setTabTextColor(2, QtGui.QColor(0,0,0))
-    self.new_listwidget.itemClicked.connect(lambda: new_var_reading(self))
-
-
-def new_var_reading(self):
-    logging.debug('gui - gui_functions.py - new_var_reading : variable ' + str(self.new_listwidget.currentItem().text()))
-    update_icons_state(self, 'new_var_reading')
-    clear_gui(self, 'new_variable')
-    all_lines_edit = self.tab_3.findChildren(QtWidgets.QLineEdit)
-    for widget in all_lines_edit:
-            widget.setEnabled(False)
-    all_text_edit = self.tab_3.findChildren(QtWidgets.QPlainTextEdit)
-    for widget in all_text_edit:
-            widget.setEnabled(False)
-    all_buttons = self.tab_3.findChildren(QtWidgets.QToolButton)
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-    for widget in all_buttons:
-            widget.setIcon(icon)
-    sublist = self.list_of_new_variables_and_attributes[self.new_listwidget.currentItem().text()]
-    read_set_attribute_gui(self, self.new_varName_ln, 'var_name', sublist[1])
-    read_set_attribute_gui(self, self.new_longName_ln, 'long_name', sublist[1])
-    read_set_attribute_gui(self, self.new_units_ln, 'units', sublist[1])
-    read_set_attribute_gui(self, self.new_category_ln, 'Category', sublist[1])
-    read_set_attribute_gui(self, self.new_egadsProcessor_ln, 'Processor', sublist[1])
-    read_set_attribute_gui(self, self.new_fillValue_ln, '_FillValue', sublist[1])
-    if not self.new_fillValue_ln.text():
-        read_set_attribute_gui(self, self.new_fillValue_ln, 'missing_value', sublist[1])
-    dimensions_str = ''
-    for key, value in sublist[2].iteritems():
-        dimensions_str = dimensions_str + str(value) + ' (' + key + '), '
-    read_set_attribute_gui(self, self.new_dimensions_ln, dimensions_str[:-2])
+        self.new_variable_list.addItem(sublist[0])
 
 
 def status_bar_update(self):
     logging.debug('gui - gui_functions.py - status_bar_update')
     if self.file_is_opened:
         out_file_base, out_file_ext = ntpath.splitext(ntpath.basename(self.file_name))
-        open_file_size = humansize(self, ntpath.getsize(self.file_name))
+        open_file_size = humansize(ntpath.getsize(self.file_name))
         filename = out_file_base + out_file_ext
+        filetype = ''
         try:
             conventions = self.list_of_global_attributes['Conventions']
         except KeyError:
             logging.exception('gui - gui_functions.py - statusBar_updating : an exception occured')
-            conventions =  'no conventions'
+            conventions = 'no conventions'
         if self.file_ext == 'NetCDF Files (*.nc)':
             filetype = 'NetCDF'
         elif self.file_ext == 'NASA Ames Files (*.na)':
@@ -478,15 +436,9 @@ def update_icons_state(self, string=None):
     logging.debug('gui - gui_functions.py - update_icons_state : string ' + str(string))
     if string == 'close_file':
         self.actionOpenBar.setEnabled(True)
-        self.actionSaveBar.setEnabled(False)
         self.actionSaveAsBar.setEnabled(False)
         self.actionCloseBar.setEnabled(False)
         self.actionAlgorithmsBar.setEnabled(False)
-        
-        
-        self.actionCreatealgorithmBar.setEnabled(False)
-        
-        
         self.actionCreateVariableBar.setEnabled(False)
         self.actionDeleteVariableBar.setEnabled(False)
         self.actionMigrateVariableBar.setEnabled(False)
@@ -497,101 +449,130 @@ def update_icons_state(self, string=None):
     if string == 'open_file':
         self.actionSaveAsBar.setEnabled(True)
         self.actionCloseBar.setEnabled(True)
-        #self.actionCreateVariableBar.setEnabled(True)
+        self.actionAlgorithmsBar.setEnabled(True)
         self.actionGlobalAttributesBar.setEnabled(True)
+        self.actionCreateVariableBar.setEnabled(True)
     if string == 'var_reading':
-        self.va_button_1.setEnabled(True)
-        self.va_button_2.setEnabled(True)
-        self.va_button_3.setEnabled(True)
-        self.va_button_4.setEnabled(True)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.va_button_1.setIcon(icon)
         self.va_button_2.setIcon(icon)
         self.va_button_3.setIcon(icon)
         self.va_button_4.setIcon(icon)
-        #self.actionAlgorithmsBar.setEnabled(True)
-        #self.actionDeleteVariableBar.setEnabled(True)
-        self.actionVariableAttributesBar.setEnabled(True)
-        self.actionPlotBar.setEnabled(True)
-        self.actionDisplayBar.setEnabled(True)
+        if len(self.variable_list.selectedItems()) > 1:
+            self.va_button_1.setEnabled(False)
+            self.va_button_2.setEnabled(False)
+            self.va_button_3.setEnabled(False)
+            self.va_button_4.setEnabled(False)
+            self.actionDisplayBar.setEnabled(False)
+            self.actionVariableAttributesBar.setEnabled(False)
+            self.actionDeleteVariableBar.setEnabled(True)
+            self.actionPlotBar.setEnabled(True)
+        else:
+            self.va_button_1.setEnabled(True)
+            self.va_button_2.setEnabled(True)
+            self.va_button_3.setEnabled(True)
+            self.va_button_4.setEnabled(True)
+            self.actionDisplayBar.setEnabled(True)
+            self.actionVariableAttributesBar.setEnabled(True)
+            self.actionDeleteVariableBar.setEnabled(True)
+            self.actionPlotBar.setEnabled(True)
     if string == 'new_var_reading':
-        self.new_button_1.setEnabled(True)
-        self.new_button_2.setEnabled(True)
-        self.new_button_3.setEnabled(True)
-        self.new_button_4.setEnabled(True)
-        #self.actionAlgorithmsBar.setEnabled(True)
-        #self.actionDeleteVariableBar.setEnabled(True)
-        self.actionVariableAttributesBar.setEnabled(True)
-        self.actionPlotBar.setEnabled(True)
-        self.actionDisplayBar.setEnabled(True)
-        #self.actionMigrateVariableBar.setEnabled(True)
-    if string == None:
-        self.actionAlgorithmsBar.setEnabled(False)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.new_button_1.setIcon(icon)
+        self.new_button_2.setIcon(icon)
+        self.new_button_3.setIcon(icon)
+        self.new_button_4.setIcon(icon)
+        if len(self.new_variable_list.selectedItems()) > 1:
+            self.new_button_1.setEnabled(False)
+            self.new_button_2.setEnabled(False)
+            self.new_button_3.setEnabled(False)
+            self.new_button_4.setEnabled(False)
+            self.actionDisplayBar.setEnabled(False)
+            self.actionVariableAttributesBar.setEnabled(False)
+            self.actionDeleteVariableBar.setEnabled(True)
+            self.actionPlotBar.setEnabled(True)
+            self.actionMigrateVariableBar.setEnabled(True)
+        else:
+            self.new_button_1.setEnabled(True)
+            self.new_button_2.setEnabled(True)
+            self.new_button_3.setEnabled(True)
+            self.new_button_4.setEnabled(True)
+            self.actionDisplayBar.setEnabled(True)
+            self.actionVariableAttributesBar.setEnabled(True)
+            self.actionDeleteVariableBar.setEnabled(True)
+            self.actionPlotBar.setEnabled(True)
+            self.actionMigrateVariableBar.setEnabled(True)
+    if string is None:
         self.actionDeleteVariableBar.setEnabled(False)
         self.actionVariableAttributesBar.setEnabled(False)
         self.actionPlotBar.setEnabled(False)
         self.actionDisplayBar.setEnabled(False)
         self.actionMigrateVariableBar.setEnabled(False)
         if self.tab_view.currentIndex() == 1:
-            '''self.actionAlgorithmsBar.setEnabled(True)
-            self.actionPlotBar.setEnabled(True)'''
             try:
-                if self.variable_list.currentItem().text() == "":
+                if not self.variable_list.selectedItems():
                     self.actionDisplayBar.setEnabled(False)
                     self.actionVariableAttributesBar.setEnabled(False)
                     self.actionDeleteVariableBar.setEnabled(False)
-                    self.actionAlgorithmsBar.setEnabled(False)
                     self.actionPlotBar.setEnabled(False)
                 else:
-                    self.actionDisplayBar.setEnabled(True)
-                    self.actionVariableAttributesBar.setEnabled(True)
-                    #self.actionDeleteVariableBar.setEnabled(True)
-                    #self.actionAlgorithmsBar.setEnabled(True)
-                    self.actionPlotBar.setEnabled(True)
+                    if len(self.variable_list.selectedItems()) > 1:
+                        self.actionDisplayBar.setEnabled(False)
+                        self.actionVariableAttributesBar.setEnabled(False)
+                        self.actionDeleteVariableBar.setEnabled(True)
+                        self.actionPlotBar.setEnabled(True)
+                    else:
+                        self.actionDisplayBar.setEnabled(True)
+                        self.actionVariableAttributesBar.setEnabled(True)
+                        self.actionDeleteVariableBar.setEnabled(True)
+                        self.actionPlotBar.setEnabled(True)
             except AttributeError:
                 self.actionDisplayBar.setEnabled(False)
                 self.actionVariableAttributesBar.setEnabled(False)
                 self.actionDeleteVariableBar.setEnabled(False)
-                self.actionAlgorithmsBar.setEnabled(False)
                 self.actionPlotBar.setEnabled(False)
         elif self.tab_view.currentIndex() == 2:
-            '''self.actionAlgorithmsBar.setEnabled(True)
-            self.actionPlotBar.setEnabled(True)'''
             try:
-                if self.new_variable_list.currentItem().text() == "":
+
+                if not self.new_variable_list.selectedItems():
                     self.actionDisplayBar.setEnabled(False)
                     self.actionVariableAttributesBar.setEnabled(False)
                     self.actionDeleteVariableBar.setEnabled(False)
-                    self.actionMigrateVariableBar.setEnabled(False)
-                    self.actionAlgorithmsBar.setEnabled(False)
                     self.actionPlotBar.setEnabled(False)
+                    self.actionMigrateVariableBar.setEnabled(False)
                 else:
-                    self.actionDisplayBar.setEnabled(True)
-                    self.actionVariableAttributesBar.setEnabled(True)
-                    #self.actionDeleteVariableBar.setEnabled(True)
-                    #self.actionMigrateVariableBar.setEnabled(True)
-                    #self.actionAlgorithmsBar.setEnabled(True)
-                    self.actionPlotBar.setEnabled(True)
+                    if len(self.new_variable_list.selectedItems()) > 1:
+                        self.actionDisplayBar.setEnabled(False)
+                        self.actionVariableAttributesBar.setEnabled(False)
+                        self.actionDeleteVariableBar.setEnabled(True)
+                        self.actionPlotBar.setEnabled(True)
+                        self.actionMigrateVariableBar.setEnabled(True)
+                    else:
+                        self.actionDisplayBar.setEnabled(True)
+                        self.actionVariableAttributesBar.setEnabled(True)
+                        self.actionDeleteVariableBar.setEnabled(True)
+                        self.actionPlotBar.setEnabled(True)
+                        self.actionMigrateVariableBar.setEnabled(True)
             except AttributeError:
                 self.actionDisplayBar.setEnabled(False)
                 self.actionVariableAttributesBar.setEnabled(False)
                 self.actionDeleteVariableBar.setEnabled(False)
                 self.actionMigrateVariableBar.setEnabled(False)
-                self.actionAlgorithmsBar.setEnabled(False)
                 self.actionPlotBar.setEnabled(False)
 
 
 def clear_gui(self, part=None):
     logging.debug('gui - gui_functions.py - clear_gui : part ' + str(part))
-    if part == None or part == 'global':
+    if part is None or part == 'global':
         self.gm_title_ln.setText("")
         self.gm_institution_ln.setText("")
         self.gm_source_ln.setText("")
         self.gm_project_ln.setText("")
         self.gm_history_ln.setPlainText("")
         self.va_dimensionList_ln.setPlainText('')
-    if part == None or part == 'variable':
+    if part is None or part == 'variable':
         self.va_varName_ln.setText("")
         self.va_longName_ln.setText("")
         self.va_category_ln.setText("")
@@ -599,7 +580,7 @@ def clear_gui(self, part=None):
         self.va_fill_ln.setText("")
         self.va_dimensions_ln.setText("")
         self.va_egadsProcessor_ln.setPlainText("")
-    if part == None or part == 'new_variable':
+    if part is None or part == 'new_variable':
         self.new_varName_ln.setText("")
         self.new_longName_ln.setText("")
         self.new_category_ln.setText("")
@@ -607,12 +588,12 @@ def clear_gui(self, part=None):
         self.new_fill_ln.setText("")
         self.new_dimensions_ln.setText("")
         self.new_egadsProcessor_ln.setPlainText("")
-    if part == None:
+    if part is None:
         self.variable_list.clear()
         self.new_variable_list.clear()
    
         
-def read_set_attribute_gui(self, gui_object, attr_name, attr_dict=None):
+def read_set_attribute_gui(gui_object, attr_name, attr_dict=None):
     logging.debug('gui - gui_functions.py - read_set_attribute_gui')
     if attr_dict is not None:
         try:
@@ -649,25 +630,12 @@ def read_set_attribute_gui(self, gui_object, attr_name, attr_dict=None):
             gui_object.setPlainText(str(attr_name))
 
 
-def clear_layout(self, layout):
+def clear_layout(layout):
     logging.debug('gui - gui_functions.py - clear_layout')
     for i in reversed(range(layout.count())):   
         item = layout.itemAt(i)
         if isinstance(item, QtWidgets.QWidgetItem):
             item.widget().deleteLater()
         elif isinstance(item, QtWidgets.QLayout):
-            clear_layout(self, item.layout())
+            clear_layout(item.layout())
         layout.removeItem(item)
-        
-
-def humansize(self, nbytes):
-    logging.debug('gui - gui_functions.py - humansize : nbytes ' + str(nbytes))
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-    if nbytes == 0: return '0 B'
-    i = 0
-    while nbytes >= 1024 and i < len(suffixes)-1:
-        nbytes /= 1024.
-        i += 1
-    f = ('%.2f' % nbytes).rstrip('0').rstrip('.')
-    return '%s %s' % (f, suffixes[i])
-       

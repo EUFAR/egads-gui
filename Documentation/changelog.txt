@@ -4,12 +4,41 @@ CHANGELOG | LINEAGE BRANCH
 
 To do list:
 -----------
-  - when a user bring modifications to the plot window, and if the zoom or pan button is in action, release it when Update button is pushed to avoid issues.
-  - add the possibility for the user to change subplot positions.
-  - check nasa ames file handling in the GUI.
+  - add the possibility for the user to change subplot positions. (v 0.12)
+  - check nasa ames file handling in the GUI. (v 0.12)
+  - add bash processing. (v 0.12)
+  - add saving function. (v 0.12)
   
 To fix list:
 ------------
+
+
+May 9 2019, Release version 0.11.0
+==================================
+  MODIFIED:
+	- the custom vertical label in the display data window has been replaced for now by an original horizontal label to avoid issues with the paintEvent.
+	- the window to process variables with EGADS algorithms have been modified for python 3.
+	- the window to create algorithms have been modified for python 3.
+	- the processing of variables has been placed into a dedicated QThread.
+	- the code has been cleaned thanks to PyCharm.
+	- the documentation has been updated.
+	
+  FIXED:
+	- fixed an issue with the plot type and the grid activation in the plot window.
+	- if a user modifies a plot with the pan or zoom button activated, both buttons weren't released when the update button was clicked. It has been fixed.
+	- few wrongly spelled variables have been corrected.
+	- when closing a file, the dictionary containing all algorithms and their folders was deleted.
+
+  ADDED:
+    - a window to display algorithms has been added.
+	- once an algorithm is created, it is automatically loaded into EGADS and in the GUI.
+	- a right-click menu has been added to the variable list. It is possible to display data, plot data, delete data, and use the selected variable as the x axis in the plot window. The last option only works for time series (1 dimension) and doesn't work for gridded data (two or more dimensions).
+	- if multiple variables are selected, all functions which don't accept more than one variable are disabled and their icons are greyed out.
+	- if multiple variables are selected, the gui doesn't display variable metadata and all edit buttons are greyed out.
+	- if a variable can't be loaded, the gui now informs the user and try to give a reason (the number of reasons will increase in the future).
+	- EGADS GUI is now working based on the version of EGADS Lineage.
+	- information has been introduced for the algorithm creation window.
+	- information has been introduced for the plot window.
 
 
 October 1 2018, Release version 0.10.0
@@ -31,21 +60,21 @@ October 1 2018, Release version 0.10.0
     - if a user try to add a metadata (global or variable) which already exists, the metadata was added multiple times or replaced. It has been fixed.
 
 
-January 31, Release version 0.9.4
-=================================
+January 31 2018, Release version 0.9.4
+======================================
   MODIFIED:
     - documentation has been updated.
 
 
-January 19, Release version 0.9.3
-=================================
+January 19 2018, Release version 0.9.3
+======================================
   FIXED:
     - when a new variable was created, the migration of the new variable to the list of variable didn't set the "modified" attribute of the GUI on True, thus it was no possible to save the file.
     - a log message contained a mistake.
 
   
-January 11, Release version 0.9.2
-=================================
+January 11 2018, Release version 0.9.2
+======================================
   FIXED:
     - if a variable in a file can't be read, the GUI crashes. It has been fixed by adding a logged exception.
     - buttons of the toolbar were connected to the function to modify metadata when a netcdf file was read. It has been fixed.

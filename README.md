@@ -1,13 +1,13 @@
 Version:
 -------
 
-EGADS GUI Lineage 0.10.0 (Python 3).
+EGADS Lineage GUI 0.11.0 (Python 3).
 
 
 Developments:
 -------------
 
-As the EUFAR project ended the 31st of January 2018, developments involving EGADS GUI are now done in a new branch and the current version of EGADS GUI is called EGADS GUI Lineage. It is developed and maintained by Olivier Henry and is not developed under the scope of EUFAR. Merging of the Master and Lineage branch can happen in the next EUFAR project.
+As the EUFAR project ended the 31st of January 2018, developments involving EGADS GUI are now done in a new branch and the current version of EGADS GUI is called EGADS Lineage GUI. It is developed and maintained by Olivier Henry and is not developed under the scope of EUFAR. Merging of the Master and Lineage branch can happen in the next EUFAR project.
 
 
 Project Overview:
@@ -33,12 +33,13 @@ Not yet.
 Features:
 ---------
 
-* read/write NetCDF files (not yet)
+* read/write NetCDF files
 * read/write NASA/Ames files (not yet)
 * conversion between different file format (not yet)
-* use of algorithms (not yet)
-* creation of new algorithms (not yet)
-* display/plot/print data (not yet)
+* use of algorithms
+* creation of new algorithms
+* display/plot/print data
+* batch processing (not yet)
 
 
 Installation:
@@ -47,16 +48,15 @@ Installation:
 Actually, EGADS GUI is a simple python script. Just open a terminal in the EGADS GUI directory and launch the script as usual: python egads_gui.py.
 
 Do not forget to install dependancies:
-* PyQt5 (5.10 or newer)
-* EGADS Lineage (0.9.1 or newer)
-* Numpy (1.14 or newer)
-* Not necessary yet: Requests (2.18.4 or newer), optional, only for update checking)
-* Matplotlib (2.0 or newer)
-* Cartopy (0.16 or newer)
-* Pillow (5.2 or newer, optional, only to save a figure in jpeg format)
+* Python (3.5.4 or newer)
+* PyQt5 (5.11.3 or newer)
+* EGADS Lineage (0.9.3 or newer)
+* Matplotlib (2.2.2 or newer)
+* Cartopy (0.17 or newer)
+* Requests (2.18.4 or newer, optional, only to check updates if the user activates the option)
 
 
 Documentation:
 --------------
 
-Not yet.
+The documentation of EGADS Lineage GUI is available as a PDF in the Documentation folder.

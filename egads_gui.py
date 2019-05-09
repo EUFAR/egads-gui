@@ -1,66 +1,37 @@
 import logging
+import platform
 import sys
 import os
 from PyQt5 import QtWidgets, QtGui, QtCore
 from ui.mainwindow import MainWindow
 from ui._version import _gui_version
-#from egads._version import __version__ as egads_version
+from functions.utils import create_option_file, create_logging_handlers
 import configparser
+from matplotlib import __version__ as mpl_version
+from cartopy import __version__ as cy_version
 
 
-def launch_egads_gui(path):
+def launch_egads_gui(gui_path):
     app = QtWidgets.QApplication(sys.argv)
     splash_pix = QtGui.QPixmap('icons/egads_gui_splashscreen.png')
     splash = QtWidgets.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()
+    if not os.path.exists(os.path.join(gui_path, 'egads_gui.ini')):
+        create_option_file(gui_path)
     config_dict = configparser.ConfigParser()
-    if not os.path.exists(os.path.join(path, 'egads_gui.ini')):
-        ini_file = open(os.path.join(path, 'egads_gui.ini'), 'w')
-        config_dict.add_section('LOG')
-        config_dict.add_section('OPTIONS')
-        config_dict.set('LOG','level','DEBUG')
-        config_dict.set('LOG','path', '')
-        config_dict.set('OPTIONS','check_update','False')
-        config_dict.set('OPTIONS','min_egads_version','0.9.1')
-        config_dict.set('OPTIONS','egads_branch','Lineage')
-        config_dict.write(ini_file)
-        ini_file.close()   
-    config_dict.read(os.path.join(path, 'egads_gui.ini'))
-    
-    if not config_dict['OPTIONS'].get('min_egads_version') or config_dict['OPTIONS'].get('min_egads_version') != '0.9.1':
-        config_dict.set('OPTIONS', 'min_egads_version', '0.9.1')
-        with open(os.path.join(path, 'egads_gui.ini'), 'w') as configfile:
-            config_dict.write(configfile)
-    
-    if not config_dict['OPTIONS'].get('egads_branch'):
-        config_dict.set('OPTIONS', 'egads_branch', 'Lineage')
-        with open(os.path.join(path, 'egads_gui.ini'), 'w') as configfile:
-            config_dict.write(configfile)
-    
-    config_dict.read(os.path.join(path, 'egads_gui.ini'))
-    
-    
-    log_filename = os.path.join(config_dict.get('LOG', 'path'),'egads_gui.log')
-    logging.getLogger('').handlers = []
-    logging.basicConfig(filename = log_filename,
-                        level = getattr(logging, config_dict.get('LOG', 'level')),
-                        filemode = 'w',
-                        format = '%(asctime)s : %(levelname)s : %(message)s')
-    formatter = logging.Formatter('%(levelname)s : %(message)s')
-    console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
-    console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)
+    config_dict.read(os.path.join(gui_path, 'egads_gui.ini'))
+    create_logging_handlers(config_dict, 'egads_gui.log')
     logging.info('**********************************')
     logging.info('EGADS GUI ' + _gui_version + ' is starting ...')
     logging.info('**********************************')
-    logging.info('gui - operating system: ' + str(sys.platform))
+    system, release, version = platform.system_alias(platform.system(), platform.release(), platform.version())
+    logging.debug('gui - operating system: ' + system + ' ' + release + ' (' + version + ')')
     python_version = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
-    logging.info('gui - python version: ' + python_version)
-    
-    
-    ui = MainWindow(path, config_dict)
+    logging.debug('gui - python version: ' + python_version)
+    logging.debug('gui - matplotlib version: ' + mpl_version)
+    logging.debug('gui - cartopy version: ' + cy_version)
+    ui = MainWindow(gui_path, config_dict)
     ui.show()
     splash.finish(ui)
     sys.exit(app.exec_())
@@ -77,6 +48,5 @@ sys.excepthook = handle_exception
 
 
 if __name__ == '__main__':
-    path = os.path.abspath(os.path.dirname(__file__))
-    launch_egads_gui(path)
-    
+    main_path = os.path.abspath(os.path.dirname(__file__))
+    launch_egads_gui(main_path)

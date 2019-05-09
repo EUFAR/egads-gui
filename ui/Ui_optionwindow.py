@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'optionwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -87,15 +87,6 @@ class Ui_optionWindow(object):
 "    subcontrol-origin: padding;\n"
 "    subcontrol-position: top right;\n"
 "    width: 27px;\n"
-"    border-top-right-radius: 3px;\n"
-"    border-bottom-right-radius: 3px;\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"QComboBox::drop-down:hover {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: top right;\n"
-"    width: 27px;\n"
 "    border-left-width: 1px;\n"
 "    border-left-color: darkgray;\n"
 "    border-left-style: solid;\n"
@@ -109,17 +100,11 @@ class Ui_optionWindow(object):
 "    height: 16px\n"
 "}\n"
 "\n"
-"QComboBox::down-arrow:on {\n"
-"    top: 1px; \n"
-"    left: 1px;\n"
-"}\n"
-"\n"
 "QComboBox QAbstractItemView {\n"
 "    selection-background-color: rgb(200,200,200);\n"
-"    selection-color: rgb(45,45,45);\n"
+"    selection-color: black;\n"
 "    background: #f0f0f0;\n"
 "    border: 0px solid #f0f0f0;\n"
-"    color: rgb(45,45,45);\n"
 "}\n"
 "\n"
 "QComboBox QAbstractItemView::item {\n"
@@ -238,6 +223,11 @@ class Ui_optionWindow(object):
         spacerItem4 = QtWidgets.QSpacerItem(13, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout.addItem(spacerItem4)
         self.line = QtWidgets.QFrame(optionWindow)
+        self.line.setStyleSheet("QFrame {\n"
+"   background: rgb(190,190,190);\n"
+"   height: 5px;\n"
+"   border: 0px solid black;\n"
+"}")
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
@@ -326,8 +316,8 @@ class Ui_optionWindow(object):
         spacerItem10 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem10)
         self.ok_button = QtWidgets.QToolButton(optionWindow)
-        self.ok_button.setMinimumSize(QtCore.QSize(90, 27))
-        self.ok_button.setMaximumSize(QtCore.QSize(90, 27))
+        self.ok_button.setMinimumSize(QtCore.QSize(100, 27))
+        self.ok_button.setMaximumSize(QtCore.QSize(100, 27))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -362,8 +352,8 @@ class Ui_optionWindow(object):
         spacerItem11 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem11)
         self.cancel_button = QtWidgets.QToolButton(optionWindow)
-        self.cancel_button.setMinimumSize(QtCore.QSize(90, 27))
-        self.cancel_button.setMaximumSize(QtCore.QSize(90, 27))
+        self.cancel_button.setMinimumSize(QtCore.QSize(100, 27))
+        self.cancel_button.setMaximumSize(QtCore.QSize(100, 27))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)

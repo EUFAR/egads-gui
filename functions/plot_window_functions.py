@@ -1,43 +1,37 @@
-import copy
 import logging
 import numpy
 import ntpath
-import platform
-import os
-import matplotlib
 import cartopy
 import collections
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_plotwindow import Ui_plotWindow
 from ui.Ui_plottypewindow import Ui_plottypeWindow
 from ui.Ui_tickslabelswindow import Ui_tickslabelsWindow
-from functions.gui_functions import clear_layout
-matplotlib.use('Qt5Agg')
+from functions.utils import populate_combobox
+from functions.other_windows_functions import MyWait, MyInfo
+from functions.thread_functions import DrawGriddedMap, ProvideWidthHeight
+from functions.material_functions import setup_plot_material, plot_information_buttons_text
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
-#from cmocean import cm as cmo
 from cartopy.util import add_cyclic_point
-from scipy.interpolate import griddata, interp2d
-from functions.other_window_functions import MyWait, MyInfo
-from functions.thread_functions import DrawGriddedMap, ProvideWidthHeight
-from functions.material_functions import setup_plot_material
-        
+
         
 class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
-    def __init__(self, variables, dimensions, font_list, default_font):
+    def __init__(self, variables, dimensions, x_axis_variable, font_list, default_font):
         logging.debug('gui - plot_window_functions.py - PlotWindow - __init__')
         QtWidgets.QDialog.__init__(self, parent=None)
         self.setupUi(self)
         self.resize(1250, 750)
-        itemDelegate = QtWidgets.QStyledItemDelegate()
-        self.pw_saveOptions_cb_1.setItemDelegate(itemDelegate)
-        self.pw_saveOptions_cb_2.setItemDelegate(itemDelegate)
+        self.pw_saveOptions_cb_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
+        self.pw_saveOptions_cb_2.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.variables = variables
         self.dimensions = dimensions
+        self.x_axis_variable = x_axis_variable
         self.font_list = font_list
         self.default_font = default_font
         setup_plot_material(self)
+        plot_information_buttons_text(self)
         self.setup_toolbar()
         self.setup_plot_area()
         self.actionClose.triggered.connect(self.close_window)
@@ -51,15 +45,19 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_saveOptions_sl_1.valueChanged.connect(self.update_quality_value)
         self.pw_saveOptions_ln_3.setText('100')
         self.pw_saveOptions_lb_7.setText('95')
+        self.pw_info_bt_1.clicked.connect(self.save_button_information)
+        self.pw_info_bt_2.clicked.connect(self.save_button_information)
+        self.pw_info_bt_3.clicked.connect(self.save_button_information)
+        self.pw_info_bt_4.clicked.connect(self.save_button_information)
         self.select_plot_type()
         self.thread_set_width_height = ProvideWidthHeight(self.pw_saveOptions_ln_1, self.pw_saveOptions_ln_2)
         self.thread_set_width_height.start()
         logging.info('gui - plot_window_functions.py - PlotWindow - ready')
-    
-    
+
     def select_plot_type(self):
         if len(self.variables) == 1:
-            logging.debug('gui - plot_window_functions.py - PlotWindow - select_plot_type - only one variable has been found.')
+            logging.debug('gui - plot_window_functions.py - PlotWindow - select_plot_type - '
+                          + 'only one variable has been found.')
             dim_num = len(self.variables[list(self.variables.keys())[0]]['dimensions'])
             if dim_num == 1:
                 self.plot_timeseries('plot')
@@ -74,22 +72,22 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     if lon_in and lat_in:
                         georeferenced.append(True)
                 
-                info_text = ('Actually, the function to plot gridded data is still beta. Thus it is not possible yet to modify '
-                             + 'the figure and options are not available.')
+                info_text = ('Actually, the function to plot gridded data is still beta. Thus it is not possible yet '
+                             'to modify the figure and options are not available.')
                 self.infoWindow = MyInfo(info_text)
-                x1, y1, w1, h1 = self.geometry().getRect()
                 self.infoWindow.exec_()
-                
                 self.plot_single_grid_start(georeferenced)
             elif dim_num == 3:
                 data_shape = self.variables[list(self.variables.keys())[0]]['values'].shape
                 if data_shape[0] > 1 and data_shape[1] > 1 and data_shape[2] > 1:
-                    logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - EGADS GUI can\'t plot variables with more than 2 dimensions.')
+                    logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - EGADS GUI can\'t '
+                                 'plot variables with more than 2 dimensions.')
                     print('EGADS GUI can\'t plot variables with more than 2 dimensions.')
                 else:
                     for dim, value in self.dimensions.items():
                         if len(value['values']) == 1:
-                            self.variables[list(self.variables.keys())[0]]['values'] = numpy.squeeze(self.variables[list(self.variables.keys())[0]]['values'], value['axis'])
+                            tmp = numpy.squeeze(self.variables[list(self.variables.keys())[0]]['values'], value['axis'])
+                            self.variables[list(self.variables.keys())[0]]['values'] = tmp
                             break
                     self.dimensions.pop(dim)
                     self.variables[list(self.variables.keys())[0]]['dimensions'].remove(dim)
@@ -103,18 +101,18 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         if lon_in and lat_in:
                             georeferenced.append(True)
                             
-                    info_text = ('Actually, the function to plot gridded data is still beta. Thus it is not possible yet to modify '
-                                 + 'the figure and options are not available.')
+                    info_text = ('Actually, the function to plot gridded data is still beta. Thus it is not possible '
+                                 'yet to modify the figure and options are not available.')
                     self.infoWindow = MyInfo(info_text)
-                    x1, y1, w1, h1 = self.geometry().getRect()
                     self.infoWindow.exec_()
-                    
                     self.plot_single_grid_start(georeferenced)
             else:
                 print('EGADS GUI can\'t plot variables with more than 2 dimensions.')
-                logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - EGADS GUI can\'t plot variables with more than 2 dimensions.')
+                logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - EGADS GUI can\'t plot '
+                             'variables with more than 2 dimensions.')
         elif len(self.variables) > 1:
-            logging.debug('gui - plot_window_functions.py - PlotWindow - select_plot_type - more than one variable have been found, ' + str(len(self.variables)))
+            logging.debug('gui - plot_window_functions.py - PlotWindow - select_plot_type - more than one variable '
+                          'have been found, ' + str(len(self.variables)))
             dim_num = []
             units = []
             dim_name = []
@@ -135,12 +133,12 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         self.plot_timeseries('subplot')    
                 else:
                     print('EGADS GUI can\'t plot more than 1 variable with more than 1 dimensions')
-                    logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - EGADS GUI can\'t plot more than 1 '
-                                 + 'variable with more than 1 dimensions')
+                    logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - EGADS GUI can\'t '
+                                 'plot more than 1 variable with more than 1 dimensions')
             else:
                 print('Each variable has a different number of dimensions, this is not yet supported')
-                logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - Each variable has a different number of dimensions, '
-                             + 'this is not yet supported')
+                logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - Each variable has a '
+                             'different number of dimensions, this is not yet supported')
             
     def plot_timeseries(self, plot_type):
         if plot_type == 'plot':
@@ -158,7 +156,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             subplot_plot[0].set_xlim([subplot_plot[0].axes.get_xticks()[0], subplot_plot[0].axes.get_xticks()[-1]])
             subplot_plot[0].spines['top'].set_visible(False)
             subplot_plot[0].spines['right'].set_visible(False)
-            leg = subplot_plot[0].legend(prop={'family':self.default_font, 'size':'10'})
+            leg = subplot_plot[0].legend(prop={'family': self.default_font, 'size': '10'})
             leg.draggable()
             plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.90, wspace=0.4, hspace=0.4)
             self.set_figure_options('plot', subplot_plot)
@@ -173,7 +171,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 xvalues = self.dimensions[xname]['values']
                 xunits = self.dimensions[xname]['units']
                 subplot_plot.append(self.figure.add_subplot(len(self.variables), 1, i + 1))
-                subplot_plot[i].plot(xvalues, yvalues, label = yname)
+                subplot_plot[i].plot(xvalues, yvalues, label=yname)
                 subplot_plot[i].set_ylabel(yunits)
                 subplot_plot[i].set_xlabel(xunits)
                 subplot_plot[i].set_ylim([subplot_plot[i].axes.get_yticks()[0], subplot_plot[i].axes.get_yticks()[-1]])
@@ -183,7 +181,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 leg = subplot_plot[i].legend(prop={'family':self.default_font, 'size':'10'})
                 leg.draggable()
                 i += 1
-            #self.figure.tight_layout()
+            # self.figure.tight_layout()
             plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.90, wspace=0.4, hspace=0.4)
             self.set_figure_options('subplot', subplot_plot)
             self.set_plot_options('subplot', subplot_plot)
@@ -201,11 +199,9 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         i = 0
         high_density = False
         for var_name in self.variables:
-            lon, lat = None, None
-            subplot_dict = {}
-            subplot_dict['var_values'] = self.variables[var_name]['values']
-            subplot_dict['var_units'] = self.variables[var_name]['units']
-            subplot_dict['var_dims'] = self.variables[var_name]['dimensions']
+            subplot_dict = {'var_values': self.variables[var_name]['values'],
+                            'var_units': self.variables[var_name]['units'],
+                            'var_dims': self.variables[var_name]['dimensions']}
             if georeferenced[i]:
                 subplot_dict['georeferenced'] = georeferenced
                 for dim in self.variables[var_name]['dimensions']:
@@ -217,16 +213,23 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         subplot_dict['lat_name'] = dim
                         subplot_dict['lat_values'] = self.dimensions[dim]['values']
                         subplot_dict['lat_units'] = self.dimensions[dim]['units']
-                subplot_dict['var_values'], subplot_dict['lon_values'] = add_cyclic_point(subplot_dict['var_values'], coord=subplot_dict['lon_values'])
+                subplot_dict['var_values'], subplot_dict['lon_values'] = add_cyclic_point(subplot_dict['var_values'],
+                                                                                          coord=subplot_dict[
+                                                                                              'lon_values'])
                 subplot_dict['projection'] = cartopy.crs.PlateCarree(central_longitude=0)   
             else:
-                subplot_dict['lon_name'] = var_dims[0]
-                subplot_dict['lon_values'] = self.dimensions[var_dims[0]]['values']
-                subplot_dict['lon_units'] = self.dimensions[var_dims[0]]['units']
-                subplot_dict['lat_name'] = var_dims[1]
-                subplot_dict['lat_values'] = self.dimensions[var_dims[1]]['values']
-                subplot_dict['lat_units'] = self.dimensions[var_dims[1]]['units']
-                subplot_dict['projection'] = None
+                pass
+                # chercher le temps et le mettre en longitude et l'autre dimension en latitude
+                # sinon choisir une dimension à mettre en lon et une dimension à mettre en lat
+
+                # subplot_dict['lon_name'] = var_dims[0]
+                # subplot_dict['lon_values'] = self.dimensions[var_dims[0]]['values']
+                # subplot_dict['lon_units'] = self.dimensions[var_dims[0]]['units']
+                # subplot_dict['lat_name'] = var_dims[1]
+                # subplot_dict['lat_values'] = self.dimensions[var_dims[1]]['values']
+                # subplot_dict['lat_units'] = self.dimensions[var_dims[1]]['units']
+                # subplot_dict['projection'] = None
+
             subplot_dict['ax'] = plt.subplot(len(self.variables), 1, i + 1, projection=subplot_dict['projection'])
             subplot_object[var_name] = subplot_dict
             if len(subplot_dict['lon_values']) * len(subplot_dict['lat_values']) > 65000:
@@ -237,8 +240,9 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.thread.finished.connect(self.close_wait_window)
             self.thread.start()
         else:
-            for sublot in subplot_object:
-                sublot['ax'].pcolormesh(lon_values, lat_values, var_values, transform=subplot['projection'], cmap='jet')
+            for key, subplot in subplot_object.items():
+                subplot['ax'].pcolormesh(subplot['lon_values'], subplot['lat_values'], subplot['var_values'],
+                                         transform=subplot['projection'], cmap='jet')
             self.plot_single_grid_end(subplot_object)
         
     def plot_single_grid_end(self, subplot_object):
@@ -249,15 +253,17 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 for land in cartopy.io.shapereader.Reader(land_shp_file).records():
                     subplot['ax'].add_geometries(land.geometry, subplot['projection'], facecolor='#e6e6e6')
                 for coastline in cartopy.io.shapereader.Reader(coastline_shp_file).records():
-                    subplot['ax'].add_geometries(coastline.geometry, subplot['projection'], edgecolor='black', linewidth=1.0, facecolor='None', antialiased=True)
+                    subplot['ax'].add_geometries(coastline.geometry, subplot['projection'], edgecolor='black',
+                                                 linewidth=1.0, facecolor='None', antialiased=True)
                 
-                gl = subplot['ax'].gridlines(crs=subplot['projection'], draw_labels=True, linewidth=1, color='black', alpha=1, linestyle='-')
+                gl = subplot['ax'].gridlines(crs=subplot['projection'], draw_labels=True, linewidth=1, color='black',
+                                             alpha=1, linestyle='-')
                 gl.xlabels_top = True
                 gl.ylabels_left = True
                 gl.xlines = True
                 gl.ylines = True
-                #gl.xlocator = matplotlib.ticker.FixedLocator([-180, -120, -60, -30, 0, 30, 60, 120, 180])
-                #gl.ylocator = matplotlib.ticker.FixedLocator([-80, -40, 0, 40, 80])
+                # gl.xlocator = matplotlib.ticker.FixedLocator([-180, -120, -60, -30, 0, 30, 60, 120, 180])
+                # gl.ylocator = matplotlib.ticker.FixedLocator([-80, -40, 0, 40, 80])
                 gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
                 gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
                 subplot['ax'].text(-0.07, 0.55, 'Latitude', va='bottom', ha='center',
@@ -270,11 +276,9 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 
         plt.subplots_adjust(left=0.085, right=0.85, bottom=0.085, top=0.9)
         self.canvas.draw()
-        #self.set_figure_options('grid', subplot_object)
-        #self.add_figure_options('grids')
-        
-    
-        
+        # self.set_figure_options('grid', subplot_object)
+        # self.add_figure_options('grids')
+
     def set_figure_options(self, plot_type, subplot_list=None):
         if plot_type == 'plot' or plot_type == 'subplot':
             self.figure_options['title'] = []
@@ -340,9 +344,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.figure_options['colorbar_width'] = []
             self.figure_options['colorbar_axis_xposition'] = []
             self.figure_options['colorbar_axis_yposition'] = []
-            
-            
-            
+
         if plot_type == 'plot':
             self.figure_options['title'].append('')
             self.figure_options['title_font'].append(self.default_font)
@@ -411,10 +413,10 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.figure_options['title'].append('')
             self.figure_options['title_font'].append(self.default_font)
             self.figure_options['title_size'].append(10)
-            #self.figure_options['xlabel'].append(plt.axes().xaxis.get_label_text())
+            # self.figure_options['xlabel'].append(plt.axes().xaxis.get_label_text())
             self.figure_options['xlabel_font'].append(self.default_font)
             self.figure_options['xlabel_size'].append(10)
-            #self.figure_options['ylabel'].append(plt.axes().yaxis.get_label_text())
+            # self.figure_options['ylabel'].append(plt.axes().yaxis.get_label_text())
             self.figure_options['ylabel_font'].append(self.default_font)
             self.figure_options['ylabel_size'].append(10)
             self.figure_options['margin_left'].append(0.085)
@@ -442,10 +444,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.figure_options['colorbar_width'].append(0.02)
             self.figure_options['colorbar_axis_xposition'].append(0.9)
             self.figure_options['colorbar_axis_yposition'].append(0.13)
-            
-            
-            
-    
+
     def set_plot_options(self, plot_type, subplot_list=None):
         if plot_type == 'plot' or plot_type == 'subplot':
             self.plot_options['line_style'] = []
@@ -506,9 +505,11 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 if self.figure_option_num == 0:
                     self.figure_options_sliders()
                 self.pw_figureOptions_vl_1.append(QtWidgets.QVBoxLayout())
-                self.pw_figureOptions_vl_1[self.figure_option_num].setObjectName("pw_figureOptions_vl_1_" + str(self.figure_option_num))
+                self.pw_figureOptions_vl_1[self.figure_option_num].setObjectName("pw_figureOptions_vl_1_" + str(
+                    self.figure_option_num))
                 self.pw_figureOptions_hl_1.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_1[self.figure_option_num].setObjectName("pw_figureOptions_hl_1_" + str(self.figure_option_num))
+                self.pw_figureOptions_hl_1[self.figure_option_num].setObjectName("pw_figureOptions_hl_1_" + str(
+                    self.figure_option_num))
                 self.pw_figureOptions_lb_1.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_1[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_1[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
@@ -517,1128 +518,1160 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     text = 'Subplot ' + str(self.figure_option_num + 1) + ': Figure options'
                 else:
                     text = 'Figure options:'
-                self.pw_figureOptions_lb_1[self.figure_option_num].setText(text)     
-                self.pw_figureOptions_lb_1[self.figure_option_num].setObjectName("pw_figureOptions_lb_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_1[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_hl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_1[self.figure_option_num])
-                self.pw_figureOptions_hl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(358, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_1[self.figure_option_num])
+                self.pw_figureOptions_lb_1[self.figure_option_num].setText(text)
+                self.pw_figureOptions_lb_1[self.figure_option_num].setObjectName("pw_figureOptions_lb_1_" + str(
+                    self.figure_option_num))
+                self.pw_figureOptions_lb_1[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_hl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_1[
+                                                                                 self.figure_option_num])
+                self.pw_figureOptions_hl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(358, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_1[
+                                                                                 self.figure_option_num])
                 self.pw_figureOptions_hl_2.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_2[self.figure_option_num].setObjectName("pw_figureOptions_hl_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_hl_2[self.figure_option_num].setObjectName("pw_figureOptions_hl_2_" + str(
+                    self.figure_option_num))
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_gl_1.append(QtWidgets.QGridLayout())
-                self.pw_figureOptions_gl_1[self.figure_option_num].setObjectName("pw_figureOptions_gl_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_2[self.figure_option_num].addLayout(self.pw_figureOptions_gl_1[self.figure_option_num])
+                self.pw_figureOptions_gl_1[self.figure_option_num].setObjectName("pw_figureOptions_gl_1_" + str(
+                    self.figure_option_num))
+                self.pw_figureOptions_hl_2[self.figure_option_num].addLayout(self.pw_figureOptions_gl_1[
+                                                                                 self.figure_option_num])
                 self.pw_figureOptions_lb_2.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_2[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_2[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_2[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_2[self.figure_option_num].setText("Figure title:")
-                self.pw_figureOptions_lb_2[self.figure_option_num].setObjectName("pw_figureOptions_lb_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_2[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_2[self.figure_option_num], 0, 0, 1, 1)
+                self.pw_figureOptions_lb_2[self.figure_option_num].setObjectName("pw_figureOptions_lb_2_" + str(
+                    self.figure_option_num))
+                self.pw_figureOptions_lb_2[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_2[
+                                                                                 self.figure_option_num], 0, 0, 1, 1)
                 self.pw_figureOptions_ln_1.append(QtWidgets.QLineEdit(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_ln_1[self.figure_option_num].setMinimumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_1[self.figure_option_num].setMaximumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_1[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_1[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_1[self.figure_option_num].setObjectName("pw_lineEdit_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_ln_1[self.figure_option_num], 0, 1, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color:  rgb(240, "
+                                                                                 "240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_1[self.figure_option_num].setObjectName("pw_lineEdit_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_1[self.figure_option_num], 0, 1, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 0, 2, 1, 1)
                 self.pw_figureOptions_lb_3.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_3[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_3[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_3[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_3[self.figure_option_num].setText("Font:")
-                self.pw_figureOptions_lb_3[self.figure_option_num].setObjectName("pw_figureOptions_lb_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_3[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_3[self.figure_option_num], 0, 3, 1, 1)
-                self.pw_figureOptions_cb_1.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_1[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_3[self.figure_option_num].setObjectName("pw_figureOptions_lb_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_3[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_3[self.figure_option_num], 0, 3, 1, 1)
+                self.pw_figureOptions_cb_1.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_1[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_1[self.figure_option_num].setMinimumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_1[self.figure_option_num].setMaximumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_1[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_1[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
-                self.pw_figureOptions_cb_1[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_1[self.figure_option_num].setObjectName("pw_figureOptions_cb_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_1[self.figure_option_num], 0, 4, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 5, 1, 1)
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
+                self.pw_figureOptions_cb_1[self.figure_option_num].setObjectName("pw_figureOptions_cb_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_1[self.figure_option_num], 0, 4, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 0, 5, 1, 1)
                 self.pw_figureOptions_lb_4.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_4[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_4[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_4[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_4[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_4[self.figure_option_num].setObjectName("pw_figureOptions_lb_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_4[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_4[self.figure_option_num], 0, 6, 1, 1)
-                self.pw_figureOptions_cb_2.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_2[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_4[self.figure_option_num].setObjectName("pw_figureOptions_lb_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_4[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_4[self.figure_option_num], 0, 6, 1, 1)
+                self.pw_figureOptions_cb_2.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_2[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_2[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_2[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_2[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_2[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
-                self.pw_figureOptions_cb_2[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_2[self.figure_option_num].setObjectName("pw_figureOptions_cb_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_2[self.figure_option_num], 0, 7, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 8, 1, 1)
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
+                self.pw_figureOptions_cb_2[self.figure_option_num].setObjectName("pw_figureOptions_cb_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_2[self.figure_option_num], 0, 7, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 0, 8, 1, 1)
                 self.pw_figureOptions_lb_5.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_5[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_5[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_5[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_5[self.figure_option_num].setText("X axis label:")
-                self.pw_figureOptions_lb_5[self.figure_option_num].setObjectName("pw_figureOptions_lb_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_5[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_5[self.figure_option_num], 1, 0, 1, 1)
+                self.pw_figureOptions_lb_5[self.figure_option_num].setObjectName("pw_figureOptions_lb_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_5[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_5[self.figure_option_num], 1, 0, 1, 1)
                 self.pw_figureOptions_ln_2.append(QtWidgets.QLineEdit(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_ln_2[self.figure_option_num].setMinimumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_2[self.figure_option_num].setMaximumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_2[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_2[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_2[self.figure_option_num].setObjectName("pw_lineEdit_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_ln_2[self.figure_option_num], 1, 1, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 1, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_2[self.figure_option_num].setObjectName("pw_lineEdit_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_2[self.figure_option_num], 1, 1, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 1, 2, 1, 1)
                 self.pw_figureOptions_lb_6.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_6[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_6[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_6[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_6[self.figure_option_num].setText("Font:")
-                self.pw_figureOptions_lb_6[self.figure_option_num].setObjectName("pw_figureOptions_lb_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_6[self.figure_option_num], 1, 3, 1, 1)
-                self.pw_figureOptions_cb_3.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_3[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_6[self.figure_option_num].setObjectName("pw_figureOptions_lb_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_6[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_6[self.figure_option_num], 1, 3, 1, 1)
+                self.pw_figureOptions_cb_3.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_3[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_3[self.figure_option_num].setMinimumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_3[self.figure_option_num].setMaximumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_3[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_3[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_3[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_3[self.figure_option_num].setObjectName("pw_figureOptions_cb_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_3[self.figure_option_num], 1, 4, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 1, 5, 1, 1)
+                self.pw_figureOptions_cb_3[self.figure_option_num].setObjectName("pw_figureOptions_cb_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_3[self.figure_option_num], 1, 4, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 1, 5, 1, 1)
                 self.pw_figureOptions_lb_7.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_7[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_7[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_7[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_7[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_7[self.figure_option_num].setObjectName("pw_figureOptions_lb_7_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_7[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_7[self.figure_option_num], 1, 6, 1, 1)
-                self.pw_figureOptions_cb_4.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_4[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_7[self.figure_option_num].setObjectName("pw_figureOptions_lb_7_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_7[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_7[self.figure_option_num], 1, 6, 1, 1)
+                self.pw_figureOptions_cb_4.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_4[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_4[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_4[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_4[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_4[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_4[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_4[self.figure_option_num].setObjectName("pw_figureOptions_cb_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_4[self.figure_option_num], 1, 7, 1, 1)
+                self.pw_figureOptions_cb_4[self.figure_option_num].setObjectName("pw_figureOptions_cb_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_4[self.figure_option_num], 1, 7, 1, 1)
                 self.pw_figureOptions_lb_8.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_8[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_8[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_8[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_8[self.figure_option_num].setText("Y axis label:")
-                self.pw_figureOptions_lb_8[self.figure_option_num].setObjectName("pw_figureOptions_lb_8_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_8[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_8[self.figure_option_num], 2, 0, 1, 1)
+                self.pw_figureOptions_lb_8[self.figure_option_num].setObjectName("pw_figureOptions_lb_8_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_8[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_8[self.figure_option_num], 2, 0, 1, 1)
                 self.pw_figureOptions_ln_3.append(QtWidgets.QLineEdit(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_ln_3[self.figure_option_num].setMinimumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_3[self.figure_option_num].setMaximumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_3[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_3[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "   padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_3[self.figure_option_num].setObjectName("pw_lineEdit_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_ln_3[self.figure_option_num], 2, 1, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 2, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "   padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_3[self.figure_option_num].setObjectName("pw_lineEdit_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_3[self.figure_option_num], 2, 1, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 2, 2, 1, 1)
                 self.pw_figureOptions_lb_9.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_9[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_9[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_9[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_9[self.figure_option_num].setText("Font:")
-                self.pw_figureOptions_lb_9[self.figure_option_num].setObjectName("pw_figureOptions_lb_9_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_9[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_9[self.figure_option_num], 2, 3, 1, 1)
+                self.pw_figureOptions_lb_9[self.figure_option_num].setObjectName("pw_figureOptions_lb_9_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_9[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_9[self.figure_option_num], 2, 3, 1, 1)
                 self.pw_figureOptions_cb_5.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_5[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_5[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_5[self.figure_option_num].setMinimumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_5[self.figure_option_num].setMaximumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_5[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_5[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_5[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_5[self.figure_option_num].setObjectName("pw_figureOptions_cb_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_5[self.figure_option_num], 2, 4, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 2, 5, 1, 1)
+                self.pw_figureOptions_cb_5[self.figure_option_num].setObjectName("pw_figureOptions_cb_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_5[self.figure_option_num], 2, 4, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 2, 5, 1, 1)
                 self.pw_figureOptions_lb_10.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_10[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_10[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_10[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_10[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_10[self.figure_option_num].setObjectName("pw_figureOptions_lb_10_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_10[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_10[self.figure_option_num], 2, 6, 1, 1)
+                self.pw_figureOptions_lb_10[self.figure_option_num].setObjectName("pw_figureOptions_lb_10_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_10[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_10[self.figure_option_num], 2, 6, 1, 1)
                 self.pw_figureOptions_cb_6.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_6[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_6[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_6[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_6[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_6[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_6[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_6[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_6[self.figure_option_num].setObjectName("pw_figureOptions_cb_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_6[self.figure_option_num], 2, 7, 1, 1)
-                self.pw_figureOptions_hl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_cb_6[self.figure_option_num].setObjectName("pw_figureOptions_cb_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_6[self.figure_option_num], 2, 7, 1, 1)
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_bt_1.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_1[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_1[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_1[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_1[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_1[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_1[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_1[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_1[self.figure_option_num].setObjectName("pw_figureOptions_bt_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_2[self.figure_option_num].addWidget(self.pw_figureOptions_bt_1[self.figure_option_num])
-                self.pw_figureOptions_hl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_2[self.figure_option_num])
+                self.pw_figureOptions_bt_1[self.figure_option_num].setObjectName("pw_figureOptions_bt_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_1[self.figure_option_num])
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding,
+                                                  QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_2[self.figure_option_num])
                 self.pw_figureOptions_hl_3.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_3[self.figure_option_num].setObjectName("pw_figureOptions_hl_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_hl_3[self.figure_option_num].setObjectName("pw_figureOptions_hl_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_gl_2.append(QtWidgets.QGridLayout())
-                self.pw_figureOptions_gl_2[self.figure_option_num].setObjectName("pw_figureOptions_gl_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_3[self.figure_option_num].addLayout(self.pw_figureOptions_gl_2[self.figure_option_num])
+                self.pw_figureOptions_gl_2[self.figure_option_num].setObjectName("pw_figureOptions_gl_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_gl_2[self.figure_option_num])
                 self.pw_figureOptions_lb_11.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_11[self.figure_option_num].setMinimumSize(QtCore.QSize(200, 27))
                 self.pw_figureOptions_lb_11[self.figure_option_num].setMaximumSize(QtCore.QSize(200, 27))
                 self.pw_figureOptions_lb_11[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_11[self.figure_option_num].setText("X min / max / tick step:")
-                self.pw_figureOptions_lb_11[self.figure_option_num].setObjectName("pw_figureOptions_lb_11_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_11[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_lb_11[self.figure_option_num], 0, 0, 1, 1)
+                self.pw_figureOptions_lb_11[self.figure_option_num].setObjectName("pw_figureOptions_lb_11_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_11[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_11[self.figure_option_num], 0, 0, 1, 1)
                 self.pw_figureOptions_ln_4.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_4[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_4[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_4[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_4[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_4[self.figure_option_num].setObjectName("pw_figureOptions_ln_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_4[self.figure_option_num], 0, 1, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_4[self.figure_option_num].setObjectName("pw_figureOptions_ln_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_4[self.figure_option_num], 0, 1, 1, 1)
                 self.pw_figureOptions_ln_5.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_5[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_5[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_5[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_5[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_5[self.figure_option_num].setObjectName("pw_figureOptions_ln_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_5[self.figure_option_num], 0, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_5[self.figure_option_num].setObjectName("pw_figureOptions_ln_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_5[self.figure_option_num], 0, 2, 1, 1)
                 self.pw_figureOptions_ln_6.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_6[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_6[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_6[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_6[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_6[self.figure_option_num].setObjectName("pw_figureOptions_ln_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_6[self.figure_option_num], 0, 3, 1, 1)
-                self.pw_figureOptions_gl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 4, 1, 1)
-                '''self.pw_figureOptions_lb_12.append(QtWidgets.QLabel())
-                self.pw_figureOptions_lb_12[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
-                self.pw_figureOptions_lb_12[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
-                self.pw_figureOptions_lb_12[self.figure_option_num].setFont(font)
-                self.pw_figureOptions_lb_12[self.figure_option_num].setText("Format:")
-                self.pw_figureOptions_lb_12[self.figure_option_num].setObjectName("pw_figureOptions_lb_12_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_12[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_lb_12[self.figure_option_num], 0, 5, 1, 1)
-                self.pw_figureOptions_cb_7.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_7[self.figure_option_num].setItemDelegate(itemDelegate)
-                self.pw_figureOptions_cb_7[self.figure_option_num].setMinimumSize(QtCore.QSize(180, 27))
-                self.pw_figureOptions_cb_7[self.figure_option_num].setMaximumSize(QtCore.QSize(180, 27))
-                self.pw_figureOptions_cb_7[self.figure_option_num].setFont(font3)
-                self.pw_figureOptions_cb_7[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
-                self.pw_figureOptions_cb_7[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_7[self.figure_option_num].setObjectName("pw_figureOptions_cb_7_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_cb_7[self.figure_option_num], 0, 6, 1, 1)'''
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_6[self.figure_option_num].setObjectName("pw_figureOptions_ln_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_6[self.figure_option_num], 0, 3, 1, 1)
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 0, 4, 1, 1)
                 self.pw_figureOptions_lb_13.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_13[self.figure_option_num].setMinimumSize(QtCore.QSize(200, 27))
                 self.pw_figureOptions_lb_13[self.figure_option_num].setMaximumSize(QtCore.QSize(200, 27))
                 self.pw_figureOptions_lb_13[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_13[self.figure_option_num].setText("Y min / max / tick step:")
-                self.pw_figureOptions_lb_13[self.figure_option_num].setObjectName("pw_figureOptions_lb_13_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_13[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_lb_13[self.figure_option_num], 1, 0, 1, 1)
+                self.pw_figureOptions_lb_13[self.figure_option_num].setObjectName("pw_figureOptions_lb_13_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_13[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_13[self.figure_option_num], 1, 0, 1, 1)
                 self.pw_figureOptions_ln_7.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_7[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_7[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_7[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_7[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_7[self.figure_option_num].setObjectName("pw_figureOptions_ln_7_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_7[self.figure_option_num], 1, 1, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_7[self.figure_option_num].setObjectName("pw_figureOptions_ln_7_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_7[self.figure_option_num], 1, 1, 1, 1)
                 self.pw_figureOptions_ln_8.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_8[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_8[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_8[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_8[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "   padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "}")
-                self.pw_figureOptions_ln_8[self.figure_option_num].setObjectName("pw_figureOptions_ln_8_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_8[self.figure_option_num], 1, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "   padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_8[self.figure_option_num].setObjectName("pw_figureOptions_ln_8_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_8[self.figure_option_num], 1, 2, 1, 1)
                 self.pw_figureOptions_ln_9.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_9[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_9[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_9[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_9[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "   padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "}")
-                self.pw_figureOptions_ln_9[self.figure_option_num].setObjectName("pw_figureOptions_ln_9_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_9[self.figure_option_num], 1, 3, 1, 1)
-                self.pw_figureOptions_gl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 1, 4, 1, 1)
-                '''self.pw_figureOptions_lb_14.append(QtWidgets.QLabel())
-                self.pw_figureOptions_lb_14[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
-                self.pw_figureOptions_lb_14[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
-                self.pw_figureOptions_lb_14[self.figure_option_num].setFont(font)
-                self.pw_figureOptions_lb_14[self.figure_option_num].setText("Format:")
-                self.pw_figureOptions_lb_14[self.figure_option_num].setObjectName("pw_figureOptions_lb_14_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_14[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_lb_14[self.figure_option_num], 1, 5, 1, 1)
-                self.pw_figureOptions_cb_8.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_8[self.figure_option_num].setItemDelegate(itemDelegate)
-                self.pw_figureOptions_cb_8[self.figure_option_num].setMinimumSize(QtCore.QSize(180, 27))
-                self.pw_figureOptions_cb_8[self.figure_option_num].setMaximumSize(QtCore.QSize(180, 27))
-                self.pw_figureOptions_cb_8[self.figure_option_num].setFont(font)
-                self.pw_figureOptions_cb_8[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
-                self.pw_figureOptions_cb_8[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_8[self.figure_option_num].setObjectName("pw_figureOptions_cb_8_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_cb_8[self.figure_option_num], 1, 6, 1, 1)
-                self.pw_figureOptions_hl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))'''
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "   padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_9[self.figure_option_num].setObjectName("pw_figureOptions_ln_9_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_9[self.figure_option_num], 1, 3, 1, 1)
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 1, 4, 1, 1)
                 self.pw_figureOptions_bt_2.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_2[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_2[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_2[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_2[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_2[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_2[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_2[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_2[self.figure_option_num].setObjectName("pw_figureOptions_bt_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_3[self.figure_option_num].addWidget(self.pw_figureOptions_bt_2[self.figure_option_num])
-                self.pw_figureOptions_hl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_3[self.figure_option_num])
+                self.pw_figureOptions_bt_2[self.figure_option_num].setObjectName("pw_figureOptions_bt_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_2[self.figure_option_num])
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_3[self.figure_option_num])
                 self.pw_figureOptions_hl_4.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_4[self.figure_option_num].setObjectName("pw_figureOptions_hl_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_hl_4[self.figure_option_num].setObjectName("pw_figureOptions_hl_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_gl_3.append(QtWidgets.QGridLayout())
-                self.pw_figureOptions_gl_3[self.figure_option_num].setObjectName("pw_figureOptions_gl_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_4[self.figure_option_num].addLayout(self.pw_figureOptions_gl_3[self.figure_option_num])
+                self.pw_figureOptions_gl_3[self.figure_option_num].setObjectName("pw_figureOptions_gl_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_gl_3[self.figure_option_num])
                 self.pw_figureOptions_lb_15.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_15[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_15[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_15[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_15[self.figure_option_num].setText("Display grid ?")
-                self.pw_figureOptions_lb_15[self.figure_option_num].setObjectName("pw_figureOptions_lb_15_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_15[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_15[self.figure_option_num], 0, 0, 1, 1)
+                self.pw_figureOptions_lb_15[self.figure_option_num].setObjectName("pw_figureOptions_lb_15_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_15[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_15[self.figure_option_num], 0, 0, 1, 1)
                 self.pw_figureOptions_ck_1.append(QtWidgets.QCheckBox())
                 self.pw_figureOptions_ck_1[self.figure_option_num].setMinimumSize(QtCore.QSize(25, 20))
                 self.pw_figureOptions_ck_1[self.figure_option_num].setMaximumSize(QtCore.QSize(25, 20))
                 self.pw_figureOptions_ck_1[self.figure_option_num].setText("")
-                self.pw_figureOptions_ck_1[self.figure_option_num].setObjectName("pw_figureOptions_ck_1_" + str(self.figure_option_num))
+                self.pw_figureOptions_ck_1[self.figure_option_num].setObjectName("pw_figureOptions_ck_1_"
+                                                                                 + str(self.figure_option_num))
                 self.pw_figureOptions_ck_1[self.figure_option_num].setStyleSheet("QCheckBox {\n"
-                "    spacing: 5px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_ck_1[self.figure_option_num], 0, 1, 1, 1)
-                self.pw_figureOptions_gl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 2, 1, 1)
+                                                                                 "    spacing: 5px;\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ck_1[self.figure_option_num], 0, 1, 1, 1)
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 2, 1, 1)
                 self.pw_figureOptions_lb_16.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_16[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_16[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_16[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_16[self.figure_option_num].setText("Style:")
-                self.pw_figureOptions_lb_16[self.figure_option_num].setObjectName("pw_figureOptions_lb_16_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_16[self.figure_option_num], 0, 3, 1, 1)
+                self.pw_figureOptions_lb_16[self.figure_option_num].setObjectName("pw_figureOptions_lb_16_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_16[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_16[self.figure_option_num], 0, 3, 1, 1)
                 self.pw_figureOptions_cb_9.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_9[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_9[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_9[self.figure_option_num].setEnabled(False)
                 self.pw_figureOptions_cb_9[self.figure_option_num].setMinimumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_9[self.figure_option_num].setMaximumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_9[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_9[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_9[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_9[self.figure_option_num].setObjectName("pw_figureOptions_cb_9_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_cb_9[self.figure_option_num], 0, 4, 1, 1)
-                self.pw_figureOptions_gl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 5, 1, 1)
+                self.pw_figureOptions_cb_9[self.figure_option_num].setObjectName("pw_figureOptions_cb_9_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_9[self.figure_option_num], 0, 4, 1, 1)
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 5, 1, 1)
                 self.pw_figureOptions_lb_17.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_17[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_17[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_17[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_17[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_17[self.figure_option_num].setObjectName("pw_figureOptions_lb_17_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_17[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_17[self.figure_option_num], 0, 6, 1, 1)
+                self.pw_figureOptions_lb_17[self.figure_option_num].setObjectName("pw_figureOptions_lb_17_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_17[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_17[self.figure_option_num], 0, 6, 1, 1)
                 self.pw_figureOptions_ln_10.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_10[self.figure_option_num].setEnabled(False)
                 self.pw_figureOptions_ln_10[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_ln_10[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_ln_10[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_10[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QLineEdit:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}")
-                self.pw_figureOptions_ln_10[self.figure_option_num].setObjectName("pw_figureOptions_ln_10_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_ln_10[self.figure_option_num], 0, 7, 1, 1)
-                self.pw_figureOptions_gl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 8, 1, 1)
+                                                                                  "    border-radius: 3px;\n"
+                                                                                  "    padding: 1px 4px 1px 4px;\n"
+                                                                                  "    background-color: "
+                                                                                  "rgb(240, 240, 240);\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QLineEdit:disabled {\n"
+                                                                                  "    background-color: "
+                                                                                  "rgb(200,200,200);\n"
+                                                                                  "}")
+                self.pw_figureOptions_ln_10[self.figure_option_num].setObjectName("pw_figureOptions_ln_10_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_10[self.figure_option_num], 0, 7, 1, 1)
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 8, 1, 1)
                 self.pw_figureOptions_lb_19.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_19[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_19[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_19[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_19[self.figure_option_num].setText("Color:")
-                self.pw_figureOptions_lb_19[self.figure_option_num].setObjectName("pw_figureOptions_lb_19_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_19[self.figure_option_num], 0, 9, 1, 1)
+                self.pw_figureOptions_lb_19[self.figure_option_num].setObjectName("pw_figureOptions_lb_19_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_19[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_19[self.figure_option_num], 0, 9, 1, 1)
                 self.pw_figureOptions_cb_10.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_10[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_10[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_10[self.figure_option_num].setEnabled(False)
                 self.pw_figureOptions_cb_10[self.figure_option_num].setMinimumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_10[self.figure_option_num].setMaximumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_10[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_10[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                  "    border: 1px solid #acacac;\n"
+                                                                                  "    border-radius: 1px;\n"
+                                                                                  "    padding-left: 5px;\n"
+                                                                                  "    background-color: "
+                                                                                  "qlineargradient(x1: 0, y1: 0, "
+                                                                                  "x2: 0, y2: 1, \n"
+                                                                                  "                                "
+                                                                                  "stop: 0 #f0f0f0, "
+                                                                                  "stop: 1 #e5e5e5);\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QComboBox:disabled {\n"
+                                                                                  "    background-color: "
+                                                                                  "rgb(200,200,200);\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QComboBox:hover {\n"
+                                                                                  "    border: 1px solid #7eb4ea;\n"
+                                                                                  "    border-radius: 1px;\n"
+                                                                                  "    background-color: "
+                                                                                  "qlineargradient(x1: 0, y1: 0, "
+                                                                                  "x2: 0, y2: 1, \n"
+                                                                                  "                                "
+                                                                                  "stop: 0 #ecf4fc, "
+                                                                                  "stop: 1 #dcecfc);\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QComboBox::drop-down {\n"
+                                                                                  "    subcontrol-origin: padding;\n"
+                                                                                  "    subcontrol-position: "
+                                                                                  "top right;\n"
+                                                                                  "    width: 27px;\n"
+                                                                                  "    border-left-width: 1px;\n"
+                                                                                  "    border-left-color: darkgray;\n"
+                                                                                  "    border-left-style: solid;\n"
+                                                                                  "    border-top-right-radius: 3px;\n"
+                                                                                  "    border-bottom-right-radius: "
+                                                                                  "3px;\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QComboBox::down-arrow {\n"
+                                                                                  "    image: "
+                                                                                  "url(icons/down_arrow_icon.svg); \n"
+                                                                                  "    width: 16px;\n"
+                                                                                  "    height: 16px\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QComboBox QAbstractItemView {\n"
+                                                                                  "    selection-background-color: "
+                                                                                  "rgb(200,200,200);\n"
+                                                                                  "    selection-color: black;\n"
+                                                                                  "    background: #f0f0f0;\n"
+                                                                                  "    border: 0px solid #f0f0f0;\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QComboBox QAbstractItemView::item "
+                                                                                  "{\n"
+                                                                                  "    margin: 5px 5px 5px 5px;\n"
+                                                                                  "}")
                 self.pw_figureOptions_cb_10[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_10[self.figure_option_num].setObjectName("pw_figureOptions_cb_10_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_cb_10[self.figure_option_num], 0, 10, 1, 1)
-                self.pw_figureOptions_gl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 11, 1, 1)
+                self.pw_figureOptions_cb_10[self.figure_option_num].setObjectName("pw_figureOptions_cb_10_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_10[self.figure_option_num], 0, 10, 1, 1)
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 11, 1, 1)
                 self.pw_figureOptions_bt_6.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_6[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_6[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_6[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_6[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_6[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_6[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_6[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_6[self.figure_option_num].setObjectName("pw_figureOptions_bt_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_bt_6[self.figure_option_num], 0, 12, 1, 1)
+                self.pw_figureOptions_bt_6[self.figure_option_num].setObjectName("pw_figureOptions_bt_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_6[self.figure_option_num], 0, 12, 1, 1)
                 self.pw_figureOptions_lb_18.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_18[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_18[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_18[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_18[self.figure_option_num].setText("Display Legend ?")
-                self.pw_figureOptions_lb_18[self.figure_option_num].setObjectName("pw_figureOptions_lb_18_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_18[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_18[self.figure_option_num], 1, 0, 1, 1)
+                self.pw_figureOptions_lb_18[self.figure_option_num].setObjectName("pw_figureOptions_lb_18_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_18[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_18[self.figure_option_num], 1, 0, 1, 1)
                 self.pw_figureOptions_ck_2.append(QtWidgets.QCheckBox())
                 self.pw_figureOptions_ck_2[self.figure_option_num].setMinimumSize(QtCore.QSize(25, 20))
                 self.pw_figureOptions_ck_2[self.figure_option_num].setMaximumSize(QtCore.QSize(25, 20))
                 self.pw_figureOptions_ck_2[self.figure_option_num].setText("")
                 self.pw_figureOptions_ck_2[self.figure_option_num].setChecked(True)
-                self.pw_figureOptions_ck_2[self.figure_option_num].setObjectName("pw_figureOptions_ck_2_" + str(self.figure_option_num))
+                self.pw_figureOptions_ck_2[self.figure_option_num].setObjectName("pw_figureOptions_ck_2_"
+                                                                                 + str(self.figure_option_num))
                 self.pw_figureOptions_ck_2[self.figure_option_num].setStyleSheet("QCheckBox {\n"
-                "    spacing: 5px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_ck_2[self.figure_option_num], 1, 1, 1, 1)
-                self.pw_figureOptions_gl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 1, 2, 1, 1)
+                                                                                 "    spacing: 5px;\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ck_2[self.figure_option_num], 1, 1, 1, 1)
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 1, 2, 1, 1)
                 self.pw_figureOptions_bt_7.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_7[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_7[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_7[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_7[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_7[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_7[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_7[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_7[self.figure_option_num].setObjectName("pw_figureOptions_bt_7_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_bt_7[self.figure_option_num], 1, 3, 1, 1)
-                self.pw_figureOptions_gl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum), 1, 4, 1, 1)
-                self.pw_figureOptions_hl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_4[self.figure_option_num])
-                self.pw_figureOptions_vl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
+                self.pw_figureOptions_bt_7[self.figure_option_num].setObjectName("pw_figureOptions_bt_7_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_7[self.figure_option_num], 1, 3, 1, 1)
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Expanding,
+                                                  QtWidgets.QSizePolicy.Minimum), 1, 4, 1, 1)
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding,
+                                                  QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_4[self.figure_option_num])
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
                 self.pw_figureOptions_li_1.append(QtWidgets.QFrame())
                 self.pw_figureOptions_li_1[self.figure_option_num].setFrameShape(QtWidgets.QFrame.HLine)
                 self.pw_figureOptions_li_1[self.figure_option_num].setFrameShadow(QtWidgets.QFrame.Sunken)
                 self.pw_figureOptions_li_1[self.figure_option_num].setStyleSheet("QFrame {\n"
-                "    background: rgb(190,190,190);\n"
-                "    height: 5px;\n"
-                "    border: 0px solid black;\n"
-                "}")
-                self.pw_figureOptions_li_1[self.figure_option_num].setObjectName("pw_figureOptions_li_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addWidget(self.pw_figureOptions_li_1[self.figure_option_num])
-                self.pw_figureOptions_vl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
+                                                                                 "    background: rgb(190,190,190);\n"
+                                                                                 "    height: 5px;\n"
+                                                                                 "    border: 0px solid black;\n"
+                                                                                 "}")
+                self.pw_figureOptions_li_1[self.figure_option_num].setObjectName("pw_figureOptions_li_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_li_1[self.figure_option_num])
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
                 self.pw_figureOptions_la.addLayout(self.pw_figureOptions_vl_1[self.figure_option_num])
                 self.pw_figureOptions_la.setAlignment(QtCore.Qt.AlignTop)
-                self.populate_combobox(self.pw_figureOptions_cb_1[self.figure_option_num], self.font_list, False, self.default_font)
-                self.populate_combobox(self.pw_figureOptions_cb_3[self.figure_option_num], self.font_list, False, self.default_font)
-                self.populate_combobox(self.pw_figureOptions_cb_5[self.figure_option_num], self.font_list, False, self.default_font)
-                self.populate_combobox(self.pw_figureOptions_cb_2[self.figure_option_num], [str(x) for x in range(1,49,1)], False, 9)
-                self.populate_combobox(self.pw_figureOptions_cb_4[self.figure_option_num], [str(x) for x in range(1,49,1)], False, 9)
-                self.populate_combobox(self.pw_figureOptions_cb_6[self.figure_option_num], [str(x) for x in range(1,49,1)], False, 9)
-                self.pw_figureOptions_ck_1[self.figure_option_num].stateChanged.connect(self.activate_grid_options(val, plot_type='timeseries'))
+                populate_combobox(self.pw_figureOptions_cb_1[self.figure_option_num], self.font_list, False,
+                                  self.default_font)
+                populate_combobox(self.pw_figureOptions_cb_3[self.figure_option_num], self.font_list, False,
+                                  self.default_font)
+                populate_combobox(self.pw_figureOptions_cb_5[self.figure_option_num], self.font_list, False,
+                                  self.default_font)
+                populate_combobox(self.pw_figureOptions_cb_2[self.figure_option_num],
+                                       [str(x) for x in range(1, 49, 1)], False, 9)
+                populate_combobox(self.pw_figureOptions_cb_4[self.figure_option_num],
+                                       [str(x) for x in range(1, 49, 1)], False, 9)
+                populate_combobox(self.pw_figureOptions_cb_6[self.figure_option_num],
+                                       [str(x) for x in range(1, 49, 1)], False, 9)
+                self.pw_figureOptions_ck_1[self.figure_option_num].stateChanged.connect(lambda val:
+                                                                                        self.activate_grid_options(
+                                                                                            val, plot_type))
+
+                self.pw_figureOptions_bt_1[self.figure_option_num].clicked.connect(self.figure_button_information)
+                self.pw_figureOptions_bt_2[self.figure_option_num].clicked.connect(self.figure_button_information)
+                self.pw_figureOptions_bt_6[self.figure_option_num].clicked.connect(self.figure_button_information)
+                self.pw_figureOptions_bt_7[self.figure_option_num].clicked.connect(self.figure_button_information)
+
                 if 'figure_instance' in self.figure_options:
                     subplot = self.figure_options['figure_instance'][self.figure_option_num]
                     self.pw_figureOptions_ln_2[self.figure_option_num].setText(subplot.axes.xaxis.get_label_text())
@@ -1686,16 +1719,18 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     self.pw_figureOptions_ln_8[self.figure_option_num].setCursorPosition(0)
                     self.pw_figureOptions_ln_9[self.figure_option_num].setText(str(ystep))
                     self.pw_figureOptions_ln_9[self.figure_option_num].setCursorPosition(0)
-                self.figure_option_num +=1
+                self.figure_option_num += 1
         elif plot_type == 'grids':
             for _ in self.figure_options['title']:
                 if self.figure_option_num == 0:
                     self.figure_options_sliders()
-                
+
                 self.pw_figureOptions_vl_1.append(QtWidgets.QVBoxLayout())
-                self.pw_figureOptions_vl_1[self.figure_option_num].setObjectName("pw_figureOptions_vl_1_" + str(self.figure_option_num))
+                self.pw_figureOptions_vl_1[self.figure_option_num].setObjectName("pw_figureOptions_vl_1_"
+                                                                                 + str(self.figure_option_num))
                 self.pw_figureOptions_hl_1.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_1[self.figure_option_num].setObjectName("pw_figureOptions_hl_1_" + str(self.figure_option_num))
+                self.pw_figureOptions_hl_1[self.figure_option_num].setObjectName("pw_figureOptions_hl_1_"
+                                                                                 + str(self.figure_option_num))
                 self.pw_figureOptions_lb_1.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_1[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_1[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
@@ -1704,1049 +1739,1193 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     text = 'Subplot ' + str(self.figure_option_num + 1) + ': Figure options'
                 else:
                     text = 'Figure options:'
-                self.pw_figureOptions_lb_1[self.figure_option_num].setText(text)     
-                self.pw_figureOptions_lb_1[self.figure_option_num].setObjectName("pw_figureOptions_lb_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_1[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_hl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_1[self.figure_option_num])
-                self.pw_figureOptions_hl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(358, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_1[self.figure_option_num])
+                self.pw_figureOptions_lb_1[self.figure_option_num].setText(text)
+                self.pw_figureOptions_lb_1[self.figure_option_num].setObjectName("pw_figureOptions_lb_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_1[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_hl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_1[self.figure_option_num])
+                self.pw_figureOptions_hl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(358, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_1[self.figure_option_num])
                 self.pw_figureOptions_hl_2.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_2[self.figure_option_num].setObjectName("pw_figureOptions_hl_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_hl_2[self.figure_option_num].setObjectName("pw_figureOptions_hl_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_gl_1.append(QtWidgets.QGridLayout())
-                self.pw_figureOptions_gl_1[self.figure_option_num].setObjectName("pw_figureOptions_gl_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_2[self.figure_option_num].addLayout(self.pw_figureOptions_gl_1[self.figure_option_num])
+                self.pw_figureOptions_gl_1[self.figure_option_num].setObjectName("pw_figureOptions_gl_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_gl_1[self.figure_option_num])
                 self.pw_figureOptions_lb_2.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_2[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_2[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_2[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_2[self.figure_option_num].setText("Figure title:")
-                self.pw_figureOptions_lb_2[self.figure_option_num].setObjectName("pw_figureOptions_lb_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_2[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_2[self.figure_option_num], 0, 0, 1, 1)
+                self.pw_figureOptions_lb_2[self.figure_option_num].setObjectName("pw_figureOptions_lb_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_2[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_2[self.figure_option_num], 0, 0, 1, 1)
                 self.pw_figureOptions_ln_1.append(QtWidgets.QLineEdit(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_ln_1[self.figure_option_num].setMinimumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_1[self.figure_option_num].setMaximumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_1[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_1[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_1[self.figure_option_num].setObjectName("pw_lineEdit_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_ln_1[self.figure_option_num], 0, 1, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color:  rgb(240, "
+                                                                                 "240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_1[self.figure_option_num].setObjectName("pw_lineEdit_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_1[self.figure_option_num], 0, 1, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 2, 1, 1)
                 self.pw_figureOptions_lb_3.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_3[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_3[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_3[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_3[self.figure_option_num].setText("Font:")
-                self.pw_figureOptions_lb_3[self.figure_option_num].setObjectName("pw_figureOptions_lb_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_3[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_3[self.figure_option_num], 0, 3, 1, 1)
-                self.pw_figureOptions_cb_1.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_1[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_3[self.figure_option_num].setObjectName("pw_figureOptions_lb_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_3[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_3[self.figure_option_num], 0, 3, 1, 1)
+                self.pw_figureOptions_cb_1.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_1[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_1[self.figure_option_num].setMinimumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_1[self.figure_option_num].setMaximumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_1[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_1[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: rgb(200,200,"
+                                                                                 "200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: url("
+                                                                                 "icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_1[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_1[self.figure_option_num].setObjectName("pw_figureOptions_cb_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_1[self.figure_option_num], 0, 4, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 5, 1, 1)
+                self.pw_figureOptions_cb_1[self.figure_option_num].setObjectName("pw_figureOptions_cb_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_1[self.figure_option_num], 0, 4, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 5, 1, 1)
                 self.pw_figureOptions_lb_4.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_4[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_4[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_4[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_4[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_4[self.figure_option_num].setObjectName("pw_figureOptions_lb_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_4[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_4[self.figure_option_num], 0, 6, 1, 1)
-                self.pw_figureOptions_cb_2.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_2[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_4[self.figure_option_num].setObjectName("pw_figureOptions_lb_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_4[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_4[self.figure_option_num], 0, 6, 1, 1)
+                self.pw_figureOptions_cb_2.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_2[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_2[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_2[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_2[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_2[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: rgb(200,200,"
+                                                                                 "200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: url("
+                                                                                 "icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_2[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_2[self.figure_option_num].setObjectName("pw_figureOptions_cb_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_2[self.figure_option_num], 0, 7, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 8, 1, 1)
+                self.pw_figureOptions_cb_2[self.figure_option_num].setObjectName("pw_figureOptions_cb_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_2[self.figure_option_num], 0, 7, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 8, 1, 1)
                 self.pw_figureOptions_lb_5.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_5[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_5[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_5[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_5[self.figure_option_num].setText("X axis label:")
-                self.pw_figureOptions_lb_5[self.figure_option_num].setObjectName("pw_figureOptions_lb_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_5[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_5[self.figure_option_num], 1, 0, 1, 1)
+                self.pw_figureOptions_lb_5[self.figure_option_num].setObjectName("pw_figureOptions_lb_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_5[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_5[self.figure_option_num], 1, 0, 1, 1)
                 self.pw_figureOptions_ln_2.append(QtWidgets.QLineEdit(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_ln_2[self.figure_option_num].setMinimumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_2[self.figure_option_num].setMaximumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_2[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_2[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_2[self.figure_option_num].setObjectName("pw_lineEdit_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_ln_2[self.figure_option_num], 1, 1, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 1, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color:  rgb(240, "
+                                                                                 "240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_2[self.figure_option_num].setObjectName("pw_lineEdit_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_2[self.figure_option_num], 1, 1, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 1, 2, 1, 1)
                 self.pw_figureOptions_lb_6.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_6[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_6[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_6[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_6[self.figure_option_num].setText("Font:")
-                self.pw_figureOptions_lb_6[self.figure_option_num].setObjectName("pw_figureOptions_lb_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_6[self.figure_option_num], 1, 3, 1, 1)
-                self.pw_figureOptions_cb_3.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_3[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_6[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_lb_6[self.figure_option_num].setObjectName("pw_figureOptions_lb_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_6[self.figure_option_num], 1, 3, 1, 1)
+                self.pw_figureOptions_cb_3.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_3[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_3[self.figure_option_num].setMinimumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_3[self.figure_option_num].setMaximumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_3[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_3[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: rgb(200,200,"
+                                                                                 "200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: url("
+                                                                                 "icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_3[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_3[self.figure_option_num].setObjectName("pw_figureOptions_cb_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_3[self.figure_option_num], 1, 4, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 1, 5, 1, 1)
+                self.pw_figureOptions_cb_3[self.figure_option_num].setObjectName("pw_figureOptions_cb_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_3[self.figure_option_num], 1, 4, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 1, 5, 1, 1)
                 self.pw_figureOptions_lb_7.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_7[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_7[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_7[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_7[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_7[self.figure_option_num].setObjectName("pw_figureOptions_lb_7_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_7[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_7[self.figure_option_num], 1, 6, 1, 1)
-                self.pw_figureOptions_cb_4.append(QtWidgets.QComboBox(self.scrollAreaWidgetContents_3))
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_4[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_lb_7[self.figure_option_num].setObjectName("pw_figureOptions_lb_7_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_7[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_7[self.figure_option_num], 1, 6, 1, 1)
+                self.pw_figureOptions_cb_4.append(QtWidgets.QComboBox())
+                self.pw_figureOptions_cb_4[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_4[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_4[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_4[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_4[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: rgb(200,200,"
+                                                                                 "200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: url("
+                                                                                 "icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_4[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_4[self.figure_option_num].setObjectName("pw_figureOptions_cb_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_4[self.figure_option_num], 1, 7, 1, 1)
+                self.pw_figureOptions_cb_4[self.figure_option_num].setObjectName("pw_figureOptions_cb_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_4[self.figure_option_num], 1, 7, 1, 1)
                 self.pw_figureOptions_lb_8.append(QtWidgets.QLabel(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_lb_8[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_8[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_8[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_8[self.figure_option_num].setText("Y axis label:")
-                self.pw_figureOptions_lb_8[self.figure_option_num].setObjectName("pw_figureOptions_lb_8_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_8[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_8[self.figure_option_num], 2, 0, 1, 1)
+                self.pw_figureOptions_lb_8[self.figure_option_num].setObjectName("pw_figureOptions_lb_8_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_8[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_8[self.figure_option_num], 2, 0, 1, 1)
                 self.pw_figureOptions_ln_3.append(QtWidgets.QLineEdit(self.scrollAreaWidgetContents_3))
                 self.pw_figureOptions_ln_3[self.figure_option_num].setMinimumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_3[self.figure_option_num].setMaximumSize(QtCore.QSize(500, 27))
                 self.pw_figureOptions_ln_3[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_3[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "   padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_3[self.figure_option_num].setObjectName("pw_lineEdit_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_ln_3[self.figure_option_num], 2, 1, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 2, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "   padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color:  rgb(240, "
+                                                                                 "240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_3[self.figure_option_num].setObjectName("pw_lineEdit_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_3[self.figure_option_num], 2, 1, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 2, 2, 1, 1)
                 self.pw_figureOptions_lb_9.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_9[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_9[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_9[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_9[self.figure_option_num].setText("Font:")
-                self.pw_figureOptions_lb_9[self.figure_option_num].setObjectName("pw_figureOptions_lb_9_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_9[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_9[self.figure_option_num], 2, 3, 1, 1)
+                self.pw_figureOptions_lb_9[self.figure_option_num].setObjectName("pw_figureOptions_lb_9_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_lb_9[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_9[self.figure_option_num], 2, 3, 1, 1)
                 self.pw_figureOptions_cb_5.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_5[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_5[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_5[self.figure_option_num].setMinimumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_5[self.figure_option_num].setMaximumSize(QtCore.QSize(240, 27))
                 self.pw_figureOptions_cb_5[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_5[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_5[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_5[self.figure_option_num].setObjectName("pw_figureOptions_cb_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_5[self.figure_option_num], 2, 4, 1, 1)
-                self.pw_figureOptions_gl_1[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 2, 5, 1, 1)
+                self.pw_figureOptions_cb_5[self.figure_option_num].setObjectName("pw_figureOptions_cb_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_5[self.figure_option_num], 2, 4, 1, 1)
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 2, 5, 1, 1)
                 self.pw_figureOptions_lb_10.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_10[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_10[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_10[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_10[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_10[self.figure_option_num].setObjectName("pw_figureOptions_lb_10_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_10[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_lb_10[self.figure_option_num], 2, 6, 1, 1)
+                self.pw_figureOptions_lb_10[self.figure_option_num].setObjectName("pw_figureOptions_lb_10_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_10[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_10[self.figure_option_num], 2, 6, 1, 1)
                 self.pw_figureOptions_cb_6.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_6[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_6[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_6[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_6[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_cb_6[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_6[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_6[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_6[self.figure_option_num].setObjectName("pw_figureOptions_cb_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_1[self.figure_option_num].addWidget(self.pw_figureOptions_cb_6[self.figure_option_num], 2, 7, 1, 1)
-                self.pw_figureOptions_hl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_cb_6[self.figure_option_num].setObjectName("pw_figureOptions_cb_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_1[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_6[self.figure_option_num], 2, 7, 1, 1)
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_bt_1.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_1[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_1[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_1[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_1[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_1[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_1[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_1[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_1[self.figure_option_num].setObjectName("pw_figureOptions_bt_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_2[self.figure_option_num].addWidget(self.pw_figureOptions_bt_1[self.figure_option_num])
-                self.pw_figureOptions_hl_2[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_2[self.figure_option_num])
-                
-                
-                
-                
+                self.pw_figureOptions_bt_1[self.figure_option_num].setObjectName("pw_figureOptions_bt_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_1[self.figure_option_num])
+                self.pw_figureOptions_hl_2[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_2[self.figure_option_num])
                 self.pw_figureOptions_hl_3.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_3[self.figure_option_num].setObjectName("pw_figureOptions_hl_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_3[self.figure_option_num])
+                self.pw_figureOptions_hl_3[self.figure_option_num].setObjectName("pw_figureOptions_hl_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_3[self.figure_option_num])
                 self.pw_figureOptions_lb_11.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_11[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_11[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 16777215))
                 self.pw_figureOptions_lb_11[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_11[self.figure_option_num].setText("X/Y extension:")
-                self.pw_figureOptions_lb_11[self.figure_option_num].setObjectName("pw_figureOptions_lb_11_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_11[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_hl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_11[self.figure_option_num])
-                self.pw_figureOptions_hl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_lb_11[self.figure_option_num].setObjectName("pw_figureOptions_lb_11_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_11[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_11[self.figure_option_num])
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_gl_2.append(QtWidgets.QGridLayout())
-                self.pw_figureOptions_gl_2[self.figure_option_num].setObjectName("pw_figureOptions_gl_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_3[self.figure_option_num].addLayout(self.pw_figureOptions_gl_2[self.figure_option_num])
+                self.pw_figureOptions_gl_2[self.figure_option_num].setObjectName("pw_figureOptions_gl_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_gl_2[self.figure_option_num])
                 self.pw_figureOptions_lb_12.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_12[self.figure_option_num].setMinimumSize(QtCore.QSize(100, 27))
                 self.pw_figureOptions_lb_12[self.figure_option_num].setMaximumSize(QtCore.QSize(100, 27))
                 self.pw_figureOptions_lb_12[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_12[self.figure_option_num].setText("X min/max:")
-                self.pw_figureOptions_lb_12[self.figure_option_num].setObjectName("pw_figureOptions_lb_12_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_12[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_lb_12[self.figure_option_num], 0, 0, 1, 1)
+                self.pw_figureOptions_lb_12[self.figure_option_num].setObjectName("pw_figureOptions_lb_12_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_12[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_12[self.figure_option_num], 0, 0, 1, 1)
                 self.pw_figureOptions_ln_4.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_4[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_4[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_4[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_4[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_4[self.figure_option_num].setObjectName("pw_figureOptions_ln_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_4[self.figure_option_num], 0, 1, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_4[self.figure_option_num].\
+                    setObjectName("pw_figureOptions_ln_4_" + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_4[self.figure_option_num], 0, 1, 1, 1)
                 self.pw_figureOptions_ln_5.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_5[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_5[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_5[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_5[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_5[self.figure_option_num].setObjectName("pw_figureOptions_ln_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_5[self.figure_option_num], 0, 2, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color:  rgb(240, "
+                                                                                 "240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_5[self.figure_option_num].setObjectName("pw_figureOptions_ln_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_5[self.figure_option_num], 0, 2, 1, 1)
                 self.pw_figureOptions_lb_13.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_13[self.figure_option_num].setMinimumSize(QtCore.QSize(100, 27))
                 self.pw_figureOptions_lb_13[self.figure_option_num].setMaximumSize(QtCore.QSize(100, 27))
                 self.pw_figureOptions_lb_13[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_13[self.figure_option_num].setText("Y min/max:")
-                self.pw_figureOptions_lb_13[self.figure_option_num].setObjectName("pw_figureOptions_lb_13_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_13[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_lb_13[self.figure_option_num], 1, 0, 1, 1)
+                self.pw_figureOptions_lb_13[self.figure_option_num].setObjectName("pw_figureOptions_lb_13_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_13[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_13[self.figure_option_num], 1, 0, 1, 1)
                 self.pw_figureOptions_ln_6.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_6[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_6[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_6[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_6[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_ln_6[self.figure_option_num].setObjectName("pw_figureOptions_ln_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_6[self.figure_option_num], 1, 1, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_6[self.figure_option_num].setObjectName("pw_figureOptions_ln_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_6[self.figure_option_num], 1, 1, 1, 1)
                 self.pw_figureOptions_ln_7.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_7[self.figure_option_num].setMinimumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_7[self.figure_option_num].setMaximumSize(QtCore.QSize(70, 27))
                 self.pw_figureOptions_ln_7[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_7[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "   padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "}")
-                self.pw_figureOptions_ln_7[self.figure_option_num].setObjectName("pw_figureOptions_ln_7_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_2[self.figure_option_num].addWidget(self.pw_figureOptions_ln_7[self.figure_option_num], 1, 2, 1, 1)
-                self.pw_figureOptions_hl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "   padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_7[self.figure_option_num].setObjectName("pw_figureOptions_ln_7_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_2[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_7[self.figure_option_num], 1, 2, 1, 1)
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_bt_2.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_2[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_2[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_2[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_2[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_2[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_2[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_2[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_2[self.figure_option_num].setObjectName("pw_figureOptions_bt_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_3[self.figure_option_num].addWidget(self.pw_figureOptions_bt_2[self.figure_option_num])
-                self.pw_figureOptions_hl_3[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                
-                
-                
-                
-                
+                self.pw_figureOptions_bt_2[self.figure_option_num].setObjectName("pw_figureOptions_bt_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_2[self.figure_option_num])
+                self.pw_figureOptions_hl_3[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_figureOptions_hl_4.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_4[self.figure_option_num].setObjectName("pw_figureOptions_hl_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_4[self.figure_option_num])
+                self.pw_figureOptions_hl_4[self.figure_option_num].setObjectName("pw_figureOptions_hl_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_4[self.figure_option_num])
                 self.pw_figureOptions_gl_3.append(QtWidgets.QGridLayout())
-                self.pw_figureOptions_gl_3[self.figure_option_num].setObjectName("pw_figureOptions_gl_3_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_4[self.figure_option_num].addLayout(self.pw_figureOptions_gl_3[self.figure_option_num])
-                
+                self.pw_figureOptions_gl_3[self.figure_option_num].setObjectName("pw_figureOptions_gl_3_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_gl_3[self.figure_option_num])
                 self.pw_figureOptions_lb_14.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_14[self.figure_option_num].setMinimumSize(QtCore.QSize(120, 27))
                 self.pw_figureOptions_lb_14[self.figure_option_num].setMaximumSize(QtCore.QSize(120, 27))
                 self.pw_figureOptions_lb_14[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_14[self.figure_option_num].setText("X ticks/labels:")
-                self.pw_figureOptions_lb_14[self.figure_option_num].setObjectName("pw_figureOptions_lb_14_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_14[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_14[self.figure_option_num], 0, 0, 1, 1)
-                
+                self.pw_figureOptions_lb_14[self.figure_option_num].setObjectName("pw_figureOptions_lb_14_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_14[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_14[self.figure_option_num], 0, 0, 1, 1)
                 self.pw_figureOptions_lb_15.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_15[self.figure_option_num].setMinimumSize(QtCore.QSize(120, 27))
                 self.pw_figureOptions_lb_15[self.figure_option_num].setMaximumSize(QtCore.QSize(120, 27))
                 self.pw_figureOptions_lb_15[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_15[self.figure_option_num].setText("Y ticks/labels:")
-                self.pw_figureOptions_lb_15[self.figure_option_num].setObjectName("pw_figureOptions_lb_15_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_15[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_15[self.figure_option_num], 1, 0, 1, 1)
-                
+                self.pw_figureOptions_lb_15[self.figure_option_num].setObjectName("pw_figureOptions_lb_15_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_15[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_15[self.figure_option_num], 1, 0, 1, 1)
                 self.pw_figureOptions_bt_3.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_3[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_3[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_3[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_3[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_3[self.figure_option_num].setIcon(icon2)
                 self.pw_figureOptions_bt_3[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_3[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_3[self.figure_option_num].setObjectName("pw_ticks_bt_1_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_bt_3[self.figure_option_num], 0, 1, 1, 1)
-                
+                self.pw_figureOptions_bt_3[self.figure_option_num].setObjectName("pw_ticks_bt_1_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_3[self.figure_option_num], 0, 1, 1, 1)
                 self.pw_figureOptions_bt_4.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_4[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_4[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_4[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_4[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_4[self.figure_option_num].setIcon(icon2)
                 self.pw_figureOptions_bt_4[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_4[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_4[self.figure_option_num].setObjectName("pw_ticks_bt_2_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_bt_4[self.figure_option_num], 1, 1, 1, 1)
-                
+                self.pw_figureOptions_bt_4[self.figure_option_num].setObjectName("pw_ticks_bt_2_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_4[self.figure_option_num], 1, 1, 1, 1)
                 space1 = QtWidgets.QSpacerItem(15, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
                 self.pw_figureOptions_gl_3[self.figure_option_num].addItem(space1, 0, 2, 1, 1)
-                
                 space2 = QtWidgets.QSpacerItem(15, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
                 self.pw_figureOptions_gl_3[self.figure_option_num].addItem(space2, 1, 2, 1, 1)
-                
                 self.pw_figureOptions_lb_16.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_16[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_16[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_16[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_16[self.figure_option_num].setText("")
-                self.pw_figureOptions_lb_16[self.figure_option_num].setObjectName("pw_figureOptions_lb_16_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_16[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_16[self.figure_option_num], 0, 3, 1, 1)
-                
+                self.pw_figureOptions_lb_16[self.figure_option_num].setObjectName("pw_figureOptions_lb_16_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_16[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_16[self.figure_option_num], 0, 3, 1, 1)
                 self.pw_figureOptions_lb_17.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_17[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_17[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_17[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_17[self.figure_option_num].setText("")
-                self.pw_figureOptions_lb_17[self.figure_option_num].setObjectName("pw_figureOptions_lb_17_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_17[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_3[self.figure_option_num].addWidget(self.pw_figureOptions_lb_17[self.figure_option_num], 1, 3, 1, 1)
-                self.pw_figureOptions_hl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
-                
+                self.pw_figureOptions_lb_17[self.figure_option_num].setObjectName("pw_figureOptions_lb_17_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_17[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_3[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_17[self.figure_option_num], 1, 3, 1, 1)
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_bt_5.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_5[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_5[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_5[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_5[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_5[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_5[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_5[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_5[self.figure_option_num].setObjectName("pw_figureOptions_bt_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_4[self.figure_option_num].addWidget(self.pw_figureOptions_bt_5[self.figure_option_num])
-                self.pw_figureOptions_hl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                
-                
-                
-                
-                
-                
+                self.pw_figureOptions_bt_5[self.figure_option_num].setObjectName("pw_figureOptions_bt_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_5[self.figure_option_num])
+                self.pw_figureOptions_hl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_figureOptions_hl_5.append(QtWidgets.QHBoxLayout())
-                self.pw_figureOptions_hl_5[self.figure_option_num].setObjectName("pw_figureOptions_hl_5_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_5[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_figureOptions_hl_5[self.figure_option_num].setObjectName("pw_figureOptions_hl_5_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_5[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_figureOptions_gl_4.append(QtWidgets.QGridLayout())
-                self.pw_figureOptions_gl_4[self.figure_option_num].setObjectName("pw_figureOptions_gl_4_" + str(self.figure_option_num))
-                self.pw_figureOptions_hl_5[self.figure_option_num].addLayout(self.pw_figureOptions_gl_4[self.figure_option_num])
+                self.pw_figureOptions_gl_4[self.figure_option_num].setObjectName("pw_figureOptions_gl_4_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_hl_5[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_gl_4[self.figure_option_num])
                 self.pw_figureOptions_lb_18.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_18[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_18[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_18[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_18[self.figure_option_num].setText("Display grid ?")
-                self.pw_figureOptions_lb_18[self.figure_option_num].setObjectName("pw_figureOptions_lb_18_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_18[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_lb_18[self.figure_option_num], 0, 0, 1, 1)
+                self.pw_figureOptions_lb_18[self.figure_option_num].setObjectName("pw_figureOptions_lb_18_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_18[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_18[self.figure_option_num], 0, 0, 1, 1)
                 self.pw_figureOptions_ck_1.append(QtWidgets.QCheckBox())
                 self.pw_figureOptions_ck_1[self.figure_option_num].setMinimumSize(QtCore.QSize(25, 20))
                 self.pw_figureOptions_ck_1[self.figure_option_num].setMaximumSize(QtCore.QSize(25, 20))
                 self.pw_figureOptions_ck_1[self.figure_option_num].setText("")
-                self.pw_figureOptions_ck_1[self.figure_option_num].setObjectName("pw_figureOptions_ck_1_" + str(self.figure_option_num))
+                self.pw_figureOptions_ck_1[self.figure_option_num].setObjectName("pw_figureOptions_ck_1_"
+                                                                                 + str(self.figure_option_num))
                 self.pw_figureOptions_ck_1[self.figure_option_num].setStyleSheet("QCheckBox {\n"
-                "    spacing: 5px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_ck_1[self.figure_option_num], 0, 1, 1, 1)
-                self.pw_figureOptions_gl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 2, 1, 1)
+                                                                                 "    spacing: 5px;\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}")
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ck_1[self.figure_option_num], 0, 1, 1, 1)
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 0, 2, 1, 1)
                 self.pw_figureOptions_lb_19.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_19[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_19[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_19[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_19[self.figure_option_num].setText("Style:")
-                self.pw_figureOptions_lb_19[self.figure_option_num].setObjectName("pw_figureOptions_lb_19_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_lb_19[self.figure_option_num], 0, 3, 1, 1)
+                self.pw_figureOptions_lb_19[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_lb_19[self.figure_option_num].setObjectName("pw_figureOptions_lb_19_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_19[self.figure_option_num], 0, 3, 1, 1)
                 self.pw_figureOptions_cb_7.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_7[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_7[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_7[self.figure_option_num].setEnabled(False)
                 self.pw_figureOptions_cb_7[self.figure_option_num].setMinimumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_7[self.figure_option_num].setMaximumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_7[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_7[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_7[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_7[self.figure_option_num].setObjectName("pw_figureOptions_cb_7_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_cb_7[self.figure_option_num], 0, 4, 1, 1)
-                self.pw_figureOptions_gl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 5, 1, 1)
+                self.pw_figureOptions_cb_7[self.figure_option_num].setObjectName("pw_figureOptions_cb_7_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_7[self.figure_option_num], 0, 4, 1, 1)
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 0, 5, 1, 1)
                 self.pw_figureOptions_lb_20.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_20[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_20[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_20[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_20[self.figure_option_num].setText("Size:")
-                self.pw_figureOptions_lb_20[self.figure_option_num].setObjectName("pw_figureOptions_lb_20_" + str(self.figure_option_num))
-                self.pw_figureOptions_lb_20[self.figure_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_lb_20[self.figure_option_num], 0, 6, 1, 1)
+                self.pw_figureOptions_lb_20[self.figure_option_num].setObjectName("pw_figureOptions_lb_20_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_lb_20[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_20[self.figure_option_num], 0, 6, 1, 1)
                 self.pw_figureOptions_ln_8.append(QtWidgets.QLineEdit())
                 self.pw_figureOptions_ln_8[self.figure_option_num].setEnabled(False)
                 self.pw_figureOptions_ln_8[self.figure_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_ln_8[self.figure_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_figureOptions_ln_8[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_ln_8[self.figure_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QLineEdit:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}")
-                self.pw_figureOptions_ln_8[self.figure_option_num].setObjectName("pw_figureOptions_ln_8_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_ln_8[self.figure_option_num], 0, 7, 1, 1)
-                self.pw_figureOptions_gl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 8, 1, 1)
+                                                                                 "    border-radius: 3px;\n"
+                                                                                 "    padding: 1px 4px 1px 4px;\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(240, 240, 240);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QLineEdit:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}")
+                self.pw_figureOptions_ln_8[self.figure_option_num].setObjectName("pw_figureOptions_ln_8_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_ln_8[self.figure_option_num], 0, 7, 1, 1)
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.
+                                                  Minimum), 0, 8, 1, 1)
                 self.pw_figureOptions_lb_21.append(QtWidgets.QLabel())
                 self.pw_figureOptions_lb_21[self.figure_option_num].setMinimumSize(QtCore.QSize(0, 27))
                 self.pw_figureOptions_lb_21[self.figure_option_num].setMaximumSize(QtCore.QSize(16777215, 27))
                 self.pw_figureOptions_lb_21[self.figure_option_num].setFont(font)
                 self.pw_figureOptions_lb_21[self.figure_option_num].setText("Color:")
-                self.pw_figureOptions_lb_21[self.figure_option_num].setObjectName("pw_figureOptions_lb_21_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_lb_21[self.figure_option_num], 0, 9, 1, 1)
+                self.pw_figureOptions_lb_21[self.figure_option_num].setStyleSheet("QLabel {\n"
+                                                                                  "    color: rgb(45,45,45);\n"
+                                                                                  "}")
+                self.pw_figureOptions_lb_21[self.figure_option_num].setObjectName("pw_figureOptions_lb_21_"
+                                                                                  + str(self.figure_option_num))
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_lb_21[self.figure_option_num], 0, 9, 1, 1)
                 self.pw_figureOptions_cb_8.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_figureOptions_cb_8[self.figure_option_num].setItemDelegate(itemDelegate)
+                self.pw_figureOptions_cb_8[self.figure_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_figureOptions_cb_8[self.figure_option_num].setEnabled(False)
                 self.pw_figureOptions_cb_8[self.figure_option_num].setMinimumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_8[self.figure_option_num].setMaximumSize(QtCore.QSize(160, 27))
                 self.pw_figureOptions_cb_8[self.figure_option_num].setFont(font3)
                 self.pw_figureOptions_cb_8[self.figure_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
+                                                                                 "    border: 1px solid #acacac;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    padding-left: 5px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #f0f0f0, "
+                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    color: rgb(45,45,45);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:disabled {\n"
+                                                                                 "    background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox:hover {\n"
+                                                                                 "    border: 1px solid #7eb4ea;\n"
+                                                                                 "    border-radius: 1px;\n"
+                                                                                 "    background-color: "
+                                                                                 "qlineargradient(x1: 0, y1: 0, "
+                                                                                 "x2: 0, y2: 1, \n"
+                                                                                 "                                "
+                                                                                 "stop: 0 #ecf4fc, "
+                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::drop-down {\n"
+                                                                                 "    subcontrol-origin: padding;\n"
+                                                                                 "    subcontrol-position: top right;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    border-left-width: 1px;\n"
+                                                                                 "    border-left-color: darkgray;\n"
+                                                                                 "    border-left-style: solid;\n"
+                                                                                 "    border-top-right-radius: 3px;\n"
+                                                                                 "    border-bottom-right-radius: "
+                                                                                 "3px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow {\n"
+                                                                                 "    image: "
+                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView {\n"
+                                                                                 "    selection-background-color: "
+                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-color: black;\n"
+                                                                                 "    background: #f0f0f0;\n"
+                                                                                 "    border: 0px solid #f0f0f0;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox QAbstractItemView::item {\n"
+                                                                                 "    margin: 5px 5px 5px 5px;\n"
+                                                                                 "}")
                 self.pw_figureOptions_cb_8[self.figure_option_num].setFrame(False)
-                self.pw_figureOptions_cb_8[self.figure_option_num].setObjectName("pw_figureOptions_cb_8_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_cb_8[self.figure_option_num], 0, 10, 1, 1)
-                self.pw_figureOptions_gl_4[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum), 0, 11, 1, 1)
+                self.pw_figureOptions_cb_8[self.figure_option_num].setObjectName("pw_figureOptions_cb_8_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_cb_8[self.figure_option_num], 0, 10, 1, 1)
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.
+                                                  QSizePolicy.Minimum), 0, 11, 1, 1)
                 self.pw_figureOptions_bt_6.append(QtWidgets.QToolButton())
                 self.pw_figureOptions_bt_6[self.figure_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_6[self.figure_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_figureOptions_bt_6[self.figure_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                                 "    border: 1px solid transparent;\n"
+                                                                                 "    background-color: transparent;\n"
+                                                                                 "    width: 27px;\n"
+                                                                                 "    height: 27px;\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QToolButton:flat {\n"
+                                                                                 "    border: none;\n"
+                                                                                 "}")
                 self.pw_figureOptions_bt_6[self.figure_option_num].setText("")
                 self.pw_figureOptions_bt_6[self.figure_option_num].setIcon(icon)
                 self.pw_figureOptions_bt_6[self.figure_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_figureOptions_bt_6[self.figure_option_num].setAutoRaise(False)
-                self.pw_figureOptions_bt_6[self.figure_option_num].setObjectName("pw_figureOptions_bt_6_" + str(self.figure_option_num))
-                self.pw_figureOptions_gl_4[self.figure_option_num].addWidget(self.pw_figureOptions_bt_6[self.figure_option_num], 0, 12, 1, 1)
-                self.pw_figureOptions_hl_5[self.figure_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
-                self.pw_figureOptions_vl_1[self.figure_option_num].addLayout(self.pw_figureOptions_hl_5[self.figure_option_num])
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                self.pw_figureOptions_bt_6[self.figure_option_num].setObjectName("pw_figureOptions_bt_6_"
+                                                                                 + str(self.figure_option_num))
+                self.pw_figureOptions_gl_4[self.figure_option_num].\
+                    addWidget(self.pw_figureOptions_bt_6[self.figure_option_num], 0, 12, 1, 1)
+                self.pw_figureOptions_hl_5[self.figure_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.
+                                                  Minimum))
+                self.pw_figureOptions_vl_1[self.figure_option_num].\
+                    addLayout(self.pw_figureOptions_hl_5[self.figure_option_num])
                 self.pw_figureOptions_ln_2[self.figure_option_num].setText('Longitude')
                 self.pw_figureOptions_ln_2[self.figure_option_num].setCursorPosition(0)
                 self.pw_figureOptions_ln_3[self.figure_option_num].setText('Latitude')
                 self.pw_figureOptions_ln_3[self.figure_option_num].setCursorPosition(0)
-                
-                
-                
                 self.pw_figureOptions_la.addLayout(self.pw_figureOptions_vl_1[self.figure_option_num])
                 self.pw_figureOptions_la.setAlignment(QtCore.Qt.AlignTop)
-                
                 self.pw_figureOptions_bt_3[self.figure_option_num].clicked.connect(self.set_axis_ticks_labels)
                 self.pw_figureOptions_bt_4[self.figure_option_num].clicked.connect(self.set_axis_ticks_labels)
-                self.pw_figureOptions_ck_1[self.figure_option_num].stateChanged.connect(lambda val, plot_type='grids': self.activate_grid_options(val, plot_type))
-                
-                self.figure_option_num +=1
-                
+                self.pw_figureOptions_ck_1[self.figure_option_num].\
+                    stateChanged.connect(lambda val: self.activate_grid_options(val, plot_type))
+                self.figure_option_num += 1
     
     def figure_options_sliders(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - figure_options_sliders')
@@ -2776,8 +2955,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_1.setMaximumSize(QtCore.QSize(16777215, 27))
         self.pw_commonOptions_lb_1.setFont(font2)
         self.pw_commonOptions_lb_1.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_1.setObjectName("pw_commonOptions_lb_1")
         self.pw_commonOptions_hl_1.addWidget(self.pw_commonOptions_lb_1)
         spacerItem = QtWidgets.QSpacerItem(358, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -2795,8 +2974,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.pw_commonOptions_lb_2.setFont(font)
         self.pw_commonOptions_lb_2.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_2.setWordWrap(True)
         self.pw_commonOptions_lb_2.setObjectName("pw_commonOptions_lb_2")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_2, 0, 0, 2, 1)
@@ -2805,39 +2984,42 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_3.setMaximumSize(QtCore.QSize(16777215, 27))
         self.pw_commonOptions_lb_3.setFont(font)
         self.pw_commonOptions_lb_3.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_3.setObjectName("pw_commonOptions_lb_3")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_3, 0, 1, 1, 1)
         self.pw_commonOptions_sl_1 = QtWidgets.QSlider()
         self.pw_commonOptions_sl_1.setMinimumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_1.setMaximumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_1.setStyleSheet("QSlider::groove:horizontal {\n"
-        "    border: 1px solid #999999;\n"
-        "    height: 1px;\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
-        "    margin: 2px 0;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
-        "    border: 1px solid #5c5c5c;\n"
-        "    width: 10px;\n"
-        "    margin: -5px 0;\n"
-        "    border-radius: 5px;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal:hover {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
-        "}\n"
-        "\n"
-        "QSlider::add-page:horizontal {\n"
-        "    background: rgb(200,200,200);\n"
-        "}\n"
-        "\n"
-        "QSlider::sub-page:horizontal {\n"
-        "    background: rgb(0,0,200);\n"
-        "}")
+                                                 "    border: 1px solid #999999;\n"
+                                                 "    height: 1px;\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+                                                 "stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                                 "    margin: 2px 0;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                                 "    border: 1px solid #5c5c5c;\n"
+                                                 "    width: 10px;\n"
+                                                 "    margin: -5px 0;\n"
+                                                 "    border-radius: 5px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal:hover {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::add-page:horizontal {\n"
+                                                 "    background: rgb(200,200,200);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::sub-page:horizontal {\n"
+                                                 "    background: rgb(0,0,200);\n"
+                                                 "}")
         self.pw_commonOptions_sl_1.setMinimum(0)
         self.pw_commonOptions_sl_1.setMaximum(40)
         self.pw_commonOptions_sl_1.setSingleStep(1)
@@ -2852,8 +3034,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_5.setMaximumSize(QtCore.QSize(50, 27))
         self.pw_commonOptions_lb_5.setFont(font3)
         self.pw_commonOptions_lb_5.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_5.setObjectName("slider_lb_1")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_5, 0, 3, 1, 1)
         self.pw_commonOptions_lb_7 = QtWidgets.QLabel()
@@ -2861,39 +3043,42 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_7.setMaximumSize(QtCore.QSize(16777215, 27))
         self.pw_commonOptions_lb_7.setFont(font)
         self.pw_commonOptions_lb_7.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_7.setObjectName("pw_commonOptions_lb_7")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_7, 0, 4, 1, 1)
         self.pw_commonOptions_sl_2 = QtWidgets.QSlider()
         self.pw_commonOptions_sl_2.setMinimumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_2.setMaximumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_2.setStyleSheet("QSlider::groove:horizontal {\n"
-        "    border: 1px solid #999999;\n"
-        "    height: 1px;\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
-        "    margin: 2px 0;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
-        "    border: 1px solid #5c5c5c;\n"
-        "    width: 10px;\n"
-        "    margin: -5px 0;\n"
-        "    border-radius: 5px;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal:hover {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
-        "}\n"
-        "\n"
-        "QSlider::sub-page:horizontal {\n"
-        "background: rgb(200,200,200);\n"
-        "}\n"
-        "\n"
-        "QSlider::add-page:horizontal {\n"
-        "background: rgb(0,0,200);\n"
-        "}")
+                                                 "    border: 1px solid #999999;\n"
+                                                 "    height: 1px;\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+                                                 "stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                                 "    margin: 2px 0;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                                 "    border: 1px solid #5c5c5c;\n"
+                                                 "    width: 10px;\n"
+                                                 "    margin: -5px 0;\n"
+                                                 "    border-radius: 5px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal:hover {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::sub-page:horizontal {\n"
+                                                 "background: rgb(200,200,200);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::add-page:horizontal {\n"
+                                                 "background: rgb(0,0,200);\n"
+                                                 "}")
         self.pw_commonOptions_sl_2.setMinimum(0)
         self.pw_commonOptions_sl_2.setMaximum(40)
         self.pw_commonOptions_sl_2.setSingleStep(1)
@@ -2912,8 +3097,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_9.setMaximumSize(QtCore.QSize(50, 27))
         self.pw_commonOptions_lb_9.setFont(font3)
         self.pw_commonOptions_lb_9.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_9.setObjectName("slider_lb_2")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_9, 0, 6, 1, 1)
         self.pw_commonOptions_lb_11 = QtWidgets.QLabel()
@@ -2921,8 +3106,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_11.setMaximumSize(QtCore.QSize(90, 16777215))
         self.pw_commonOptions_lb_11.setFont(font)
         self.pw_commonOptions_lb_11.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                  "    color: rgb(45,45,45);\n"
+                                                  "}")
         self.pw_commonOptions_lb_11.setWordWrap(True)
         self.pw_commonOptions_lb_11.setObjectName("pw_commonOptions_lb_11")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_11, 0, 7, 2, 1)
@@ -2931,50 +3116,51 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_14.setMaximumSize(QtCore.QSize(16777215, 27))
         self.pw_commonOptions_lb_14.setFont(font)
         self.pw_commonOptions_lb_14.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                  "    color: rgb(45,45,45);\n"
+                                                  "}")
         self.pw_commonOptions_lb_14.setObjectName("pw_commonOptions_lb_14")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_14, 1, 8, 1, 1)
-        
-        
         self.pw_commonOptions_lb_13 = QtWidgets.QLabel()
         self.pw_commonOptions_lb_13.setMinimumSize(QtCore.QSize(0, 27))
         self.pw_commonOptions_lb_13.setMaximumSize(QtCore.QSize(16777215, 27))
         self.pw_commonOptions_lb_13.setFont(font)
         self.pw_commonOptions_lb_13.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                  "    color: rgb(45,45,45);\n"
+                                                  "}")
         self.pw_commonOptions_lb_13.setObjectName("pw_commonOptions_lb_13")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_13, 0, 8, 1, 1)
         self.pw_commonOptions_sl_5 = QtWidgets.QSlider()
         self.pw_commonOptions_sl_5.setMinimumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_5.setMaximumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_5.setStyleSheet("QSlider::groove:horizontal {\n"
-        "    border: 1px solid #999999;\n"
-        "    height: 1px;\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
-        "    margin: 2px 0;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
-        "    border: 1px solid #5c5c5c;\n"
-        "    width: 10px;\n"
-        "    margin: -5px 0;\n"
-        "    border-radius: 5px;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal:hover {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
-        "}\n"
-        "\n"
-        "QSlider::add-page:horizontal {\n"
-        "    background: rgb(200,200,200);\n"
-        "}\n"
-        "\n"
-        "QSlider::sub-page:horizontal {\n"
-        "    background: rgb(0,0,200);\n"
-        "}")
+                                                 "    border: 1px solid #999999;\n"
+                                                 "    height: 1px;\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+                                                 "stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                                 "    margin: 2px 0;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                                 "    border: 1px solid #5c5c5c;\n"
+                                                 "    width: 10px;\n"
+                                                 "    margin: -5px 0;\n"
+                                                 "    border-radius: 5px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal:hover {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::add-page:horizontal {\n"
+                                                 "    background: rgb(200,200,200);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::sub-page:horizontal {\n"
+                                                 "    background: rgb(0,0,200);\n"
+                                                 "}")
         self.pw_commonOptions_sl_5.setMinimum(1)
         self.pw_commonOptions_sl_5.setMaximum(100)
         self.pw_commonOptions_sl_5.setSingleStep(1)
@@ -2988,31 +3174,34 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_sl_6.setMinimumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_6.setMaximumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_6.setStyleSheet("QSlider::groove:horizontal {\n"
-        "    border: 1px solid #999999;\n"
-        "    height: 1px;\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
-        "    margin: 2px 0;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
-        "    border: 1px solid #5c5c5c;\n"
-        "    width: 10px;\n"
-        "    margin: -5px 0;\n"
-        "    border-radius: 5px;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal:hover {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
-        "}\n"
-        "\n"
-        "QSlider::add-page:horizontal {\n"
-        "    background: rgb(200,200,200);\n"
-        "}\n"
-        "\n"
-        "QSlider::sub-page:horizontal {\n"
-        "    background: rgb(0,0,200);\n"
-        "}")
+                                                 "    border: 1px solid #999999;\n"
+                                                 "    height: 1px;\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+                                                 "stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                                 "    margin: 2px 0;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                                 "    border: 1px solid #5c5c5c;\n"
+                                                 "    width: 10px;\n"
+                                                 "    margin: -5px 0;\n"
+                                                 "    border-radius: 5px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal:hover {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::add-page:horizontal {\n"
+                                                 "    background: rgb(200,200,200);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::sub-page:horizontal {\n"
+                                                 "    background: rgb(0,0,200);\n"
+                                                 "}")
         self.pw_commonOptions_sl_6.setMinimum(0)
         self.pw_commonOptions_sl_6.setMaximum(100)
         self.pw_commonOptions_sl_6.setSingleStep(1)
@@ -3053,31 +3242,34 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_sl_3.setMinimumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_3.setMaximumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_3.setStyleSheet("QSlider::groove:horizontal {\n"
-        "    border: 1px solid #999999;\n"
-        "    height: 1px;\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
-        "    margin: 2px 0;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
-        "    border: 1px solid #5c5c5c;\n"
-        "    width: 10px;\n"
-        "    margin: -5px 0;\n"
-        "    border-radius: 5px;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal:hover {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
-        "}\n"
-        "\n"
-        "QSlider::add-page:horizontal {\n"
-        "    background: rgb(200,200,200);\n"
-        "}\n"
-        "\n"
-        "QSlider::sub-page:horizontal {\n"
-        "    background: rgb(0,0,200);\n"
-        "}")
+                                                 "    border: 1px solid #999999;\n"
+                                                 "    height: 1px;\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+                                                 "stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                                 "    margin: 2px 0;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                                 "    border: 1px solid #5c5c5c;\n"
+                                                 "    width: 10px;\n"
+                                                 "    margin: -5px 0;\n"
+                                                 "    border-radius: 5px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal:hover {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::add-page:horizontal {\n"
+                                                 "    background: rgb(200,200,200);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::sub-page:horizontal {\n"
+                                                 "    background: rgb(0,0,200);\n"
+                                                 "}")
         self.pw_commonOptions_sl_3.setMinimum(0)
         self.pw_commonOptions_sl_3.setMaximum(40)
         self.pw_commonOptions_sl_3.setSingleStep(1)
@@ -3092,8 +3284,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_6.setMaximumSize(QtCore.QSize(16777215, 27))
         self.pw_commonOptions_lb_6.setFont(font3)
         self.pw_commonOptions_lb_6.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_6.setObjectName("slider_lb_3")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_6, 1, 3, 1, 1)
         self.pw_commonOptions_lb_8 = QtWidgets.QLabel()
@@ -3101,39 +3293,42 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_8.setMaximumSize(QtCore.QSize(16777215, 27))
         self.pw_commonOptions_lb_8.setFont(font)
         self.pw_commonOptions_lb_8.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                 "    color: rgb(45,45,45);\n"
+                                                 "}")
         self.pw_commonOptions_lb_8.setObjectName("pw_commonOptions_lb_8")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_8, 1, 4, 1, 1)
         self.pw_commonOptions_sl_4 = QtWidgets.QSlider()
         self.pw_commonOptions_sl_4.setMinimumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_4.setMaximumSize(QtCore.QSize(180, 27))
         self.pw_commonOptions_sl_4.setStyleSheet("QSlider::groove:horizontal {\n"
-        "    border: 1px solid #999999;\n"
-        "    height: 1px;\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
-        "    margin: 2px 0;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
-        "    border: 1px solid #5c5c5c;\n"
-        "    width: 10px;\n"
-        "    margin: -5px 0;\n"
-        "    border-radius: 5px;\n"
-        "}\n"
-        "\n"
-        "QSlider::handle:horizontal:hover {\n"
-        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
-        "}\n"
-        "\n"
-        "QSlider::sub-page:horizontal {\n"
-        "background: rgb(200,200,200);\n"
-        "}\n"
-        "\n"
-        "QSlider::add-page:horizontal {\n"
-        "background: rgb(0,0,200);\n"
-        "}")
+                                                 "    border: 1px solid #999999;\n"
+                                                 "    height: 1px;\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+                                                 "stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                                 "    margin: 2px 0;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                                 "    border: 1px solid #5c5c5c;\n"
+                                                 "    width: 10px;\n"
+                                                 "    margin: -5px 0;\n"
+                                                 "    border-radius: 5px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::handle:horizontal:hover {\n"
+                                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                                                 "stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::sub-page:horizontal {\n"
+                                                 "background: rgb(200,200,200);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QSlider::add-page:horizontal {\n"
+                                                 "background: rgb(0,0,200);\n"
+                                                 "}")
         self.pw_commonOptions_sl_4.setMinimum(0)
         self.pw_commonOptions_sl_4.setMaximum(40)
         self.pw_commonOptions_sl_4.setSingleStep(1)
@@ -3151,8 +3346,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_lb_10.setMaximumSize(QtCore.QSize(50, 27))
         self.pw_commonOptions_lb_10.setFont(font3)
         self.pw_commonOptions_lb_10.setStyleSheet("QLabel {\n"
-        "    color: rgb(45,45,45);\n"
-        "}")
+                                                  "    color: rgb(45,45,45);\n"
+                                                  "}")
         self.pw_commonOptions_lb_10.setObjectName("slider_lb_4")
         self.gridLayout_3.addWidget(self.pw_commonOptions_lb_10, 1, 6, 1, 1)
         self.horizontalLayout_2.addLayout(self.gridLayout_3)
@@ -3160,37 +3355,37 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_bt_1.setMinimumSize(QtCore.QSize(27, 27))
         self.pw_commonOptions_bt_1.setMaximumSize(QtCore.QSize(27, 27))
         self.pw_commonOptions_bt_1.setStyleSheet("QToolButton {\n"
-        "    border: 1px solid transparent;\n"
-        "    background-color: transparent;\n"
-        "    width: 27px;\n"
-        "    height: 27px;\n"
-        "}\n"
-        "\n"
-        "QToolButton:flat {\n"
-        "    border: none;\n"
-        "}")
+                                                 "    border: 1px solid transparent;\n"
+                                                 "    background-color: transparent;\n"
+                                                 "    width: 27px;\n"
+                                                 "    height: 27px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QToolButton:flat {\n"
+                                                 "    border: none;\n"
+                                                 "}")
         self.pw_commonOptions_bt_1.setIcon(icon)
         self.pw_commonOptions_bt_1.setIconSize(QtCore.QSize(23, 23))
         self.pw_commonOptions_bt_1.setObjectName("pw_commonOptions_bt_1")
         self.horizontalLayout_2.addWidget(self.pw_commonOptions_bt_1)
-        spacerItem2 = QtWidgets.QSpacerItem(13, 17, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem2)
+        self.horizontalLayout_2.addItem(QtWidgets.QSpacerItem(13, 17, QtWidgets.QSizePolicy.Expanding,
+                                                              QtWidgets.QSizePolicy.Minimum))
         self.pw_figureOptions_la.addLayout(self.horizontalLayout_2)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.pw_figureOptions_la.addItem(spacerItem3)
+        self.pw_figureOptions_la.addItem(QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum,
+                                                               QtWidgets.QSizePolicy.Fixed))
         self.line = QtWidgets.QFrame()
         self.line.setStyleSheet("QFrame {\n"
-        "    background: rgb(190,190,190);\n"
-        "    height: 5px;\n"
-        "    border: 0px solid black;\n"
-        "}")
+                                "    background: rgb(190,190,190);\n"
+                                "    height: 5px;\n"
+                                "    border: 0px solid black;\n"
+                                "}")
         self.line.setLineWidth(1)
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.pw_figureOptions_la.addWidget(self.line)
-        spacerItem4 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.pw_figureOptions_la.addItem(spacerItem4)
+        self.pw_figureOptions_la.addItem(QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum,
+                                                               QtWidgets.QSizePolicy.Fixed))
         self.pw_commonOptions_lb_1.setText("Common options:")
         self.pw_commonOptions_lb_2.setText("Set figure margins:")
         self.pw_commonOptions_lb_3.setText("Left:")
@@ -3212,6 +3407,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_commonOptions_sl_4.valueChanged.connect(self.update_slider_value)
         self.pw_commonOptions_sl_5.valueChanged.connect(self.update_slider_value)
         self.pw_commonOptions_sl_6.valueChanged.connect(self.update_slider_value)
+        self.pw_commonOptions_bt_1.clicked.connect(self.figure_button_information)
         self.pw_commonOptions_sl_1.setSliderPosition(10)
         self.pw_commonOptions_sl_2.setSliderPosition(5)
         self.pw_commonOptions_sl_3.setSliderPosition(10)
@@ -3257,244 +3453,267 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         if plot_type == 'timeseries':
             for _ in self.plot_options['line_style']:
                 self.pw_plotOptions_vl_1.append(QtWidgets.QVBoxLayout())
-                self.pw_plotOptions_vl_1[self.plot_option_num].setObjectName("pw_plotOptions_vl_1_" + str(self.plot_option_num))
+                self.pw_plotOptions_vl_1[self.plot_option_num].setObjectName("pw_plotOptions_vl_1_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_hl_1.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_1[self.plot_option_num].setObjectName("pw_plotOptions_hl_1_" + str(self.plot_option_num))
+                self.pw_plotOptions_hl_1[self.plot_option_num].setObjectName("pw_plotOptions_hl_1_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_lb_1.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_1[self.plot_option_num].setMinimumSize(QtCore.QSize(700, 27))
                 self.pw_plotOptions_lb_1[self.plot_option_num].setMaximumSize(QtCore.QSize(700, 27))
                 self.pw_plotOptions_lb_1[self.plot_option_num].setFont(font2)
-                
                 if 'figure_instance' in self.plot_options:
                     text = 'Subplot ' + str(self.plot_option_num + 1) + ': Plot options - '
                 else:
                     text = 'Plot options - '
-                
-                self.pw_plotOptions_lb_1[self.plot_option_num].setText(text + self.plot_options['legend_label'][self.plot_option_num] + ":")
-                self.pw_plotOptions_lb_1[self.plot_option_num].setObjectName("pw_plotOptions_lb_1_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_1[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_1[self.plot_option_num].setText(text + self.plot_options['legend_label'][
+                    self.plot_option_num] + ":")
+                self.pw_plotOptions_lb_1[self.plot_option_num].setObjectName("pw_plotOptions_lb_1_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_lb_1[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_1[self.plot_option_num].addWidget(self.pw_plotOptions_lb_1[self.plot_option_num])
-                self.pw_plotOptions_hl_1[self.plot_option_num].addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_1[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addLayout(self.pw_plotOptions_hl_1[self.plot_option_num])
                 self.pw_plotOptions_hl_2.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_2[self.plot_option_num].setObjectName("pw_plotOptions_hl_2_" + str(self.plot_option_num))
-                self.pw_plotOptions_hl_2[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_2[self.plot_option_num].setObjectName("pw_plotOptions_hl_2_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_hl_2[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_2.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_2[self.plot_option_num].setMinimumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_2[self.plot_option_num].setMaximumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_2[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_2[self.plot_option_num].setText("Line style:")
-                self.pw_plotOptions_lb_2[self.plot_option_num].setObjectName("pw_plotOptions_lb_2_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_2[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_2[self.plot_option_num].setObjectName("pw_plotOptions_lb_2_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_lb_2[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_2[self.plot_option_num].addWidget(self.pw_plotOptions_lb_2[self.plot_option_num])
                 self.pw_plotOptions_hl_3.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_3[self.plot_option_num].setObjectName("pw_plotOptions_hl_3_" + str(self.plot_option_num))
+                self.pw_plotOptions_hl_3[self.plot_option_num].setObjectName("pw_plotOptions_hl_3_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_rb_1.append(QtWidgets.QRadioButton())
                 self.pw_plotOptions_rb_1[self.plot_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_plotOptions_rb_1[self.plot_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_plotOptions_rb_1[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_rb_1[self.plot_option_num].setText("Line")
-                self.pw_plotOptions_rb_1[self.plot_option_num].setObjectName("pw_plotOptions_rb_1_" + str(self.plot_option_num))
+                self.pw_plotOptions_rb_1[self.plot_option_num].setObjectName("pw_plotOptions_rb_1_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_rb_1[self.plot_option_num].setStyleSheet("QRadioButton {\n"
-                "    spacing: 5px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
+                                                                             "    spacing: 5px;\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_3[self.plot_option_num].addWidget(self.pw_plotOptions_rb_1[self.plot_option_num])
                 self.pw_plotOptions_rb_2.append(QtWidgets.QRadioButton())
                 self.pw_plotOptions_rb_2[self.plot_option_num].setMinimumSize(QtCore.QSize(90, 27))
                 self.pw_plotOptions_rb_2[self.plot_option_num].setMaximumSize(QtCore.QSize(90, 27))
                 self.pw_plotOptions_rb_2[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_rb_2[self.plot_option_num].setText("Marker")
-                self.pw_plotOptions_rb_2[self.plot_option_num].setObjectName("pw_plotOptions_rb_2_" + str(self.plot_option_num))
+                self.pw_plotOptions_rb_2[self.plot_option_num].setObjectName("pw_plotOptions_rb_2_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_rb_2[self.plot_option_num].setStyleSheet("QRadioButton {\n"
-                "    spacing: 5px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
+                                                                             "    spacing: 5px;\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_3[self.plot_option_num].addWidget(self.pw_plotOptions_rb_2[self.plot_option_num])
                 self.pw_plotOptions_bg_1.append(QtWidgets.QButtonGroup())
-                self.pw_plotOptions_bg_1[self.plot_option_num].setObjectName("pw_plotOptions_bg_1_" + str(self.plot_option_num))
+                self.pw_plotOptions_bg_1[self.plot_option_num].setObjectName("pw_plotOptions_bg_1_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_bg_1[self.plot_option_num].addButton(self.pw_plotOptions_rb_1[self.plot_option_num])
                 self.pw_plotOptions_bg_1[self.plot_option_num].addButton(self.pw_plotOptions_rb_2[self.plot_option_num])
                 self.pw_plotOptions_hl_2[self.plot_option_num].addLayout(self.pw_plotOptions_hl_3[self.plot_option_num])
                 self.pw_plotOptions_cb_1.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_plotOptions_cb_1[self.plot_option_num].setItemDelegate(itemDelegate)
+                self.pw_plotOptions_cb_1[self.plot_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_plotOptions_cb_1[self.plot_option_num].setMinimumSize(QtCore.QSize(180, 27))
                 self.pw_plotOptions_cb_1[self.plot_option_num].setMaximumSize(QtCore.QSize(180, 27))
                 self.pw_plotOptions_cb_1[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_cb_1[self.plot_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
-                self.pw_plotOptions_cb_1[self.plot_option_num].setObjectName("pw_plotOptions_cb_1_" + str(self.plot_option_num))
+                                                                             "    border: 1px solid #acacac;\n"
+                                                                             "    border-radius: 1px;\n"
+                                                                             "    padding-left: 5px;\n"
+                                                                             "    background-color: qlineargradient("
+                                                                             "x1: 0, y1: 0, "
+                                                                             "x2: 0, y2: 1, \n"
+                                                                             "                                stop: 0 "
+                                                                             "#f0f0f0, "
+                                                                             "stop: 1 #e5e5e5);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox:disabled {\n"
+                                                                             "    background-color: rgb(200,200,200);\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox:hover {\n"
+                                                                             "    border: 1px solid #7eb4ea;\n"
+                                                                             "    border-radius: 1px;\n"
+                                                                             "    background-color: qlineargradient("
+                                                                             "x1: 0, y1: 0, "
+                                                                             "x2: 0, y2: 1, \n"
+                                                                             "                                stop: 0 "
+                                                                             "#ecf4fc, "
+                                                                             "stop: 1 #dcecfc);\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox::drop-down {\n"
+                                                                             "    subcontrol-origin: padding;\n"
+                                                                             "    subcontrol-position: top right;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    border-left-width: 1px;\n"
+                                                                             "    border-left-color: darkgray;\n"
+                                                                             "    border-left-style: solid;\n"
+                                                                             "    border-top-right-radius: 3px;\n"
+                                                                             "    border-bottom-right-radius: 3px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox::down-arrow {\n"
+                                                                             "    image: url("
+                                                                             "icons/down_arrow_icon.svg); \n"
+                                                                             "    width: 16px;\n"
+                                                                             "    height: 16px\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox QAbstractItemView {\n"
+                                                                             "    selection-background-color: rgb("
+                                                                             "200,200,200);\n"
+                                                                             "    selection-color: black;\n"
+                                                                             "    background: #f0f0f0;\n"
+                                                                             "    border: 0px solid #f0f0f0;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox QAbstractItemView::item {\n"
+                                                                             "    margin: 5px 5px 5px 5px;\n"
+                                                                             "}")
+                self.pw_plotOptions_cb_1[self.plot_option_num].setObjectName("pw_plotOptions_cb_1_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_hl_2[self.plot_option_num].addWidget(self.pw_plotOptions_cb_1[self.plot_option_num])
-                self.pw_plotOptions_hl_2[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_2[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_bt_1.append(QtWidgets.QToolButton())
                 self.pw_plotOptions_bt_1[self.plot_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_1[self.plot_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_1[self.plot_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                             "    border: 1px solid transparent;\n"
+                                                                             "    background-color: transparent;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    height: 27px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QToolButton:flat {\n"
+                                                                             "    border: none;\n"
+                                                                             "}")
                 self.pw_plotOptions_bt_1[self.plot_option_num].setText("")
                 self.pw_plotOptions_bt_1[self.plot_option_num].setIcon(icon)
                 self.pw_plotOptions_bt_1[self.plot_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_plotOptions_bt_1[self.plot_option_num].setAutoRaise(False)
-                self.pw_plotOptions_bt_1[self.plot_option_num].setObjectName("pw_plotOptions_bt_1_" + str(self.plot_option_num))
+                self.pw_plotOptions_bt_1[self.plot_option_num].setObjectName("pw_plotOptions_bt_1_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_hl_2[self.plot_option_num].addWidget(self.pw_plotOptions_bt_1[self.plot_option_num])
-                self.pw_plotOptions_hl_2[self.plot_option_num].addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_2[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addLayout(self.pw_plotOptions_hl_2[self.plot_option_num])
                 self.pw_plotOptions_hl_4.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_4[self.plot_option_num].setObjectName("pw_plotOptions_hl_4_" + str(self.plot_option_num))
-                self.pw_plotOptions_hl_4[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_4[self.plot_option_num].setObjectName("pw_plotOptions_hl_4_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_hl_4[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_3.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_3[self.plot_option_num].setMinimumSize(QtCore.QSize(200, 27))
                 self.pw_plotOptions_lb_3[self.plot_option_num].setMaximumSize(QtCore.QSize(200, 27))
                 self.pw_plotOptions_lb_3[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_3[self.plot_option_num].setText("Line / Marker color:")
-                self.pw_plotOptions_lb_3[self.plot_option_num].setObjectName("pw_plotOptions_lb_3_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_3[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_3[self.plot_option_num].setObjectName("pw_plotOptions_lb_3_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_lb_3[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_4[self.plot_option_num].addWidget(self.pw_plotOptions_lb_3[self.plot_option_num])
                 self.pw_plotOptions_cb_2.append(QtWidgets.QComboBox())
-                itemDelegate = QtWidgets.QStyledItemDelegate()
-                self.pw_plotOptions_cb_2[self.plot_option_num].setItemDelegate(itemDelegate)
+                self.pw_plotOptions_cb_2[self.plot_option_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
                 self.pw_plotOptions_cb_2[self.plot_option_num].setMinimumSize(QtCore.QSize(170, 27))
                 self.pw_plotOptions_cb_2[self.plot_option_num].setMaximumSize(QtCore.QSize(170, 27))
                 self.pw_plotOptions_cb_2[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_cb_2[self.plot_option_num].setStyleSheet("QComboBox {\n"
-                "    border: 1px solid #acacac;\n"
-                "    border-radius: 1px;\n"
-                "    padding-left: 5px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QComboBox:disabled {\n"
-                "    background-color:  rgb(200,200,200);\n"
-                "}\n"
-                "\n"
-                "QComboBox:hover {\n"
-                "    border: 1px solid #7eb4ea;\n"
-                "    border-radius: 1px;\n"
-                "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::drop-down:hover {\n"
-                "    subcontrol-origin: padding;\n"
-                "    subcontrol-position: top right;\n"
-                "    width: 27px;\n"
-                "    border-left-width: 1px;\n"
-                "    border-left-color: darkgray;\n"
-                "    border-left-style: solid;\n"
-                "    border-top-right-radius: 3px;\n"
-                "    border-bottom-right-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow {\n"
-                "    image: url(icons/down_arrow_icon.svg); \n"
-                "    width: 16px;\n"
-                "    height: 16px\n"
-                "}\n"
-                "\n"
-                "QComboBox::down-arrow:on {\n"
-                "    top: 1px; \n"
-                "    left: 1px;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView {\n"
-                "    selection-background-color: rgb(200,200,200);\n"
-                "    selection-color: black;\n"
-                "    background: #f0f0f0;\n"
-                "    border: 0px solid #f0f0f0;\n"
-                "}\n"
-                "\n"
-                "QComboBox QAbstractItemView::item {\n"
-                "    margin: 5px 5px 5px 5px;\n"
-                "}")
-                self.pw_plotOptions_cb_2[self.plot_option_num].setObjectName("pw_plotOptions_cb_2_" + str(self.plot_option_num))
+                                                                             "    border: 1px solid #acacac;\n"
+                                                                             "    border-radius: 1px;\n"
+                                                                             "    padding-left: 5px;\n"
+                                                                             "    background-color: qlineargradient("
+                                                                             "x1: 0, y1: 0, "
+                                                                             "x2: 0, y2: 1, \n"
+                                                                             "                                stop: 0 "
+                                                                             "#f0f0f0, "
+                                                                             "stop: 1 #e5e5e5);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox:disabled {\n"
+                                                                             "    background-color: rgb(200,200,200);\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox:hover {\n"
+                                                                             "    border: 1px solid #7eb4ea;\n"
+                                                                             "    border-radius: 1px;\n"
+                                                                             "    background-color: qlineargradient("
+                                                                             "x1: 0, y1: 0, "
+                                                                             "x2: 0, y2: 1, \n"
+                                                                             "                                stop: 0 "
+                                                                             "#ecf4fc, "
+                                                                             "stop: 1 #dcecfc);\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox::drop-down {\n"
+                                                                             "    subcontrol-origin: padding;\n"
+                                                                             "    subcontrol-position: top right;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    border-left-width: 1px;\n"
+                                                                             "    border-left-color: darkgray;\n"
+                                                                             "    border-left-style: solid;\n"
+                                                                             "    border-top-right-radius: 3px;\n"
+                                                                             "    border-bottom-right-radius: 3px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox::down-arrow {\n"
+                                                                             "    image: url("
+                                                                             "icons/down_arrow_icon.svg); \n"
+                                                                             "    width: 16px;\n"
+                                                                             "    height: 16px\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox QAbstractItemView {\n"
+                                                                             "    selection-background-color: rgb("
+                                                                             "200,200,200);\n"
+                                                                             "    selection-color: black;\n"
+                                                                             "    background: #f0f0f0;\n"
+                                                                             "    border: 0px solid #f0f0f0;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QComboBox QAbstractItemView::item {\n"
+                                                                             "    margin: 5px 5px 5px 5px;\n"
+                                                                             "}")
+                self.pw_plotOptions_cb_2[self.plot_option_num].setObjectName("pw_plotOptions_cb_2_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_hl_4[self.plot_option_num].addWidget(self.pw_plotOptions_cb_2[self.plot_option_num])
                 self.pw_plotOptions_hl_5.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_5[self.plot_option_num].setObjectName("pw_plotOptions_hl_5_" + str(self.plot_option_num))
-                self.pw_plotOptions_hl_5[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_5[self.plot_option_num].setObjectName("pw_plotOptions_hl_5_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_hl_5[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_8.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_8[self.plot_option_num].setMinimumSize(QtCore.QSize(80, 27))
                 self.pw_plotOptions_lb_8[self.plot_option_num].setMaximumSize(QtCore.QSize(80, 27))
                 self.pw_plotOptions_lb_8[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_8[self.plot_option_num].setText("RGB code:")
-                self.pw_plotOptions_lb_8[self.plot_option_num].setObjectName("pw_plotOptions_lb_8_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_8[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_8[self.plot_option_num].setObjectName("pw_plotOptions_lb_8_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_lb_8[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_lb_8[self.plot_option_num].hide()
                 self.pw_plotOptions_hl_5[self.plot_option_num].addWidget(self.pw_plotOptions_lb_8[self.plot_option_num])
                 self.pw_plotOptions_ln_3.append(QtWidgets.QLineEdit())
@@ -3502,12 +3721,14 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_plotOptions_ln_3[self.plot_option_num].setMaximumSize(QtCore.QSize(130, 27))
                 self.pw_plotOptions_ln_3[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_ln_3[self.plot_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_plotOptions_ln_3[self.plot_option_num].setObjectName("pw_plotOptions_ln_3_" + str(self.plot_option_num))
+                                                                             "    border-radius: 3px;\n"
+                                                                             "    padding: 1px 4px 1px 4px;\n"
+                                                                             "    background-color:  rgb(240, 240, "
+                                                                             "240);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
+                self.pw_plotOptions_ln_3[self.plot_option_num].setObjectName("pw_plotOptions_ln_3_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_ln_3[self.plot_option_num].hide()
                 self.pw_plotOptions_hl_5[self.plot_option_num].addWidget(self.pw_plotOptions_ln_3[self.plot_option_num])
                 self.pw_plotOptions_ln_5.append(QtWidgets.QLineEdit())
@@ -3515,12 +3736,14 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_plotOptions_ln_5[self.plot_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_plotOptions_ln_5[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_ln_5[self.plot_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_plotOptions_ln_5[self.plot_option_num].setObjectName("pw_plotOptions_ln_5_" + str(self.plot_option_num))
+                                                                             "    border-radius: 3px;\n"
+                                                                             "    padding: 1px 4px 1px 4px;\n"
+                                                                             "    background-color:  rgb(240, 240, "
+                                                                             "240);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
+                self.pw_plotOptions_ln_5[self.plot_option_num].setObjectName("pw_plotOptions_ln_5_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_ln_5[self.plot_option_num].hide()
                 self.pw_plotOptions_hl_5[self.plot_option_num].addWidget(self.pw_plotOptions_ln_5[self.plot_option_num])
                 self.pw_plotOptions_ln_6.append(QtWidgets.QLineEdit())
@@ -3528,12 +3751,14 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_plotOptions_ln_6[self.plot_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_plotOptions_ln_6[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_ln_6[self.plot_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_plotOptions_ln_6[self.plot_option_num].setObjectName("pw_plotOptions_ln_6_" + str(self.plot_option_num))
+                                                                             "    border-radius: 3px;\n"
+                                                                             "    padding: 1px 4px 1px 4px;\n"
+                                                                             "    background-color:  rgb(240, 240, "
+                                                                             "240);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
+                self.pw_plotOptions_ln_6[self.plot_option_num].setObjectName("pw_plotOptions_ln_6_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_ln_6[self.plot_option_num].hide()
                 self.pw_plotOptions_hl_5[self.plot_option_num].addWidget(self.pw_plotOptions_ln_6[self.plot_option_num])
                 self.pw_plotOptions_hl_4[self.plot_option_num].addLayout(self.pw_plotOptions_hl_5[self.plot_option_num])
@@ -3541,140 +3766,174 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_plotOptions_bt_2[self.plot_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_2[self.plot_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_2[self.plot_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                             "    border: 1px solid transparent;\n"
+                                                                             "    background-color: transparent;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    height: 27px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QToolButton:flat {\n"
+                                                                             "    border: none;\n"
+                                                                             "}")
                 self.pw_plotOptions_bt_2[self.plot_option_num].setText("")
                 self.pw_plotOptions_bt_2[self.plot_option_num].setIcon(icon)
                 self.pw_plotOptions_bt_2[self.plot_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_plotOptions_bt_2[self.plot_option_num].setAutoRaise(False)
-                self.pw_plotOptions_bt_2[self.plot_option_num].setObjectName("pw_plotOptions_bt_2_" + str(self.plot_option_num))
+                self.pw_plotOptions_bt_2[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_bt_2_" + str(self.plot_option_num))
                 self.pw_plotOptions_hl_4[self.plot_option_num].addWidget(self.pw_plotOptions_bt_2[self.plot_option_num])
-                self.pw_plotOptions_hl_4[self.plot_option_num].addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_4[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addLayout(self.pw_plotOptions_hl_4[self.plot_option_num])
                 self.pw_plotOptions_hl_6.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_6[self.plot_option_num].setObjectName("pw_plotOptions_hl_6_" + str(self.plot_option_num))
-                self.pw_plotOptions_hl_6[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_6[self.plot_option_num].setObjectName("pw_plotOptions_hl_6_"
+                                                                             + str(self.plot_option_num))
+                self.pw_plotOptions_hl_6[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_4.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_4[self.plot_option_num].setMinimumSize(QtCore.QSize(200, 27))
                 self.pw_plotOptions_lb_4[self.plot_option_num].setMaximumSize(QtCore.QSize(200, 27))
                 self.pw_plotOptions_lb_4[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_4[self.plot_option_num].setText("Line width / Marker size:")
-                self.pw_plotOptions_lb_4[self.plot_option_num].setObjectName("pw_plotOptions_lb_4_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_4[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_4[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_lb_4_" + str(self.plot_option_num))
+                self.pw_plotOptions_lb_4[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_6[self.plot_option_num].addWidget(self.pw_plotOptions_lb_4[self.plot_option_num])
                 self.pw_plotOptions_ln_1.append(QtWidgets.QLineEdit())
                 self.pw_plotOptions_ln_1[self.plot_option_num].setMinimumSize(QtCore.QSize(60, 27))
                 self.pw_plotOptions_ln_1[self.plot_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_plotOptions_ln_1[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_ln_1[self.plot_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_plotOptions_ln_1[self.plot_option_num].setObjectName("pw_plotOptions_ln_1_" + str(self.plot_option_num))
+                                                                             "    border-radius: 3px;\n"
+                                                                             "    padding: 1px 4px 1px 4px;\n"
+                                                                             "    background-color:  rgb(240, 240, "
+                                                                             "240);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
+                self.pw_plotOptions_ln_1[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_ln_1_" + str(self.plot_option_num))
                 self.pw_plotOptions_hl_6[self.plot_option_num].addWidget(self.pw_plotOptions_ln_1[self.plot_option_num])
-                self.pw_plotOptions_hl_6[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_6[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_bt_3.append(QtWidgets.QToolButton())
                 self.pw_plotOptions_bt_3[self.plot_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_3[self.plot_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_3[self.plot_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                             "    border: 1px solid transparent;\n"
+                                                                             "    background-color: transparent;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    height: 27px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QToolButton:flat {\n"
+                                                                             "    border: none;\n"
+                                                                             "}")
                 self.pw_plotOptions_bt_3[self.plot_option_num].setText("")
                 self.pw_plotOptions_bt_3[self.plot_option_num].setIcon(icon)
                 self.pw_plotOptions_bt_3[self.plot_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_plotOptions_bt_3[self.plot_option_num].setAutoRaise(False)
-                self.pw_plotOptions_bt_3[self.plot_option_num].setObjectName("pw_plotOptions_bt_3_" + str(self.plot_option_num))
+                self.pw_plotOptions_bt_3[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_bt_3_" + str(self.plot_option_num))
                 self.pw_plotOptions_hl_6[self.plot_option_num].addWidget(self.pw_plotOptions_bt_3[self.plot_option_num])
-                self.pw_plotOptions_hl_6[self.plot_option_num].addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_6[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addLayout(self.pw_plotOptions_hl_6[self.plot_option_num])
                 self.pw_plotOptions_hl_7.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_7[self.plot_option_num].setObjectName("pw_plotOptions_hl_7_" + str(self.plot_option_num))
-                self.pw_plotOptions_hl_7[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_7[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_hl_7_" + str(self.plot_option_num))
+                self.pw_plotOptions_hl_7[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_5.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_5[self.plot_option_num].setMinimumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_5[self.plot_option_num].setMaximumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_5[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_5[self.plot_option_num].setText("Antialiased ?")
-                self.pw_plotOptions_lb_5[self.plot_option_num].setObjectName("pw_plotOptions_lb_5_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_5[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_5[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_lb_5_" + str(self.plot_option_num))
+                self.pw_plotOptions_lb_5[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_7[self.plot_option_num].addWidget(self.pw_plotOptions_lb_5[self.plot_option_num])
                 self.pw_plotOptions_ck_1.append(QtWidgets.QCheckBox())
                 self.pw_plotOptions_ck_1[self.plot_option_num].setMinimumSize(QtCore.QSize(25, 20))
                 self.pw_plotOptions_ck_1[self.plot_option_num].setMaximumSize(QtCore.QSize(25, 20))
                 self.pw_plotOptions_ck_1[self.plot_option_num].setText("")
-                self.pw_plotOptions_ck_1[self.plot_option_num].setObjectName("pw_plotOptions_ck_1_" + str(self.plot_option_num))
+                self.pw_plotOptions_ck_1[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_ck_1_" + str(self.plot_option_num))
                 self.pw_plotOptions_ck_1[self.plot_option_num].setStyleSheet("QCheckBox {\n"
-                "    spacing: 5px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
+                                                                             "    spacing: 5px;\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_7[self.plot_option_num].addWidget(self.pw_plotOptions_ck_1[self.plot_option_num])
-                self.pw_plotOptions_hl_7[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_7[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_bt_4.append(QtWidgets.QToolButton())
                 self.pw_plotOptions_bt_4[self.plot_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_4[self.plot_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_4[self.plot_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                             "    border: 1px solid transparent;\n"
+                                                                             "    background-color: transparent;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    height: 27px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QToolButton:flat {\n"
+                                                                             "    border: none;\n"
+                                                                             "}")
                 self.pw_plotOptions_bt_4[self.plot_option_num].setText("")
                 self.pw_plotOptions_bt_4[self.plot_option_num].setIcon(icon)
                 self.pw_plotOptions_bt_4[self.plot_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_plotOptions_bt_4[self.plot_option_num].setAutoRaise(False)
-                self.pw_plotOptions_bt_4[self.plot_option_num].setObjectName("pw_plotOptions_bt_4_" + str(self.plot_option_num))
+                self.pw_plotOptions_bt_4[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_bt_4_" + str(self.plot_option_num))
                 self.pw_plotOptions_hl_7[self.plot_option_num].addWidget(self.pw_plotOptions_bt_4[self.plot_option_num])
-                self.pw_plotOptions_hl_7[self.plot_option_num].addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_7[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addLayout(self.pw_plotOptions_hl_7[self.plot_option_num])
                 self.pw_plotOptions_hl_8.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_8[self.plot_option_num].setObjectName("pw_plotOptions_hl_8_" + str(self.plot_option_num))
-                self.pw_plotOptions_hl_8[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_8[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_hl_8_" + str(self.plot_option_num))
+                self.pw_plotOptions_hl_8[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_6.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_6[self.plot_option_num].setMinimumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_6[self.plot_option_num].setMaximumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_6[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_6[self.plot_option_num].setText("Opacity ?")
-                self.pw_plotOptions_lb_6[self.plot_option_num].setObjectName("pw_plotOptions_lb_6_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_6[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_6[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_lb_6_" + str(self.plot_option_num))
+                self.pw_plotOptions_lb_6[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_8[self.plot_option_num].addWidget(self.pw_plotOptions_lb_6[self.plot_option_num])
                 self.pw_plotOptions_ck_2.append(QtWidgets.QCheckBox())
                 self.pw_plotOptions_ck_2[self.plot_option_num].setMinimumSize(QtCore.QSize(25, 20))
                 self.pw_plotOptions_ck_2[self.plot_option_num].setMaximumSize(QtCore.QSize(25, 20))
                 self.pw_plotOptions_ck_2[self.plot_option_num].setText("")
-                self.pw_plotOptions_ck_2[self.plot_option_num].setObjectName("pw_plotOptions_ck_2_" + str(self.plot_option_num))
+                self.pw_plotOptions_ck_2[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_ck_2_" + str(self.plot_option_num))
                 self.pw_plotOptions_ck_2[self.plot_option_num].setStyleSheet("QCheckBox {\n"
-                "    spacing: 5px;\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
+                                                                             "    spacing: 5px;\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_8[self.plot_option_num].addWidget(self.pw_plotOptions_ck_2[self.plot_option_num])
-                self.pw_plotOptions_hl_8[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_8[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_7.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_7[self.plot_option_num].setMinimumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_7[self.plot_option_num].setMaximumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_7[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_7[self.plot_option_num].setText("Percentage:")
-                self.pw_plotOptions_lb_7[self.plot_option_num].setObjectName("pw_plotOptions_lb_7_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_7[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_7[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_lb_7_" + str(self.plot_option_num))
+                self.pw_plotOptions_lb_7[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_8[self.plot_option_num].addWidget(self.pw_plotOptions_lb_7[self.plot_option_num])
                 self.pw_plotOptions_ln_2.append(QtWidgets.QLineEdit())
                 self.pw_plotOptions_ln_2[self.plot_option_num].setEnabled(False)
@@ -3682,96 +3941,117 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_plotOptions_ln_2[self.plot_option_num].setMaximumSize(QtCore.QSize(60, 27))
                 self.pw_plotOptions_ln_2[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_ln_2[self.plot_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}\n"
-                "\n"
-                "QLineEdit:disabled {\n"
-                "    background-color:  rgb(180, 180, 180);\n"
-                "}")
-                self.pw_plotOptions_ln_2[self.plot_option_num].setObjectName("pw_plotOptions_ln_2_" + str(self.plot_option_num))
+                                                                             "    border-radius: 3px;\n"
+                                                                             "    padding: 1px 4px 1px 4px;\n"
+                                                                             "    background-color:  rgb(240, 240, "
+                                                                             "240);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QLineEdit:disabled {\n"
+                                                                             "    background-color:  rgb(180, 180, "
+                                                                             "180);\n"
+                                                                             "}")
+                self.pw_plotOptions_ln_2[self.plot_option_num].setObjectName("pw_plotOptions_ln_2_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_hl_8[self.plot_option_num].addWidget(self.pw_plotOptions_ln_2[self.plot_option_num])
-                self.pw_plotOptions_hl_8[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_8[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_bt_5.append(QtWidgets.QToolButton())
                 self.pw_plotOptions_bt_5[self.plot_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_5[self.plot_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_5[self.plot_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                             "    border: 1px solid transparent;\n"
+                                                                             "    background-color: transparent;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    height: 27px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QToolButton:flat {\n"
+                                                                             "    border: none;\n"
+                                                                             "}")
                 self.pw_plotOptions_bt_5[self.plot_option_num].setText("")
                 self.pw_plotOptions_bt_5[self.plot_option_num].setIcon(icon)
                 self.pw_plotOptions_bt_5[self.plot_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_plotOptions_bt_5[self.plot_option_num].setAutoRaise(False)
-                self.pw_plotOptions_bt_5[self.plot_option_num].setObjectName("pw_plotOptions_bt_5_" + str(self.plot_option_num))
+                self.pw_plotOptions_bt_5[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_bt_5_" + str(self.plot_option_num))
                 self.pw_plotOptions_hl_8[self.plot_option_num].addWidget(self.pw_plotOptions_bt_5[self.plot_option_num])
-                self.pw_plotOptions_hl_8[self.plot_option_num].addItem(QtWidgets.QSpacerItem(28, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_8[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(28, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addLayout(self.pw_plotOptions_hl_8[self.plot_option_num])
                 self.pw_plotOptions_hl_9.append(QtWidgets.QHBoxLayout())
-                self.pw_plotOptions_hl_9[self.plot_option_num].setObjectName("pw_plotOptions_hl_9_" + str(self.plot_option_num))
-                self.pw_plotOptions_hl_9[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_9[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_hl_9_" + str(self.plot_option_num))
+                self.pw_plotOptions_hl_9[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_lb_9.append(QtWidgets.QLabel())
                 self.pw_plotOptions_lb_9[self.plot_option_num].setMinimumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_9[self.plot_option_num].setMaximumSize(QtCore.QSize(100, 27))
                 self.pw_plotOptions_lb_9[self.plot_option_num].setFont(font)
                 self.pw_plotOptions_lb_9[self.plot_option_num].setText("Legend:")
-                self.pw_plotOptions_lb_9[self.plot_option_num].setObjectName("pw_plotOptions_lb_9_" + str(self.plot_option_num))
-                self.pw_plotOptions_lb_9[self.plot_option_num].setStyleSheet("QLabel {color: rgb(45,45,45);}")
+                self.pw_plotOptions_lb_9[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_lb_9_" + str(self.plot_option_num))
+                self.pw_plotOptions_lb_9[self.plot_option_num].setStyleSheet("QLabel {\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
                 self.pw_plotOptions_hl_9[self.plot_option_num].addWidget(self.pw_plotOptions_lb_9[self.plot_option_num])
                 self.pw_plotOptions_ln_4.append(QtWidgets.QLineEdit())
                 self.pw_plotOptions_ln_4[self.plot_option_num].setMinimumSize(QtCore.QSize(250, 27))
                 self.pw_plotOptions_ln_4[self.plot_option_num].setMaximumSize(QtCore.QSize(250, 27))
                 self.pw_plotOptions_ln_4[self.plot_option_num].setFont(font3)
                 self.pw_plotOptions_ln_4[self.plot_option_num].setStyleSheet("QLineEdit {\n"
-                "    border-radius: 3px;\n"
-                "    padding: 1px 4px 1px 4px;\n"
-                "    background-color:  rgb(240, 240, 240);\n"
-                "    color: rgb(45,45,45);\n"
-                "}")
-                self.pw_plotOptions_ln_4[self.plot_option_num].setObjectName("pw_plotOptions_ln_4_" + str(self.plot_option_num))
+                                                                             "    border-radius: 3px;\n"
+                                                                             "    padding: 1px 4px 1px 4px;\n"
+                                                                             "    background-color:  rgb(240, 240, "
+                                                                             "240);\n"
+                                                                             "    color: rgb(45,45,45);\n"
+                                                                             "}")
+                self.pw_plotOptions_ln_4[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_ln_4_" + str(self.plot_option_num))
                 self.pw_plotOptions_hl_9[self.plot_option_num].addWidget(self.pw_plotOptions_ln_4[self.plot_option_num])
-                self.pw_plotOptions_hl_9[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_9[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
                 self.pw_plotOptions_bt_6.append(QtWidgets.QToolButton())
                 self.pw_plotOptions_bt_6[self.plot_option_num].setMinimumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_6[self.plot_option_num].setMaximumSize(QtCore.QSize(27, 27))
                 self.pw_plotOptions_bt_6[self.plot_option_num].setStyleSheet("QToolButton {\n"
-                "    border: 1px solid transparent;\n"
-                "    background-color: transparent;\n"
-                "    width: 27px;\n"
-                "    height: 27px;\n"
-                "}\n"
-                "\n"
-                "QToolButton:flat {\n"
-                "    border: none;\n"
-                "}")
+                                                                             "    border: 1px solid transparent;\n"
+                                                                             "    background-color: transparent;\n"
+                                                                             "    width: 27px;\n"
+                                                                             "    height: 27px;\n"
+                                                                             "}\n"
+                                                                             "\n"
+                                                                             "QToolButton:flat {\n"
+                                                                             "    border: none;\n"
+                                                                             "}")
                 self.pw_plotOptions_bt_6[self.plot_option_num].setText("")
                 self.pw_plotOptions_bt_6[self.plot_option_num].setIcon(icon)
                 self.pw_plotOptions_bt_6[self.plot_option_num].setIconSize(QtCore.QSize(23, 23))
                 self.pw_plotOptions_bt_6[self.plot_option_num].setAutoRaise(False)
-                self.pw_plotOptions_bt_6[self.plot_option_num].setObjectName("pw_plotOptions_bt_6_" + str(self.plot_option_num))
+                self.pw_plotOptions_bt_6[self.plot_option_num].\
+                    setObjectName("pw_plotOptions_bt_6_" + str(self.plot_option_num))
                 self.pw_plotOptions_hl_9[self.plot_option_num].addWidget(self.pw_plotOptions_bt_6[self.plot_option_num])
-                self.pw_plotOptions_hl_9[self.plot_option_num].addItem(QtWidgets.QSpacerItem(28, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+                self.pw_plotOptions_hl_9[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(28, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.
+                                                  QSizePolicy.Minimum))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addLayout(self.pw_plotOptions_hl_9[self.plot_option_num])
-                self.pw_plotOptions_vl_1[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
+                self.pw_plotOptions_vl_1[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
                 self.pw_plotOptions_li_1.append(QtWidgets.QFrame())
                 self.pw_plotOptions_li_1[self.plot_option_num].setFrameShape(QtWidgets.QFrame.HLine)
                 self.pw_plotOptions_li_1[self.plot_option_num].setFrameShadow(QtWidgets.QFrame.Sunken)
                 self.pw_plotOptions_li_1[self.plot_option_num].setStyleSheet("QFrame {\n"
-                "    background: rgb(190,190,190);\n"
-                "    height: 5px;\n"
-                "    border: 0px solid black;\n"
-                "}")
-                self.pw_plotOptions_li_1[self.plot_option_num].setObjectName("pw_plotOptions_li_1_" + str(self.plot_option_num))
+                                                                             "    background: rgb(190,190,190);\n"
+                                                                             "    height: 5px;\n"
+                                                                             "    border: 0px solid black;\n"
+                                                                             "}")
+                self.pw_plotOptions_li_1[self.plot_option_num].setObjectName("pw_plotOptions_li_1_"
+                                                                             + str(self.plot_option_num))
                 self.pw_plotOptions_vl_1[self.plot_option_num].addWidget(self.pw_plotOptions_li_1[self.plot_option_num])
-                self.pw_plotOptions_vl_1[self.plot_option_num].addItem(QtWidgets.QSpacerItem(20, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
+                self.pw_plotOptions_vl_1[self.plot_option_num].\
+                    addItem(QtWidgets.QSpacerItem(20, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
                 self.pw_plotOptions_la.addLayout(self.pw_plotOptions_vl_1[self.plot_option_num])
                 self.pw_plotOptions_la.setAlignment(QtCore.Qt.AlignTop)
                 self.pw_plotOptions_cb_2[self.plot_option_num].currentIndexChanged.connect(self.activate_line_color)
@@ -3782,26 +4062,39 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         item = 'HEX Color'
                     else:
                         item = 'RGB Color'
-                self.populate_combobox(self.pw_plotOptions_cb_2[self.plot_option_num], self.colors, False, item)
-                self.pw_plotOptions_ln_3[self.plot_option_num].setText(str(self.plot_options['line_color'][self.plot_option_num]))
+                populate_combobox(self.pw_plotOptions_cb_2[self.plot_option_num], self.colors, False, item)
+                self.pw_plotOptions_ln_3[self.plot_option_num].setText(str(self.plot_options['line_color'][self.
+                                                                           plot_option_num]))
                 self.pw_plotOptions_ck_2[self.plot_option_num].stateChanged.connect(self.activate_opacity_options)
                 self.pw_plotOptions_bg_1[self.plot_option_num].buttonClicked.connect(self.activate_line_style)
                 self.pw_plotOptions_rb_1[self.plot_option_num].click() 
-                self.pw_plotOptions_ln_1[self.plot_option_num].setText(str(self.plot_options['line_width'][self.plot_option_num]))
-                self.pw_plotOptions_ck_1[self.plot_option_num].setChecked(self.plot_options['line_antialiased'][self.plot_option_num])
-                self.pw_plotOptions_ck_2[self.plot_option_num].setChecked(self.plot_options['line_alpha'][self.plot_option_num])
-                self.pw_plotOptions_ln_4[self.plot_option_num].setText(self.plot_options['legend_label'][self.plot_option_num])
-                self.plot_option_num +=1
+                self.pw_plotOptions_ln_1[self.plot_option_num].setText(str(self.plot_options['line_width'][self.
+                                                                           plot_option_num]))
+                self.pw_plotOptions_ck_1[self.plot_option_num].setChecked(self.plot_options['line_antialiased'][self.
+                                                                          plot_option_num])
+                self.pw_plotOptions_ck_2[self.plot_option_num].setChecked(self.plot_options['line_alpha'][self.
+                                                                          plot_option_num])
+                self.pw_plotOptions_ln_4[self.plot_option_num].setText(self.plot_options['legend_label'][self.
+                                                                       plot_option_num])
+                self.pw_plotOptions_bt_1[self.plot_option_num].clicked.connect(self.figure_button_information)
+                self.pw_plotOptions_bt_2[self.plot_option_num].clicked.connect(self.figure_button_information)
+                self.pw_plotOptions_bt_3[self.plot_option_num].clicked.connect(self.figure_button_information)
+                self.pw_plotOptions_bt_4[self.plot_option_num].clicked.connect(self.figure_button_information)
+                self.pw_plotOptions_bt_5[self.plot_option_num].clicked.connect(self.figure_button_information)
+                self.pw_plotOptions_bt_6[self.plot_option_num].clicked.connect(self.figure_button_information)
+                self.plot_option_num += 1
     
         elif plot_type == 'grids':
             pass
-    
-    
-    
+
     def update_figure_options(self, plot_type):
         logging.debug('gui - plot_window_functions.py - PlotWindow - update_figure_options')
+        if "activated" in self.actionPan.objectName():
+            self.plot_pan()
+        if "activated" in self.actionZoom.objectName():
+            self.plot_zoom()
         if plot_type == 'timeseries':
-            figure_options = {}
+            figure_options = dict()
             figure_options['figure_instance'] = []
             figure_options['title'] = []
             figure_options['title_font'] = []
@@ -3856,9 +4149,9 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 except ValueError:
                     figure_options['xlim_min'].append('')
                 try:
-                    figure_options['xticks'].append(numpy.arange(figure_options['xlim_min'][i] - figure_options['xlim_step'][i] * 10,
-                                                            figure_options['xlim_max'][i] + figure_options['xlim_step'][i] * 10,
-                                                            figure_options['xlim_step'][i]))
+                    figure_options['xticks'].append(numpy.arange(figure_options['xlim_min'][i] - figure_options[
+                        'xlim_step'][i] * 10, figure_options['xlim_max'][i] + figure_options['xlim_step'][i] * 10,
+                                                                 figure_options['xlim_step'][i]))
                 except (ValueError, TypeError):
                     figure_options['xticks'].append('')
                 try:
@@ -3874,16 +4167,18 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 except ValueError:
                     figure_options['ylim_min'].append('')
                 try:
-                    figure_options['yticks'].append(numpy.arange(figure_options['ylim_min'][i] - figure_options['ylim_step'][i] * 10,
-                                                            figure_options['ylim_max'][i] + figure_options['ylim_step'][i] * 10,
-                                                            figure_options['ylim_step'][i]))
+                    figure_options['yticks'].append(numpy.arange(figure_options['ylim_min'][i] - figure_options[
+                        'ylim_step'][i] * 10, figure_options['ylim_max'][i] + figure_options['ylim_step'][i] * 10,
+                                                                 figure_options['ylim_step'][i]))
                 except (ValueError, TypeError):
                     figure_options['yticks'].append('')
                 if self.pw_figureOptions_ck_1[i].isChecked():
                     figure_options['grid'].append(True)
-                    figure_options['grid_style'].append(self.line_styles_dict[str(self.pw_figureOptions_cb_9[i].currentText())])
+                    figure_options['grid_style'].append(self.line_styles_dict[str(self.pw_figureOptions_cb_9[i].
+                                                                                  currentText())])
                     figure_options['grid_size'].append(float(self.pw_figureOptions_ln_10[i].text()))
-                    figure_options['grid_color'].append(self.colors_dict[str(self.pw_figureOptions_cb_10[i].currentText())])
+                    figure_options['grid_color'].append(self.colors_dict[str(self.pw_figureOptions_cb_10[i].
+                                                                             currentText())])
                 else:
                     figure_options['grid'].append(False)
                     figure_options['grid_style'].append('')
@@ -3896,43 +4191,46 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             figure_options['margin_top'].append(1 - float(self.pw_commonOptions_lb_6.text()))
             if 'figure_instance' in self.figure_options:
                 figure_options['horizontal_space'].append(None)
-                figure_options['vertical_space'].append(float(self.pw_figureOptions_lb_30[0].text()))
+                figure_options['vertical_space'].append(float(self.pw_commonOptions_lb_15.text()))
             else:
                 figure_options['horizontal_space'].append(None)
                 figure_options['vertical_space'].append(None)
             for i in range(self.figure_option_num):
                 if figure_options['title'][i]:
-                    if (figure_options['title'][i] != self.figure_options['title'][i] or 
-                        figure_options['title_font'][i] != self.figure_options['title_font'][i] or 
-                        figure_options['title_size'][i] != self.figure_options['title_size'][i]):
+                    if figure_options['title'][i] != self.figure_options['title'][i] or figure_options['title_font'][
+                        i] != self.figure_options['title_font'][i] or figure_options['title_size'][i] != \
+                            self.figure_options['title_size'][i]:
                         self.figure_options['title'][i] = figure_options['title'][i]
                         self.figure_options['title_font'][i] = figure_options['title_font'][i]
                         self.figure_options['title_size'][i] = figure_options['title_size'][i]
-                        font = {'fontname': figure_options['title_font'][i], 'fontsize': figure_options['title_size'][i]}
+                        font = {'fontname': figure_options['title_font'][i], 'fontsize': figure_options[
+                            'title_size'][i]}
                         if 'figure_instance' in self.figure_options:
                             self.figure_options['figure_instance'][i].set_title(figure_options['title'][i], **font)
                         else:
                             plt.title(figure_options['title'][i], y=1.04, **font)
                 if figure_options['xlabel'][i]:
-                    if (figure_options['xlabel'][i] != self.figure_options['xlabel'][i] or 
-                        figure_options['xlabel_font'][i] != self.figure_options['xlabel_font'][i] or 
-                        figure_options['xlabel_size'][i] != self.figure_options['xlabel_size'][i]):
+                    if figure_options['xlabel'][i] != self.figure_options['xlabel'][i] or figure_options[
+                        'xlabel_font'][i] != self.figure_options['xlabel_font'][i] or figure_options['xlabel_size'][
+                            i] != self.figure_options['xlabel_size'][i]:
                         self.figure_options['xlabel'][i] = figure_options['xlabel'][i]
                         self.figure_options['xlabel_font'][i] = figure_options['xlabel_font'][i]
                         self.figure_options['xlabel_size'][i] = figure_options['xlabel_size'][i]
-                        font = {'fontname': figure_options['xlabel_font'][i], 'fontsize': figure_options['xlabel_size'][i]}
+                        font = {'fontname': figure_options['xlabel_font'][i], 'fontsize': figure_options[
+                            'xlabel_size'][i]}
                         if 'figure_instance' in self.figure_options:
                             self.figure_options['figure_instance'][i].set_xlabel(figure_options['xlabel'][i], **font)
                         else:
                             plt.xlabel(figure_options['xlabel'][i], **font) 
                 if figure_options['ylabel'][i]:
-                    if (figure_options['ylabel'][i] != self.figure_options['ylabel'][i] or 
-                        figure_options['ylabel_font'][i] != self.figure_options['ylabel_font'][i] or 
-                        figure_options['ylabel_size'][i] != self.figure_options['ylabel_size'][i]):
+                    if (figure_options['ylabel'][i] != self.figure_options['ylabel'][i] or figure_options[
+                        'ylabel_font'][i] != self.figure_options['ylabel_font'][i] or figure_options['ylabel_size'][
+                            i] != self.figure_options['ylabel_size'][i]):
                         self.figure_options['ylabel'][i] = figure_options['ylabel'][i]
                         self.figure_options['ylabel_font'][i] = figure_options['ylabel_font'][i]
                         self.figure_options['ylabel_size'][i] = figure_options['ylabel_size'][i]
-                        font = {'fontname': figure_options['ylabel_font'][i], 'fontsize': figure_options['ylabel_size'][i]}
+                        font = {'fontname': figure_options['ylabel_font'][i], 'fontsize': figure_options[
+                            'ylabel_size'][i]}
                         
                         if 'figure_instance' in self.figure_options:
                             self.figure_options['figure_instance'][i].set_ylabel(figure_options['ylabel'][i], **font)
@@ -3940,33 +4238,35 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                             plt.ylabel(figure_options['ylabel'][i], **font)
                 if isinstance(figure_options['xticks'][i], numpy.ndarray):
                     if not numpy.array_equal(figure_options['xticks'][i], self.figure_options['xticks'][i]):
-                        self.figure_options['xlim_step'][i] =figure_options['xlim_step'][i]
+                        self.figure_options['xlim_step'][i] = figure_options['xlim_step'][i]
                         self.figure_options['xlim_max'][i] = figure_options['xlim_max'][i]
                         self.figure_options['xlim_min'][i] = figure_options['xlim_min'][i]
                         self.figure_options['xticks'][i] = figure_options['xticks'][i]
                         if 'figure_instance' in self.figure_options:
                             self.figure_options['figure_instance'][i].set_xticks(figure_options['xticks'][i])
-                            self.figure_options['figure_instance'][i].set_xlim([figure_options['xlim_min'][i], figure_options['xlim_max'][i]])
+                            self.figure_options['figure_instance'][i].set_xlim([figure_options['xlim_min'][i],
+                                                                                figure_options['xlim_max'][i]])
                         else:
                             plt.xticks(figure_options['xticks'][i])
                             plt.xlim([figure_options['xlim_min'][i], figure_options['xlim_max'][i]])
                 if isinstance(figure_options['yticks'][i], numpy.ndarray):
                     if not numpy.array_equal(figure_options['yticks'][i], self.figure_options['yticks'][i]):
-                        self.figure_options['ylim_step'][i] =figure_options['ylim_step'][i]
+                        self.figure_options['ylim_step'][i] = figure_options['ylim_step'][i]
                         self.figure_options['ylim_max'][i] = figure_options['ylim_max'][i]
                         self.figure_options['ylim_min'][i] = figure_options['ylim_min'][i]
                         self.figure_options['yticks'][i] = figure_options['yticks'][i]
                         if 'figure_instance' in self.figure_options:
                             self.figure_options['figure_instance'][i].set_yticks(figure_options['yticks'][i])
-                            self.figure_options['figure_instance'][i].set_ylim([figure_options['ylim_min'][i], figure_options['ylim_max'][i]])
+                            self.figure_options['figure_instance'][i].set_ylim([figure_options['ylim_min'][i],
+                                                                                figure_options['ylim_max'][i]])
                         else:
                             plt.yticks(figure_options['yticks'][i])
                             plt.ylim([figure_options['ylim_min'][i], figure_options['ylim_max'][i]])
                 if figure_options['grid'][i]:
-                    if (figure_options['grid'][i] != self.figure_options['grid'][i] or
-                        self.figure_options['grid_style'][i] != figure_options['grid_style'][i] or
-                        self.figure_options['grid_size'][i] != figure_options['grid_size'][i] or
-                        self.figure_options['grid_color'][i] != figure_options['grid_color'][i]):
+                    if (figure_options['grid'][i] != self.figure_options['grid'][i] or self.figure_options[
+                        'grid_style'][i] != figure_options['grid_style'][i] or self.figure_options['grid_size'][i] !=
+                            figure_options['grid_size'][i] or self.figure_options['grid_color'][i] != figure_options[
+                                'grid_color'][i]):
                         self.figure_options['grid'][i] = figure_options['grid'][i]
                         self.figure_options['grid_style'][i] = figure_options['grid_style'][i]
                         self.figure_options['grid_size'][i] = figure_options['grid_size'][i]
@@ -3981,18 +4281,19 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 elif not figure_options['grid'][i] and figure_options['grid'][i] != self.figure_options['grid'][i]:
                     self.figure_options['grid'][i] = figure_options['grid'][i]
                     if 'figure_instance' in self.figure_options:
-                            self.figure_options['figure_instance'][i].grid(b=False)
+                        self.figure_options['figure_instance'][i].grid(b=False)
                     else:
                         plt.grid(b=False)  
                 if figure_options['display_legend'][i]:
                     if figure_options['display_legend'][i] != self.figure_options['display_legend'][i]:
                         self.figure_options['display_legend'][i] = figure_options['display_legend'][i]
                         if 'figure_instance' in self.figure_options:
-                            self.figure_options['figure_instance'][i].legend(prop={'family':self.default_font, 'size':'10'})
+                            self.figure_options['figure_instance'][i].legend(prop={'family': self.default_font,
+                                                                                   'size': '10'})
                             self.figure_options['figure_instance'][i].set_visible(True)
                             self.figure_options['figure_instance'][i].draggable()
                         else:
-                            plt.gca().legend(prop={'family':self.default_font, 'size':'10'})
+                            plt.gca().legend(prop={'family': self.default_font, 'size': '10'})
                             plt.gca().legend().set_visible(True)
                             plt.gca().legend().draggable()
                 else:
@@ -4005,23 +4306,34 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                             plt.gca().legend().set_visible(False)
             margin_left, margin_right, margin_bottom, margin_top, wspace, hspace = None, None, None, None, None, None
             if figure_options['margin_left'][0] != self.figure_options['margin_left'][0]:
-                self.figure_options['margin_left'][0], margin_left = figure_options['margin_left'][0], figure_options['margin_left'][0]
+                self.figure_options['margin_left'][0], margin_left = figure_options['margin_left'][0], \
+                                                                     figure_options['margin_left'][0]
             if figure_options['margin_right'][0] != self.figure_options['margin_right'][0]:
-                self.figure_options['margin_right'][0], margin_right = figure_options['margin_right'][0], figure_options['margin_right'][0]
+                self.figure_options['margin_right'][0], margin_right = figure_options['margin_right'][0], \
+                                                                       figure_options['margin_right'][0]
             if figure_options['margin_bottom'][0] != self.figure_options['margin_bottom'][0]:
-                self.figure_options['margin_bottom'][0], margin_bottom = figure_options['margin_bottom'][0], figure_options['margin_bottom'][0]
+                self.figure_options['margin_bottom'][0], margin_bottom = figure_options['margin_bottom'][0], \
+                                                                         figure_options['margin_bottom'][0]
             if figure_options['margin_top'][0] != self.figure_options['margin_top'][0]:
-                self.figure_options['margin_top'][0], margin_top = figure_options['margin_top'][0], figure_options['margin_top'][0]
+                self.figure_options['margin_top'][0], margin_top = figure_options['margin_top'][0], figure_options[
+                    'margin_top'][0]
             if figure_options['vertical_space'][0] != self.figure_options['vertical_space'][0]:
-                self.figure_options['vertical_space'][0], hspace = figure_options['vertical_space'][0], figure_options['vertical_space'][0]
+                self.figure_options['vertical_space'][0], hspace = figure_options['vertical_space'][0], \
+                                                                   figure_options['vertical_space'][0]
             if figure_options['horizontal_space'][0] != self.figure_options['horizontal_space'][0]:
-                self.figure_options['horizontal_space'][0], wspace = figure_options['horizontal_space'][0], figure_options['horizontal_space'][0]
-            plt.subplots_adjust(left=margin_left, right=margin_right, bottom=margin_bottom, top=margin_top, wspace=wspace, hspace=hspace)
+                self.figure_options['horizontal_space'][0], wspace = figure_options['horizontal_space'][0], \
+                                                                     figure_options['horizontal_space'][0]
+            plt.subplots_adjust(left=margin_left, right=margin_right, bottom=margin_bottom, top=margin_top,
+                                wspace=wspace, hspace=hspace)
             self.canvas.draw()
     
     def update_plot_options(self, plot_type):
+        if "activated" in self.actionPan.objectName():
+            self.plot_pan()
+        if "activated" in self.actionZoom.objectName():
+            self.plot_zoom()
         if plot_type == 'timeseries':
-            plot_options = {}
+            plot_options = dict()
             plot_options['line_style'] = []
             plot_options['line_marker'] = []
             plot_options['line_color'] = []
@@ -4032,10 +4344,12 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             plot_options['legend_label'] = []
             for i in range(self.plot_option_num):
                 try:
-                    plot_options['line_style'].append(self.line_styles_dict[str(self.pw_plotOptions_cb_1[i].currentText())])
+                    plot_options['line_style'].append(self.line_styles_dict[str(self.pw_plotOptions_cb_1[i].
+                                                                                currentText())])
                     plot_options['line_marker'].append('line')
                 except KeyError:
-                    plot_options['line_style'].append(self.marker_styles_dict[str(self.pw_plotOptions_cb_1[i].currentText())])
+                    plot_options['line_style'].append(self.marker_styles_dict[str(self.pw_plotOptions_cb_1[i].
+                                                                                  currentText())])
                     plot_options['line_marker'].append('marker')
                 if str(self.pw_plotOptions_cb_2[i].currentText()) == 'HEX Color':
                     if '#' not in str(self.pw_plotOptions_ln_3[i].text()):
@@ -4066,7 +4380,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     self.plot_options['line_marker'][i] = plot_options['line_marker'][i]
                     if plot_options['line_marker'][i] == 'line':
                         if 'figure_instance' in self.plot_options:
-                            self.plot_options['figure_instance'][i].axes.lines[0].set_linestyle(plot_options['line_style'])
+                            self.plot_options['figure_instance'][i].axes.lines[0].\
+                                set_linestyle(plot_options['line_style'])
                             self.plot_options['figure_instance'][i].axes.lines[0].set_marker(None)
                         else:
                             plt.axes().lines[i].set_linestyle(plot_options['line_style'])
@@ -4074,7 +4389,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     else:
                         if 'figure_instance' in self.plot_options:
                             self.plot_options['figure_instance'][i].axes.lines[0].set_linestyle('None')
-                            self.plot_options['figure_instance'][i].axes.lines[0].set_marker(plot_options['line_style'][i])
+                            self.plot_options['figure_instance'][i].axes.lines[0].\
+                                set_marker(plot_options['line_style'][i])
                         else:
                             plt.axes().lines[i].set_linestyle('None')
                             plt.axes().lines[i].set_marker(plot_options['line_style'][i])
@@ -4086,7 +4402,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         plt.axes().lines[i].set_color(plot_options['line_color'][i])
                     if self.figure_options['display_legend'][i]:
                         if 'figure_instance' in self.plot_options:
-                            leg = self.plot_options['figure_instance'][i].legend(prop={'family':self.default_font, 'size':'10'})  
+                            leg = self.plot_options['figure_instance'][i].\
+                                legend(prop={'family': self.default_font, 'size': '10'})
                             leg.draggable()
                         else:
                             plt.gca().legend().draggable()
@@ -4094,26 +4411,31 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     self.plot_options['line_width'][i] = plot_options['line_width'][i]
                     if plot_options['line_marker'][i] == 'line':
                         if 'figure_instance' in self.plot_options:
-                            self.plot_options['figure_instance'][i].axes.lines[0].set_linewidth(plot_options['line_width'][i])
+                            self.plot_options['figure_instance'][i].axes.lines[0].\
+                                set_linewidth(plot_options['line_width'][i])
                         else:
                             plt.axes().lines[i].set_linewidth(plot_options['line_width'][i])
                     else:
                         if 'figure_instance' in self.plot_options:
-                            self.plot_options['figure_instance'][i].axes.lines[0].set_markersize(plot_options['line_width'][i])
+                            self.plot_options['figure_instance'][i].axes.lines[0].\
+                                set_markersize(plot_options['line_width'][i])
                         else:
                             plt.axes().lines[i].set_markersize(plot_options['line_width'][i])
                 if plot_options['line_antialiased'][i] != self.plot_options['line_antialiased'][i]:
                     self.plot_options['line_antialiased'][i] = plot_options['line_antialiased'][i]
                     if 'figure_instance' in self.plot_options:
-                            self.plot_options['figure_instance'][i].axes.lines[0].set_antialiased(plot_options['line_antialiased'][i])
+                        self.plot_options['figure_instance'][i].axes.lines[0].\
+                            set_antialiased(plot_options['line_antialiased'][i])
                     else:
                         plt.axes().lines[i].set_antialiased(plot_options['line_antialiased'][i])
                 if plot_options['line_alpha'][i]:
-                    if plot_options['line_alpha'][i] != self.plot_options['line_alpha'][i] or plot_options['line_alpha_perc'][i] != self.plot_options['line_alpha_perc'][i]:
+                    if plot_options['line_alpha'][i] != self.plot_options['line_alpha'][i] or \
+                            plot_options['line_alpha_perc'][i] != self.plot_options['line_alpha_perc'][i]:
                         self.plot_options['line_alpha'][i] = plot_options['line_alpha'][i]
                         self.plot_options['line_alpha_perc'][i] = plot_options['line_alpha_perc'][i]
                         if 'figure_instance' in self.plot_options:
-                            self.plot_options['figure_instance'][i].axes.lines[0].set_alpha(float(plot_options['line_alpha_perc'][i]) / 100.)
+                            self.plot_options['figure_instance'][i].axes.lines[0].\
+                                set_alpha(float(plot_options['line_alpha_perc'][i]) / 100.)
                         else:
                             plt.axes().lines[i].set_alpha(float(plot_options['line_alpha_perc'][i]) / 100.)
                 else:
@@ -4126,12 +4448,14 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 if plot_options['legend_label'][i] != self.plot_options['legend_label'][i]:
                     self.plot_options['legend_label'][i] = plot_options['legend_label'][i]
                     if 'figure_instance' in self.plot_options:
-                            self.plot_options['figure_instance'][i].axes.lines[0].set_label(str(plot_options['legend_label'][i]))
+                        self.plot_options['figure_instance'][i].axes.lines[0].set_label(str(plot_options[
+                                                                                                 'legend_label'][i]))
                     else:
                         plt.axes().lines[i].set_label(str(plot_options['legend_label'][i]))
                     if self.figure_options['display_legend'][i]:
                         if 'figure_instance' in self.plot_options:
-                            leg = self.plot_options['figure_instance'][i].legend(prop={'family':self.default_font, 'size':'10'})  
+                            leg = self.plot_options['figure_instance'][i].legend(prop={'family': self.default_font,
+                                                                                       'size': '10'})
                             leg.draggable()
                         else:
                             plt.gca().legend().draggable()
@@ -4155,7 +4479,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.actionPan.setIcon(icon)
             self.actionPan.setObjectName("activated_actionPan")
         self.navigation_toolbar.pan()
-        
+
     def plot_zoom(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - plot_zoom : actionZoom.objectName() '
                       + str(self.actionZoom.objectName()))
@@ -4199,12 +4523,13 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                     set_width = round((set_width / 2.54) * 100) / 100
             user_size = False
             if set_height is not None and set_width is not None:
-                if (real_height - 0.1) <= set_height <= (real_height + 0.1) and (real_width - 0.1) <= set_width <= (real_width + 0.1):
+                if (real_height - 0.1) <= set_height <= (real_height + 0.1) and (real_width - 0.1) <= set_width <= (
+                        real_width + 0.1):
                     pass
                 else:
                     user_size = True
                     plt.gcf().set_size_inches(set_width, set_height)
-            kwargs = {"orientation": None, "papertype": None, "format": None,
+            kwargs = {"orientation": 'landscape', "papertype": 'a4', "format": None,
                       "bbox_inches": None, "pad_inches": 0.1, "frameon": None,
                       'dpi': 100}
             try:
@@ -4220,7 +4545,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.canvas.draw()
     
     def wait_window(self):
-        self.waitWindow = MyWait()
+        info_text = 'Rendering figure, please wait...'
+        self.waitWindow = MyWait(info_text)
         self.waitWindow.exec_()
         
     def close_wait_window(self, val):
@@ -4316,8 +4642,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_figureOptions_cb_9[index].setEnabled(True)
                 self.pw_figureOptions_cb_10[index].setEnabled(True)
                 self.pw_figureOptions_ln_10[index].setEnabled(True)
-                self.populate_combobox(self.pw_figureOptions_cb_9[index], self.line_styles, False, 3)
-                self.populate_combobox(self.pw_figureOptions_cb_10[index], self.colors_grid, False)
+                populate_combobox(self.pw_figureOptions_cb_9[index], self.line_styles, False, 3)
+                populate_combobox(self.pw_figureOptions_cb_10[index], self.colors_grid, False)
                 self.pw_figureOptions_ln_10[index].setText('1')
             else:
                 self.pw_figureOptions_cb_9[index].setDisabled(True)
@@ -4331,8 +4657,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_figureOptions_cb_7[index].setEnabled(True)
                 self.pw_figureOptions_cb_8[index].setEnabled(True)
                 self.pw_figureOptions_ln_8[index].setEnabled(True)
-                self.populate_combobox(self.pw_figureOptions_cb_7[index], self.line_styles, False, 3)
-                self.populate_combobox(self.pw_figureOptions_cb_8[index], self.colors_grid, False)
+                populate_combobox(self.pw_figureOptions_cb_7[index], self.line_styles, False, 3)
+                populate_combobox(self.pw_figureOptions_cb_8[index], self.colors_grid, False)
                 self.pw_figureOptions_ln_8[index].setText('1')
             else:
                 self.pw_figureOptions_cb_7[index].setDisabled(True)
@@ -4342,33 +4668,21 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_figureOptions_ln_8[index].setDisabled(True)
                 self.pw_figureOptions_ln_8[index].setText("")
     
-    def populate_combobox(self, combobox, item_list, make_choice=True, set_index=None):
-        logging.debug('gui - plot_window_functions.py - PlotWindow - populate_combobox')
-        if make_choice:
-            combobox.addItem("Make a choice...")
-        if isinstance(item_list, dict):
-            item_list = [key for key in sorted(item_list)]
-        combobox.addItems(item_list)
-        if set_index is not None:
-            if isinstance(set_index, str):
-                combobox.setCurrentIndex(combobox.findText(set_index))
-            else:
-                combobox.setCurrentIndex(set_index)
-    
     def update_slider_value(self, val):
-        self.findChild(QtWidgets.QLabel, 'slider_lb_' + str(self.sender().objectName()[-1:])).setText(str(float(val) / 100))
+        object_name = self.sender().objectName()[-1:]
+        self.findChild(QtWidgets.QLabel, 'slider_lb_' + str(object_name)).setText(str(float(val) / 100))
         
     def activate_line_style(self, val):
         logging.debug('gui - plot_window_functions.py - PlotWindow - activate_line_style')
         self.pw_plotOptions_cb_1[int(val.objectName()[20:])].clear()
         if "pw_plotOptions_rb_1" in val.objectName():
-            self.populate_combobox(self.pw_plotOptions_cb_1[int(val.objectName()[20:])], self.line_styles, False, 'Solid')
+            populate_combobox(self.pw_plotOptions_cb_1[int(val.objectName()[20:])], self.line_styles, False, 'Solid')
             self.pw_plotOptions_ln_1[int(val.objectName()[20:])].setText('1.25')
         else:
-            self.populate_combobox(self.pw_plotOptions_cb_1[int(val.objectName()[20:])], self.marker_styles, False)
+            populate_combobox(self.pw_plotOptions_cb_1[int(val.objectName()[20:])], self.marker_styles, False)
             self.pw_plotOptions_ln_1[int(val.objectName()[20:])].setText('10')
     
-    def activate_line_color(self, val):
+    def activate_line_color(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - activate_line_color')
         if self.sender().currentText() == "HEX Color" or self.sender().currentText() == "RGB Color":
             index = int(self.sender().objectName()[20:])
@@ -4457,7 +4771,9 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
     def update_quality_value(self, val):
         self.pw_saveOptions_lb_7.setText(str(val))
     
-    def set_axis_ticks_labels(self, val):
+    def set_axis_ticks_labels(self):
+        text = None
+        label = None
         if 'pw_ticks_bt_1' in self.sender().objectName():
             text = 'X'
             label = self.pw_figureOptions_lb_16[int(self.sender().objectName()[14:])]
@@ -4473,13 +4789,27 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         logging.debug('gui - plot_window_functions.py - PlotWindow - get_file_name')
         file_dialog = QtWidgets.QFileDialog()
         try:
-            import pillow
-            filter_types = "EPS Files (*.eps);;JPEG Files (*.jpg *.jpeg *.jpe);;PDF Files (*.pdf);;PNG Files (*.png *.pns);;TIFF Files (*.tif *.tiff)"
-        except:
+            import PIL
+            filter_types = "EPS Files (*.eps);;JPEG Files (*.jpg *.jpeg *.jpe);;PDF Files (*.pdf);;PNG Files (*.png " \
+                           "*.pns);;TIFF Files (*.tif *.tiff)"
+        except ImportError:
             filter_types = "EPS Files (*.eps);;PDF Files (*.pdf);;PNG Files (*.png *.pns);;TIFF Files (*.tif *.tiff)"
         out_file_name, out_file_ext = file_dialog.getSaveFileName(self, "Save File", "", filter_types)
         return str(out_file_name), str(out_file_ext)
-    
+
+    def save_button_information(self):
+        self.infoWindow = MyInfo(self.save_buttons_text[self.sender().objectName()])
+        self.infoWindow.exec_()
+
+    def figure_button_information(self):
+        print(self.sender().objectName())
+        if self.sender().objectName() != 'pw_commonOptions_bt_1':
+            name = self.sender().objectName()[:-1 * (int(''.join(reversed(self.sender().objectName())).find('_')) + 1)]
+        else:
+            name = self.sender().objectName()
+        self.infoWindow = MyInfo(self.figure_buttons_text[name])
+        self.infoWindow.exec_()
+
     def close_window(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - close_window')
         self.close()  
@@ -4507,6 +4837,7 @@ class TicksLabelsWindow(QtWidgets.QDialog, Ui_tickslabelsWindow):
         logging.debug('gui - plot_window_functions.py - TicksLabelsWindow - __init__')
         QtWidgets.QDialog.__init__(self, parent=None)
         self.setupUi(self)
+        self.ticks_labels = ''
         self.label.setText(text)
         self.ok_button.clicked.connect(self.set_ticks)
         self.cancel_button.clicked.connect(self.close_window)
@@ -4523,7 +4854,6 @@ class TicksLabelsWindow(QtWidgets.QDialog, Ui_tickslabelsWindow):
     
     def set_ticks(self):
         logging.debug('gui - plot_window_functions.py - TicksLabelsWindow - set_ticks')
-        self.ticks_labels = ''
         for i in range(self.table.columnCount()):
             if self.table.item(0, i).text():
                 self.ticks_labels += self.table.item(0, i).text() + '|'
@@ -4533,4 +4863,3 @@ class TicksLabelsWindow(QtWidgets.QDialog, Ui_tickslabelsWindow):
     def close_window(self):
         logging.debug('gui - plot_window_functions.py - TicksLabelsWindow - close_window')
         self.close()
-
