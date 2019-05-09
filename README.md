@@ -59,4 +59,4 @@ Do not forget to install dependancies:
 Documentation:
 --------------
 
-The documentation of EGADS Lineage GUI is available as a PDF in the Documentation folder.
+The documentation of EGADS Lineage GUI is available as a PDF in the Documentation folder or on Read The Docs (https://egads-gui.readthedocs.io/en/lineage/).
