@@ -7,7 +7,7 @@ from ui.Ui_creationwindow import Ui_creationWindow
 from functions.utils import Highlighter, create_datestring, prepare_long_string, check_string_max_length
 from functions.utils import write_algorithm
 from functions.other_windows_functions import MyInfo, MyFill, MyUnit, MyFilename, MyCategory, MyOverwriteFilename
-from functions.other_windows_functions import MyWait
+from functions.other_windows_functions import MyWait, MyCoeff
 from functions.thread_functions import VariableProcessingThread
 from functions.material_functions import algorithm_information_buttons_text
 import egads
@@ -109,7 +109,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.input_edit_1[self.input_nbr].setEnabled(True)
             self.input_edit_1[self.input_nbr].setMinimumSize(QtCore.QSize(150, 27))
             self.input_edit_1[self.input_nbr].setMaximumSize(QtCore.QSize(150, 27))
-            self.input_edit_1[self.input_nbr].setFont(font)
+            self.input_edit_1[self.input_nbr].setFont(font2)
             self.input_edit_1[self.input_nbr].setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
             self.input_edit_1[self.input_nbr].setStyleSheet("QLineEdit {\n"
                                                             "  border-radius: 3px;\n"
@@ -144,7 +144,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.input_edit_2[self.input_nbr].setEnabled(True)
             self.input_edit_2[self.input_nbr].setMinimumSize(QtCore.QSize(150, 27))
             self.input_edit_2[self.input_nbr].setMaximumSize(QtCore.QSize(150, 27))
-            self.input_edit_2[self.input_nbr].setFont(font)
+            self.input_edit_2[self.input_nbr].setFont(font2)
             self.input_edit_2[self.input_nbr].setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
             self.input_edit_2[self.input_nbr].setStyleSheet("QLineEdit {\n"
                                                             "  border-radius: 3px;\n"
@@ -377,7 +377,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                           "}")
             self.input_layout.addWidget(self.input_line[self.input_nbr])
             self.input_edit_1[self.input_nbr].setText(input_dict['Symbol'])
-            self.input_edit_2[self.input_nbr].setText(input_dict['Units'])
+            self.input_edit_2[self.input_nbr].setText(str(input_dict['Units']))
             self.input_edit_3[self.input_nbr].setPlainText(input_dict['Description'])
             self.input_nbr += 1
 
@@ -420,7 +420,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.output_edit_1[self.output_nbr].setEnabled(True)
             self.output_edit_1[self.output_nbr].setMinimumSize(QtCore.QSize(100, 27))
             self.output_edit_1[self.output_nbr].setMaximumSize(QtCore.QSize(100, 27))
-            self.output_edit_1[self.output_nbr].setFont(font)
+            self.output_edit_1[self.output_nbr].setFont(font2)
             self.output_edit_1[self.output_nbr].setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
             self.output_edit_1[self.output_nbr].setStyleSheet("QLineEdit {\n"
                                                               "  border-radius: 3px;\n"
@@ -454,7 +454,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.output_edit_2[self.output_nbr].setEnabled(True)
             self.output_edit_2[self.output_nbr].setMinimumSize(QtCore.QSize(150, 27))
             self.output_edit_2[self.output_nbr].setMaximumSize(QtCore.QSize(16777215, 27))
-            self.output_edit_2[self.output_nbr].setFont(font)
+            self.output_edit_2[self.output_nbr].setFont(font2)
             self.output_edit_2[self.output_nbr].setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
             self.output_edit_2[self.output_nbr].setStyleSheet("QLineEdit {\n"
                                                               "  border-radius: 3px;\n"
@@ -489,7 +489,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.output_edit_3[self.output_nbr].setEnabled(True)
             self.output_edit_3[self.output_nbr].setMinimumSize(QtCore.QSize(100, 27))
             self.output_edit_3[self.output_nbr].setMaximumSize(QtCore.QSize(100, 27))
-            self.output_edit_3[self.output_nbr].setFont(font)
+            self.output_edit_3[self.output_nbr].setFont(font2)
             self.output_edit_3[self.output_nbr].setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
             self.output_edit_3[self.output_nbr].setStyleSheet("QLineEdit {\n"
                                                               "  border-radius: 3px;\n"
@@ -523,7 +523,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.output_edit_4[self.output_nbr].setEnabled(True)
             self.output_edit_4[self.output_nbr].setMinimumSize(QtCore.QSize(150, 27))
             self.output_edit_4[self.output_nbr].setMaximumSize(QtCore.QSize(16777215, 27))
-            self.output_edit_4[self.output_nbr].setFont(font)
+            self.output_edit_4[self.output_nbr].setFont(font2)
             self.output_edit_4[self.output_nbr].setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
             self.output_edit_4[self.output_nbr].setStyleSheet("QLineEdit {\n"
                                                               "  border-radius: 3px;\n"
@@ -981,7 +981,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.list_of_variables_and_attributes = dict(list_of_variables_and_attributes,
                                                      **list_of_new_variables_and_attributes)
         self.algorithm = None
-        self.types_for_combobox = ["vector", "array", "vector_optional", "array_optional"]
+        self.types_for_combobox = ['vector', 'array', 'vector_optional', 'array_optional']
         self.infoWindow = None
         self.thread = None
         self.aw_okButton.clicked.connect(self.execute_processing)
@@ -996,7 +996,8 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
     def execute_processing(self):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - close_window_save : algorithm '
                       + self.algorithm().metadata["Processor"])
-        self.thread = VariableProcessingThread(self.algorithm, self.list_combobox_input, self.list_edit_output,
+        self.thread = VariableProcessingThread(self.algorithm, self.list_combobox_input,
+                                               self.coefficient_matrix_values, self.list_edit_output,
                                                self.list_of_variables_and_attributes)
         self.thread.started.connect(self.wait_window)
         self.thread.finished.connect(self.close_wait_window)
@@ -1033,23 +1034,31 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_combobox_1')
         self.aw_combobox_1.addItem("Make a choice...")
         folder_list = []
-        for key, _ in self.list_of_algorithms.items():
-            folder_list.append(key.title())
-        folder_list = sorted(folder_list)
-        self.aw_combobox_1.addItems(folder_list)
+        for key in self.list_of_algorithms.keys():
+            folder_list.append(key[:key.find(' - ')].title())
+        self.aw_combobox_1.addItems(sorted(list(dict.fromkeys(folder_list))))
 
     def populate_combobox_algorithms(self):
         logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_combobox_2')
         self.setWindowTitle('Processing')
         self.aw_okButton.setEnabled(False)
         self.aw_combobox_2.clear()
+        self.aw_edit_1.setPlainText("")
+        self.aw_edit_2.setPlainText("")
+        self.clear_layout(self.input_layout)
+        self.clear_layout(self.output_layout)
         if self.aw_combobox_1.currentText() == "Make a choice...":
             self.aw_combobox_2.setEnabled(False)
+            self.aw_combobox_2.clear()
         else:
             self.aw_combobox_2.setEnabled(True)
             self.aw_combobox_2.addItem("Make a choice...")
-            algorithm_list = self.list_of_algorithms[str(self.aw_combobox_1.currentText()).lower()]
-            self.aw_combobox_2.addItems(sorted(algorithm_list))
+            algo_list = []
+            for key in self.list_of_algorithms.keys():
+                if str(self.aw_combobox_1.currentText()).lower() in key:
+                    idx = key.find(' - ')
+                    algo_list.append(key[idx + 3:])
+            self.aw_combobox_2.addItems(sorted(algo_list))
 
     def load_algorithm_information(self):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - load_algorithm_information : algorithm '
@@ -1057,25 +1066,19 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.setWindowTitle('Processing')
         self.aw_okButton.setEnabled(False)
         if self.aw_combobox_2.currentText() != "Make a choice...":
-            self.setWindowTitle('Processing - ' + str(self.aw_combobox_2.currentText()))
+            rep, algo = str(self.aw_combobox_1.currentText()).lower(), str(self.aw_combobox_2.currentText())
+            self.setWindowTitle('Processing - ' + algo)
             self.aw_edit_1.setPlainText("")
             self.aw_edit_2.setPlainText("")
-            try:
-                self.algorithm = getattr(getattr(egads.algorithms, str(self.aw_combobox_1.currentText()).lower()),
-                                         str(self.aw_combobox_2.currentText()))
-            except AttributeError:
-                self.algorithm = getattr(getattr(egads.algorithms.user, str(self.aw_combobox_1.currentText()).lower()),
-                                         str(self.aw_combobox_2.currentText()))
+            self.algorithm = self.list_of_algorithms[rep + ' - ' + algo]['method']
             try:
                 self.aw_edit_2.setText('<p align="justify">' + str(self.algorithm().metadata["Description"]) + '</p>')
             except KeyError:
-                logging.exception(
-                    'gui - algorithm_window_functions.py - MyProcessing - load_algorithm_information : no description')
+                pass
             try:
                 self.aw_edit_1.setText('<p align="justify">' + str(self.algorithm().metadata["Purpose"]) + '</p>')
             except KeyError:
-                logging.exception(
-                    'gui - algorithm_window_functions.py - MyProcessing - load_algorithm_information : no purpose')
+                pass
 
     def populate_inputs(self):
         self.clear_layout(self.input_layout)
@@ -1085,6 +1088,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.list_combobox_input = []
         self.list_button_input = []
         self.input_num = 0
+        self.coefficient_matrix_values = {}
         if self.aw_combobox_2.currentText() != "Make a choice...":
             font = QtGui.QFont()
             font.setFamily("fonts/SourceSansPro-Regular.ttf")
@@ -1113,8 +1117,12 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                 self.input_layout.addWidget(self.list_label_input[self.input_num], self.input_num, 0, 1, 1)
                 self.input_layout.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
                                                                 QtWidgets.QSizePolicy.Minimum), self.input_num, 1, 1, 1)
-                if self.algorithm().metadata["InputTypes"][index] in self.types_for_combobox or \
-                        self.algorithm().metadata["InputTypes"][index] == "time":
+                input_type = self.algorithm().metadata["InputTypes"][index]
+                combobox_widget = False
+                for var_type in self.types_for_combobox:
+                    if var_type in input_type:
+                        combobox_widget = True
+                if combobox_widget:
                     self.list_combobox_input.append(QtWidgets.QComboBox())
                     item_delegate = QtWidgets.QStyledItemDelegate()
                     self.list_combobox_input[self.input_num].setItemDelegate(item_delegate)
@@ -1178,55 +1186,64 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                                                                            "}")
                     self.list_combobox_input[self.input_num].setObjectName("list_combobox_input_" + str(self.input_num))
                     self.list_combobox_input[self.input_num].addItem("Make a choice...")
-                    variable_list = []
-                    for _, sublist in self.list_of_variables_and_attributes.items():
-                        if self.algorithm().metadata["InputTypes"][index] in self.types_for_combobox:
-                            if sublist[2] != 'deleted':
-                                variable_list.append(sublist[1]["var_name"])
-                        else:
-                            if "time" in sublist[1]["var_name"]:
-                                if sublist[2] != 'deleted':
-                                    variable_list.append(sublist[1]["var_name"])
-                    self.list_combobox_input[self.input_num].addItems(sorted(variable_list))
+                    self.list_combobox_input[self.input_num].addItems(self.prepare_variable_list())
                     self.list_combobox_input[self.input_num].activated.connect(self.activate_save_button)
                     self.input_layout.addWidget(self.list_combobox_input[self.input_num], self.input_num, 2, 1, 1)
                 else:
-                    if "coeff.[" in self.algorithm().metadata["InputTypes"][index]:
-                        line_edit_num = self.algorithm().metadata["InputTypes"][index][7:-1]
-                        tmp = []
-                        tmp_layout = QtWidgets.QHBoxLayout()
+                    if "coeff.[" in self.algorithm().metadata["InputTypes"][index] or "coeff[" in self.algorithm(
+                    ).metadata["InputTypes"][index]:
+                        self.list_combobox_input.append(QtWidgets.QHBoxLayout())
                         if "optional" in self.algorithm().metadata["InputTypes"][index]:
-                            tmp_layout.setObjectName("optional_tmp_layout")
+                            self.list_combobox_input[self.input_num].setObjectName("optional_tmp_layout")
                         else:
-                            tmp_layout.setObjectName("tmp_layout")
-                        layout_factor = {2: 4, 3: 5, 4: 5, 5: 5}
-                        try:
-                            size = (300 / int(line_edit_num)) - layout_factor[int(line_edit_num)]
-                        except KeyError:
-                            size = (300 / int(line_edit_num))
-                        for i in range(int(line_edit_num)):
-                            tmp.append(QtWidgets.QLineEdit())
-                            tmp[i].setEnabled(True)
-                            tmp[i].setFrame(False)
-                            tmp[i].setFont(font2)
-                            tmp[i].setObjectName("multi_list_edit_input_" + str(i))
-                            tmp[i].setMinimumSize(QtCore.QSize(size, 27))
-                            tmp[i].setMaximumSize(QtCore.QSize(size, 27))
-                            tmp[i].setStyleSheet("QLineEdit {\n"
-                                                 "    border-radius: 3px;\n"
-                                                 "    padding: 1px 4px 1px 4px;\n"
-                                                 "    background-color:  rgb(240, 240, 240);\n"
-                                                 "    color: rgb(45,45,45);\n"
-                                                 "}\n")
-                            tmp[i].textChanged.connect(self.activate_save_button)
-                            tmp_layout.addWidget(tmp[i])
-                        self.list_combobox_input.append(tmp_layout)
-                        try:
-                            self.input_layout.addWidget(self.list_combobox_input[self.input_num], self.input_num, 2,
-                                                        1, 1)
-                        except TypeError:
-                            self.input_layout.addLayout(self.list_combobox_input[self.input_num], self.input_num, 2,
-                                                        1, 1)
+                            self.list_combobox_input[self.input_num].setObjectName("tmp_layout")
+                        tmp_button = QtWidgets.QToolButton()
+                        tmp_button.setMinimumSize(QtCore.QSize(150, 27))
+                        tmp_button.setMaximumSize(QtCore.QSize(150, 27))
+                        tmp_button.setFont(font)
+                        tmp_button.setStyleSheet("QToolButton {\n"
+                                                 "    border: 1px solid #acacac;\n"
+                                                 "    border-radius: 1px;\n"
+                                                 "    background-color: qlineargradient(x1: 0, y1: 0, "
+                                                 "x2: 0, y2: 1, \n"
+                                                 "                                stop: 0 #f0f0f0, "
+                                                 "stop: 1 #e5e5e5);\n"
+                                                 "    color: rgb(45,45,45)\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QToolButton:hover {\n"
+                                                 "    border: 1px solid #7eb4ea;\n"
+                                                 "    border-radius: 1px;\n"
+                                                 "    background-color: qlineargradient(x1: 0, y1: 0, "
+                                                 "x2: 0, y2: 1, \n"
+                                                 "                                stop: 0 #ecf4fc, "
+                                                 "stop: 1 #dcecfc);\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "\n"
+                                                 "QToolButton:pressed {\n"
+                                                 "    border: 1px solid #579de5;\n"
+                                                 "    border-radius: 1px;\n"
+                                                 "    background-color: qlineargradient(x1: 0, y1: 0, "
+                                                 "x2: 0, y2: 1,\n"
+                                                 "                                      stop: 0 "
+                                                 "#daecfc, stop: 1 #c4e0fc);\n"
+                                                 "}")
+                        tmp_button.setObjectName("coeff_set_button_" + str(index))
+                        tmp_button.setText('Set coefficient')
+                        tmp_button.clicked.connect(self.launch_coeff_window)
+                        self.list_combobox_input[self.input_num].addWidget(tmp_button)
+                        tmp_label = QtWidgets.QLabel()
+                        tmp_label.setFont(font)
+                        tmp_label.setText('')
+                        tmp_label.setMinimumSize(QtCore.QSize(0, 27))
+                        tmp_label.setMaximumSize(QtCore.QSize(16777215, 27))
+                        tmp_label.setObjectName("coeff_set_label" + str(index))
+                        tmp_label.setStyleSheet("QLabel {\n"
+                                                "   color: rgb(45,45,45);\n"
+                                                "}")
+                        self.list_combobox_input[self.input_num].addWidget(tmp_label)
+                        self.input_layout.addLayout(self.list_combobox_input[self.input_num], self.input_num, 2, 1, 1)
                     else:
                         self.list_combobox_input.append(QtWidgets.QLineEdit())
                         self.list_combobox_input[self.input_num].setEnabled(True)
@@ -1241,6 +1258,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                                                                                "240);\n"
                                                                                "    color: rgb(45,45,45);\n"
                                                                                "}\n")
+
                         self.list_combobox_input[self.input_num].textChanged.connect(self.activate_save_button)
                         if "optional" in self.algorithm().metadata["InputTypes"][index]:
                             self.list_combobox_input[self.input_num].setObjectName("optional_list_lineedit_input_" +
@@ -1287,7 +1305,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.list_button_output = []
         self.output_num = 0
         self.output_activate = 0
-        self.list_of_outputs = []
+        self.list_of_outputs = {}
         if self.aw_combobox_2.currentText() != "Make a choice...":
             font = QtGui.QFont()
             font.setFamily("fonts/SourceSansPro-Regular.ttf")
@@ -1364,23 +1382,41 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                     self.output_num, 5, 1, 1)
                 self.output_num += 1
 
+    def launch_coeff_window(self):
+        index = int(self.sender().objectName()[17:])
+        matrix_nbr_idx = self.algorithm().metadata["InputTypes"][index].index('[')
+        matrix_nbr_str = self.algorithm().metadata["InputTypes"][index][matrix_nbr_idx + 1:-1]
+        matrix_nbr_str = matrix_nbr_str.split(',')
+        try:
+            coefficient_data = self.coefficient_matrix_values[self.sender().objectName()]
+        except KeyError:
+            coefficient_data = None
+        self.coefWindow = MyCoeff(matrix_nbr_str, coefficient_data, self.list_of_variables_and_attributes)
+        self.coefWindow.exec_()
+        if self.coefWindow.coef_array is not None:
+            self.coefficient_matrix_values[self.sender().objectName()] = self.coefWindow.coef_array
+        self.activate_save_button()
+
+    def prepare_variable_list(self):
+        variable_list = []
+        for var in self.list_of_variables_and_attributes:
+            variable_list.append(var)
+        return sorted(variable_list)
+
     def activate_save_button(self):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - activate_save_button')
         input_activate = 1
         for widget in self.list_combobox_input:
-            try:
-                if widget.currentText() == "Make a choice...":
-                    input_activate = 0
-            except AttributeError:
-                if "optional" not in widget.objectName():
-                    try:
-                        if widget.text() == "":
-                            input_activate = 0
-                    except AttributeError:
-                        subwidgets = (widget.itemAt(i) for i in range(widget.count()))
-                        for subwidget in subwidgets:
-                            if subwidget.widget().text() == "":
-                                input_activate = 0
+            if "optional" not in widget.objectName():
+                if isinstance(widget, QtWidgets.QComboBox):
+                    if widget.currentText() == "Make a choice...":
+                        input_activate = 0
+                elif isinstance(widget, QtWidgets.QLineEdit):
+                    if widget.text() == '':
+                        input_activate = 0
+                elif isinstance(widget, QtWidgets.QHBoxLayout):
+                    if widget.itemAt(0).widget().objectName()not in self.coefficient_matrix_values:
+                        input_activate = 0
         output_activate = 1
         for widget in self.list_edit_output:
             if widget.text() == "":
@@ -1543,6 +1579,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.algorithm_filename = None
         self.algorithm_category = None
         self.algorithm_name = None
+        self.setTabOrder(self.cw_line_1, self.cw_line_3)
+        self.setTabOrder(self.cw_line_3, self.cw_line_2)
+        self.setTabOrder(self.cw_line_2, self.cw_line_4)
+        self.setTabOrder(self.cw_line_4, self.cw_plain_2)
+        self.setTabOrder(self.cw_plain_2, self.cw_plain_1)
+        self.setTabOrder(self.cw_plain_1, self.cw_plain_4)
         logging.info('gui - algorithm_windows_functions.py - MyAlgorithm -  ready')
 
     def add_input(self):
@@ -1810,6 +1852,9 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_2[self.input_num].clicked.connect(self.input_output_button_info)
         self.cw_info_bt_3[self.input_num].clicked.connect(self.input_output_button_info)
         self.cw_info_bt_4[self.input_num].clicked.connect(self.input_output_button_info)
+        self.setTabOrder(self.cw_input_ln_1[self.input_num], self.cw_input_ln_2[self.input_num])
+        self.setTabOrder(self.cw_input_ln_2[self.input_num], self.cw_input_ln_3[self.input_num])
+        self.setTabOrder(self.cw_input_ln_3[self.input_num], self.cw_input_ln_4[self.input_num])
         self.input_num += 1
 
     def del_input(self, index=None):
@@ -2593,7 +2638,6 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_del_1[self.output_num].clicked.connect(self.del_output)
         self.cw_output_add_1[self.output_num].clicked.connect(self.add_output_category)
         self.cw_output_lw_1[self.output_num].itemDoubleClicked.connect(self.remove_output_category)
-
         self.cw_info_bt_5[self.output_num].clicked.connect(self.input_output_button_info)
         self.cw_info_bt_6[self.output_num].clicked.connect(self.input_output_button_info)
         self.cw_info_bt_7[self.output_num].clicked.connect(self.input_output_button_info)
@@ -2601,7 +2645,11 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_9[self.output_num].clicked.connect(self.input_output_button_info)
         self.cw_info_bt_10[self.output_num].clicked.connect(self.input_output_button_info)
         self.cw_info_bt_11[self.output_num].clicked.connect(self.input_output_button_info)
-
+        self.setTabOrder(self.cw_output_ln_1[self.output_num], self.cw_output_ln_5[self.output_num])
+        self.setTabOrder(self.cw_output_ln_5[self.output_num], self.cw_output_ln_2[self.output_num])
+        self.setTabOrder(self.cw_output_ln_2[self.output_num], self.cw_output_ln_6[self.output_num])
+        self.setTabOrder(self.cw_output_ln_6[self.output_num], self.cw_output_ln_3[self.output_num])
+        self.setTabOrder(self.cw_output_ln_3[self.output_num], self.cw_output_ln_4[self.output_num])
         self.output_num += 1
 
     def del_output(self, index=None):
@@ -2879,10 +2927,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         input_description = []
         for i in range(len(self.cw_input_vl_1)):
             input_symbols.append(str(self.cw_input_ln_1[i].text()))
-            if str(self.cw_input_ln_2[i].text()):
-                input_units.append(str(self.cw_input_ln_2[i].text()))
-            else:
+            if str(self.cw_input_ln_2[i].text()) == 'None' or str(self.cw_input_ln_2[i].text()) == ' ':
                 input_units.append('_')
+            else:
+                input_units.append(str(self.cw_input_ln_2[i].text()))
             input_types.append(str(self.cw_input_ln_3[i].text()))
             input_description.append(str(self.cw_input_ln_4[i].text()))
         max_symbols_length = check_string_max_length(input_symbols)
@@ -2999,10 +3047,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                 input_types = '['
                 input_description = '['
             input_symbols += "'" + str(self.cw_input_ln_1[i].text()) + "',"
-            if self.cw_input_ln_2[i].text():
-                input_units += "'" + str(self.cw_input_ln_2[i].text()) + "',"
-            else:
+            if str(self.cw_input_ln_2[i].text()) == 'None':
                 input_units += "None,"
+            elif str(self.cw_input_ln_2[i].text()) == ' ':
+                input_units += "'',"
+            else:
+                input_units += "'" + str(self.cw_input_ln_2[i].text()) + "',"
             input_types += "'" + str(self.cw_input_ln_3[i].text()) + "',"
             input_description += "'" + str(self.cw_input_ln_4[i].text()) + "',"
         input_symbols = input_symbols[:-1] + ']'
@@ -3075,9 +3125,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         units_list = []
         for i in range(len(self.cw_input_vl_1)):
             if str(self.cw_input_ln_2[i].text()):
-                unit_validation = egads.EgadsData(value=[0], units=str(self.cw_input_ln_2[i].text()))
-                units_list.append([str(self.cw_input_ln_1[i].text()), str(self.cw_input_ln_2[i].text()),
-                                  unit_validation.units, 'input'])
+                if str(self.cw_input_ln_2[i].text()) == 'None' or str(self.cw_input_ln_2[i].text()) == ' ':
+                    pass
+                else:
+                    unit_validation = egads.EgadsData(value=[0], units=str(self.cw_input_ln_2[i].text()))
+                    units_list.append([str(self.cw_input_ln_1[i].text()), str(self.cw_input_ln_2[i].text()),
+                                       unit_validation.units, 'input'])
         for i in range(len(self.cw_output_vl_1)):
             if str(self.cw_output_ln_2[i].text()):
                 if 'input' in str(self.cw_output_ln_2[i].text()):

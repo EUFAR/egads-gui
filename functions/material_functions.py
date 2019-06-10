@@ -6,6 +6,7 @@ import matplotlib
 def objects_initialization(self):
     logging.debug('gui - sql_functions.py - objects_initialization')
     self.modified = False
+    self.opened_file = None
     self.file_name = ''
     self.file_ext = ''
     self.file_is_opened = False
@@ -55,8 +56,7 @@ def objects_initialization(self):
                         "new_varName_ln": "var_name",
                         "new_longName_ln": "long_name",
                         "new_category_ln": "Category",
-                        "new_units_ln": "units"
-                        }
+                        "new_units_ln": "units"}
 
 
 def setup_fonts():
@@ -400,3 +400,86 @@ def algorithm_information_buttons_text(self):
                                      'cw_info_bt_10': 'A short description of the output.<br><br><u>Ex</u>: Mean '
                                                       'diameter of the particles',
                                      'cw_info_bt_11': 'Each output has to be linked to one or more categories.'}
+
+
+def options_information_buttons_text(self):
+    self.information_buttons_text = {'info_button_1': 'The user can change the verbose level of the logging system. '
+                                                      'If an issue is noticed, it is a good idea to change the level '
+                                                      'to DEBUG and send the log file to the developer.',
+                                     'info_button_2': 'The path and folder where to save the log file, modifying this '
+                                                      'option assumes to restart the GUI',
+                                     'info_button_3': 'This option allows the GUI to check for an update online at '
+                                                      'startup automatically. The user has the possibility to check '
+                                                      'manually by clicking on the left button.',
+                                     'info_button_4': 'It is possible in EGADS to read the values of a variable '
+                                                      'stored in a NASA Ames/NetCDF file as floats. Selecting this '
+                                                      'option will ask EGADS to do so. Please read the documentation '
+                                                      'of EGADS to have more details.',
+                                     'info_button_5': 'By checking this option, EGADS will automatically replace '
+                                                      'missing values in data by Numpy NaN.',
+                                     'info_button_6': 'Numpy NaN is for float array only, thus it is not possible to '
+                                                      'replace missing values in variables composed of integer '
+                                                      'values. By checking this option, the user allows EGADS to '
+                                                      'switch back to the default option if the read of a variable '
+                                                      'fails in this particular situation.'}
+
+
+def batch_processing_information_buttons_text(self):
+    self.information_buttons_text = {'bw_info_1': 'At this time, the batch processing function has 6 different '
+                                                  'processes:<ul><li>the concatenation of multiple files</li><li>the '
+                                                  'conversion of multiple NetCDF files to NASA Ames file '
+                                                  'format</li><li>the conversion of multiple NASA Ames files to '
+                                                  'NetCDF format</li><li>the deletion of one or more global metadata '
+                                                  '(only for NetCDF files)</li><li>the deletion of one or more '
+                                                  'variables</li><li>and the use of an algorithm on multiple '
+                                                  'files</li></ul>Select one of them to display options related to '
+                                                  'the selected process.',
+                                     'bw_info_2': 'Once a category and an algorithm have been selected, the Algorithm '
+                                                  'options tab will list the different input(s) and output(s).',
+                                     'bw_info_3': 'In case of error with one or more files, the GUI will decide to '
+                                                  'continue or stop the processing based on this option.',
+                                     'bw_info_4': 'Select here all the files to be processed. It is possible to '
+                                                  'select a specific format by playing the radiobuttons. If the GUI '
+                                                  'detects files in the selected folder, those files are displayed '
+                                                  'in the list below. Furthermore, it is possible to manipulate the '
+                                                  'file list with the different buttons on the right of the file list.',
+                                     'bw_info_5': 'Select here the folder where to save files after the processing.',
+                                     'bw_info_6': 'If the previous option is selected, the GUI will handle the '
+                                                  'filename automatically. However, if the user wants to manage '
+                                                  'himself the name of all files after the processing, he can do it '
+                                                  'by turning the option off. The creation of filenames is then '
+                                                  'handles by the following widgets. In that case, the base filename '
+                                                  'is the concatenation of the text displayed in each LineEdit below. '
+                                                  'Each Combobox can be used to select pre-formated options or free '
+                                                  'text.',
+                                     'Date and time': 'This option will display the actual date and time following '
+                                                      'the format:<ul><li><b>%Y</b> for year</li><li><b>%m</b> for '
+                                                      'month</li><li><b>%d</b> for day</li><li><b>%H</b> for '
+                                                      'hour</li><li><b>%M</b> for minute</li><li><b>%S</b> for '
+                                                      'second</li></ul>It is possible to mix text and options, '
+                                                      'or to write only date or time.<br><br><u>Ex:</u> '
+                                                      '<b>%Y-%m-%d-T%H:%M:%S</b> will display '
+                                                      '<b>2019-01-06T12:00:00</b>',
+                                     'Text': 'This option is used to write free text only.<br><br><u>Ex:</u> '
+                                             '<i>my_free_text</i>',
+                                     'Original filename': 'With this option, for each processed file, the new filename '
+                                                          'will contain the original filename. <br><br><u>Ex:</u> if '
+                                                          'the name of the processed file is '
+                                                          '<i>my_sea_level_measurements.nc</i>, the new filename will '
+                                                          'contain <i>my_sea_level_measurements</i>',
+                                     'Serial number with n digit': 'This option adds a number with n digit to the '
+                                                                   'filename. As the processing iterates through the '
+                                                                   'file list, the number increases by one at each '
+                                                                   'iteration. It can be a number like <i>10</i> or a '
+                                                                   'number preceded by one or more zeros like '
+                                                                   '<i>0010</i>.<br><br><u>Ex:</u> 0010<br>&nbsp;&nbsp;'
+                                                                   '&nbsp;&nbsp;sea_level_measurements_0010?nc<br>'
+                                                                   '&nbsp;&nbsp;&nbsp;&nbsp;sea_level_measurements_'
+                                                                   '0011.nc<br>&nbsp;&nbsp;&nbsp;&nbsp;sea_level_measu'
+                                                                   'rements_0012.nc<br>&nbsp;&nbsp;&nbsp;&nbsp;...',
+                                     'Make a choice...': 'Please select an option first.',
+                                     'bw_info_7': self.bw_combobox_5,
+                                     'bw_info_8': self.bw_combobox_6,
+                                     'bw_info_9': self.bw_combobox_7,
+                                     'bw_info_10': self.bw_combobox_8,
+                                     'bw_info_11': self.bw_combobox_9}

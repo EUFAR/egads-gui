@@ -20,7 +20,7 @@ The simplest way to start working with EGADS GUI is to run it from the terminal:
 
 The EGADS GUI is easy to use and self explaining by the presence of information button (once a button is clicked, a popup will appear with text to explain the purpose of the area actually used) and tool tips.
 
-The EGADS GUI is composed of different windows, designed to display information to the user and accept interactions, and functions linking different parts of the GUI with EGADS.
+The EGADS GUI is composed of different windows, designed to display information to the user and accept interactions, and functions linking different parts of the GUI with EGADS. At the end of this section, information are also given about the option window, used to control EGADS and the GUI options.
 
 
 -----------------------
@@ -98,7 +98,7 @@ About is a submenu of the menu bar.
    :scale: 45 %
    :align: center
 
-The user will find here information about the software and links to the EUFAR website.
+The user will find here information about the software, options and and link to the documentation.
 
 
 ----------------------------
@@ -245,6 +245,9 @@ One of the main goal of EGADS is to let the user creates his own algorithms. Acc
 The window is composed of three tabs. The first tab is dedicated to the metadata of the algorithm and, the most important, to the mathematic formula. The second tab is dedicated to the input(s). The user will fill the different text boxes to prepare the input variable(s). The last tab is dedicated to the output(s). As the window follows the EGADS convention, few tips have to be used here and will be explained later.  Once the user click on ``Save``, an automated task will check every item in the window, in particular units, and will display a warning popup is something went wrong. The algorithm is then saved in the ``user`` sub-folder of the EGADS/Algorithms folder. For help purpose, few info buttons are present.
 The system doesn't test the algorithm created by the user, it is expected to work, and the user has to give his greatest attention when writing the algorithm using Python 3. If a complex algorithm needs to be written, the use of a text editor and the manual declaration of the algorithm in EGADS are strongly encouraged.
 
+.. NOTE ::
+  For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT, p. 28.
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^
 The data display window
@@ -294,12 +297,6 @@ The plot window is composed of an icon bar including six icons and four differen
 * In the second and third tab, the software gives the possibility to the user to change few options for each curve or for the whole figure.
 * The last tab is only dedicated to the options involved when a figure is saved.
 
-.. |save_as| image:: images/icons/save_as_icon.png
-   :width: 130px
-   :height: 130px
-   :scale: 25 %
-   :align: middle
-
 .. |move| image:: images/icons/pan_icon.png
    :width: 130px
    :height: 130px
@@ -325,6 +322,32 @@ The plot window is composed of an icon bar including six icons and four differen
    :align: middle
 
 The design of the plot window is based on the access to as many options as possible to let the user modify the figure to his heart content, quickly and easily. Obviously, if the user wants to create complex figures, it is strongly encouraged to use EGADS and Matplotlib from script.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The algorithm information window
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+From the Processing menu, the user has the possibility to display information about each algorithm embedded in EGADS or created by himself.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_algorithm_display_1.png
+   :width: 702px
+   :height: 604px
+   :scale: 45 %
+   :align: center
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The batch processing window
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For those who want to process more than one file at a time, they can use the batch processing function from the File menu.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_6.png
+   :width: 836px
+   :height: 596px
+   :scale: 45 %
+   :align: center
 
 
 ----------------------------------------------
@@ -401,3 +424,18 @@ The footbar
 -----------
 
 The purpose of the footbar is to display few information about the file actually loaded, like the name, the size and the conventions.
+
+
+---------------------
+EGADS and GUI options
+---------------------
+
+The options of EGADS and its GUI are controled through the option window, in the About menu.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_option_window.png
+   :width: 748px
+   :height: 525px
+   :scale: 45 %
+   :align: center
+
+In the Log options section, the user will find options to control the logging system: the log level and the path where to save the log file. In the System options section, the user can control options usually set in EGADS. Please refer to the documentation of EGADS for more details about those options.

@@ -15,7 +15,6 @@ def launch_egads_gui(gui_path):
     app = QtWidgets.QApplication(sys.argv)
     splash_pix = QtGui.QPixmap('icons/egads_gui_splashscreen.png')
     splash = QtWidgets.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
-    splash.setMask(splash_pix.mask())
     splash.show()
     if not os.path.exists(os.path.join(gui_path, 'egads_gui.ini')):
         create_option_file(gui_path)

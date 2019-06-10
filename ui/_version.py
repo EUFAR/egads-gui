@@ -1,5 +1,5 @@
-_gui_version = '0.11.0'
+_gui_version = '0.12.0'
 _gui_branch = 'Lineage'
-_eclipse_version = '2019.1.1'
+_eclipse_version = '2019.1.2'
 _qt_version = '5.11.3'
 _python_version = '3.5.4'

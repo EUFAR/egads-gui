@@ -13,7 +13,7 @@ Once the GUI is ready to handle raw, csv and text files, the corresponding tutor
 How to open a file?
 *******************
 
-* To open a file, a NetCDF file for example, from the EGADS GUI, first click on the icon |open|.
+* To open a file, a NetCDF file for example, the easiest way is to drag and drop the file in the dedicated area of the GUI. Or there is still the possibility to use the open |open| button, from the tool bar or from the ``File`` menu. 
 
 .. image:: images/egads_gui_screencaptures/EGADS_GUI_open_file_1b.png
    :width: 936px
@@ -35,15 +35,13 @@ How to open a file?
    :scale: 45 %
    :align: center
 
-* If the file is loaded as it should, the interface specific to NASA Ames/NetCDF files should be displayed without any warning.
+* In any way, if the file is loaded as it should, the interface specific to NASA Ames/NetCDF files should be displayed without any warning.
 
 .. image:: images/egads_gui_screencaptures/EGADS_GUI_005.png
    :width: 936px
    :height: 647px
    :scale: 45 %
    :align: center
-
-* Another way to open a file is to use the menu ``File`` and then click on ``Open...``.
 
 
 *******************
@@ -211,16 +209,6 @@ From the variable tab
    :scale: 45 %
    :align: center
 
-.. |edit| image:: images/icons/edit_icon.png
-   :width: 130px
-   :height: 130px
-   :scale: 12 %
-
-.. |save| image:: images/icons/save_icon.png
-   :width: 130px
-   :height: 130px
-   :scale: 12 %
-
 * Enter your text and click on |save| to confirm your modification.
 
 .. image:: images/egads_gui_screencaptures/EGADS_GUI_variable_attributes_tab_3.png
@@ -387,7 +375,7 @@ How to delete a variable?
 How to create an algorithm through the GUI?
 *******************************************
 
-EGADS GUI offers the possibility to create algorithm from a window, by filling in different kind of fields. If a complex algorithm has to be written, the most suitable way is to use a text editor like Notepad++ (Windows) or Kate (Linux) and modify the template provided in the EGADS algorithm directory.
+EGADS GUI offers the possibility to create algorithm from a window, by filling in different kind of fields. If a complex algorithm has to be written, the most suitable way is to use a text editor like Notepad++ (Windows) or Kate (Linux) and modify the template provided in the EGADS algorithm directory. For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT, p. 28.
 
 * To launch the algorithm creation window, just click on |create algorithm|.
 
@@ -526,3 +514,66 @@ By integrating the Python module Matplotlib, the EGADS GUI gives the user a grea
    :height: 789px
    :scale: 45 %
    :align: center
+
+
+******************************************
+How to use the batch processing function ?
+******************************************
+
+EGADS GUI gives the user the possibility to use a batch processing function. This way it is possible to use an algorithm, concatenate, delete one or more variables, one or more metadata, or just convert between file formats, with multiple files.
+
+* To launch the batch processing window, click on the ``File`` menu and then on |launch process|. The button should be enabled if variables are detected in the GUI.
+
+.. |batch processing| image:: images/icons/batch_processing_icon.png
+   :width: 130px
+   :height: 130px
+   :scale: 12 %
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_6.png
+   :width: 936px
+   :height: 647px
+   :scale: 45 %
+   :align: center
+
+* The processing window is composed of three to four tabs: the first one to choose the processing (concatenation, variable or metadata deletion, conversion between file format, algorithm processing), the second one to choose the files to be processed, the third one, if needed by the processing, can list options, and the last one to set the output folder and the filename oprtions of all new files.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_1.png
+   :width: 836px
+   :height: 596px
+   :scale: 45 %
+   :align: center
+
+* First, select a processing in the processing combobox, for example Execute an algorithm, then select a Category and an Algorithm in the following comboboxes.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_2.png
+   :width: 836px
+   :height: 596px
+   :scale: 45 %
+   :align: center
+
+* Select the files to be processed by the algorithm. It will populate automatically the options and a list of variable in the next tab.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_3.png
+   :width: 836px
+   :height: 596px
+   :scale: 45 %
+   :align: center
+
+* As in the processing window, select the variables to be injected in the algorithm, and choose a name for the output(s).
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_4.png
+   :width: 836px
+   :height: 596px
+   :scale: 45 %
+   :align: center
+
+
+* Finally select an output folder, and set options to define a new filename for all output files. Click on ``Launch processing`` to start the batch processing.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_5.png
+   :width: 836px
+   :height: 596px
+   :scale: 45 %
+   :align: center
+   
+   

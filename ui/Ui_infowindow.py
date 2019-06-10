@@ -374,6 +374,7 @@ class Ui_infoWindow(object):
         self.iw_label_1.setFont(font)
         self.iw_label_1.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
+"    padding-right: 5px;\n"
 "}")
         self.iw_label_1.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.iw_label_1.setFrameShadow(QtWidgets.QFrame.Plain)

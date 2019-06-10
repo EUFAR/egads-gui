@@ -2,6 +2,8 @@ import logging
 import numpy
 import datetime
 import webbrowser
+import egads
+import pathlib
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_infowindow import Ui_infoWindow
 from ui.Ui_displaywindow import Ui_displayWindow
@@ -10,15 +12,49 @@ from ui.Ui_addcategorywindow import Ui_Addcategory
 from ui.Ui_fillwindow import Ui_fillWindow
 from ui.Ui_filenamewindow import Ui_Addfilename
 from ui.Ui_unitwindow import Ui_unitWindow
-# from ui.Ui_presavewindow import Ui_presaveWindow
 from ui.Ui_optionwindow import Ui_optionWindow
 from ui.Ui_waitwindow import Ui_waitWindow
 from ui.Ui_downloadwindow import Ui_downloadWindow
+from ui.Ui_coefwindow import Ui_coefWindow
+from ui.Ui_asksavewindow import Ui_asksaveWindow
 from functions.thread_functions import CheckEGADSGuiUpdateOnline
-from functions.waitingspinnerwidget import QtWaitingSpinner
+from functions.gui_elements import QtWaitingSpinner
 from ui._version import _gui_version
+from functions.material_functions import options_information_buttons_text
 
- 
+
+class MyAsk(QtWidgets.QDialog, Ui_asksaveWindow):
+    def __init__(self, text):
+        logging.debug('gui - other_windows_functions.py - MyAsk - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.choice = None
+        self.cancel_button.clicked.connect(self.cancel_choice)
+        self.save_button.clicked.connect(self.save_choice)
+        self.close_button.clicked.connect(self.close_choice)
+        self.close_button.setText(text + ' without saving')
+        logging.info('gui - other_windows_functions.py - MyAsk ready')
+
+    def save_choice(self):
+        logging.info('gui - other_windows_functions.py - MyAsk - save_choice')
+        self.choice = 'save'
+        self.closeWindow()
+
+    def close_choice(self):
+        logging.info('gui - other_windows_functions.py - MyAsk - close_choice')
+        self.choice = 'close'
+        self.closeWindow()
+
+    def cancel_choice(self):
+        logging.info('gui - other_windows_functions.py - MyAsk - cancel_choice')
+        self.choice = 'cancel'
+        self.closeWindow()
+
+    def closeWindow(self):
+        logging.debug('gui - other_windows_functions.py - MyAsk - closeWindow')
+        self.close()
+
+
 class MyInfo(QtWidgets.QDialog, Ui_infoWindow):
     def __init__(self, info_text):
         logging.debug('gui - other_windows_functions.py - MyInfo - __init__ : infoText ' + str(info_text))
@@ -408,28 +444,7 @@ class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
 
     def submitBox(self):
         logging.debug('gui - other_windows_functions.py - MyUnit - submitBox')
-        self.accept()  
-
-        
-'''class MyWarning(QtWidgets.QDialog, Ui_presaveWindow):
-    def __init__(self, button_string, title_string):
-        logging.debug('gui - other_windows_functions.py - MyWarning - __init__ : button_string ' + str(button_string)
-                      + ', title_string ' + str(title_string))
-        QtWidgets.QWidget.__init__(self)
-        self.setupUi(self)
-        self.iw_cancelButton.setFocus(True)
-        all_buttons = self.findChildren(QtWidgets.QToolButton)
-        for widget in all_buttons:
-            widget.clicked.connect(lambda: self.closeWindow())
-        self.iw_nosaveButton.setText(button_string + " without saving")
-        self.setWindowTitle(title_string)
-        logging.info('gui - other_windows_functions.py - MyWarning ready')
-
-    def closeWindow(self):
-        logging.debug('gui - other_windows_functions.py - MyWarning - closeWindow : sender().objectName() '
-                      + str(self.sender().objectName()))
-        self.buttonName = self.sender().objectName()
-        self.close()'''
+        self.accept()
 
 
 class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
@@ -438,18 +453,38 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.config_dict = config_dict
+        options_information_buttons_text(self)
         self.combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.ok_button.clicked.connect(self.save_config_dict)
         self.cancel_button.clicked.connect(self.closeWindow)
         self.check_button.clicked.connect(self.check_gui_update)
+        self.info_button_1.clicked.connect(self.button_info)
+        self.info_button_2.clicked.connect(self.button_info)
+        self.info_button_3.clicked.connect(self.button_info)
+        self.info_button_4.clicked.connect(self.button_info)
+        self.info_button_5.clicked.connect(self.button_info)
+        self.info_button_6.clicked.connect(self.button_info)
+        self.open_button_1.clicked.connect(self.get_folder_path)
+        self.checkbox_3.clicked.connect(self.activate_checkbox_4)
         self.cancel = True
         self.read_config_dict()
+
+    def activate_checkbox_4(self):
+        if self.checkbox_3.isChecked():
+            self.checkbox_4.setEnabled(True)
+        else:
+            self.checkbox_4.setChecked(False)
+            self.checkbox_4.setEnabled(False)
 
     def read_config_dict(self):
         logging.debug('gui - other_windows_functions.py - MyOptions - read_config_dict')
         self.combobox_1.setCurrentIndex(self.combobox_1.findText(self.config_dict.get('LOG', 'level')))
         self.line_1.setText(self.config_dict.get('LOG', 'path'))
         self.checkbox_1.setChecked(self.config_dict.getboolean('OPTIONS', 'check_update'))
+        self.checkbox_2.setChecked(self.config_dict.getboolean('SYSTEM', 'read_as_float'))
+        self.checkbox_3.setChecked(self.config_dict.getboolean('SYSTEM', 'replace_fill_value'))
+        self.checkbox_4.setChecked(self.config_dict.getboolean('SYSTEM', 'switch_fill_value'))
+        self.activate_checkbox_4()
 
     def check_gui_update(self):
         logging.debug('gui - other_windows_functions.py - MyOptions - check_gui_update')
@@ -462,14 +497,31 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         if val != 'no new version':
             self.updade_window = MyUpdate(val)
             self.updade_window.exec_()
+        else:
+            info_text = 'No new update available on GitHub.'
+            self.infoWindow = MyInfo(info_text)
+            self.infoWindow.exec_()
 
     def save_config_dict(self):
         logging.debug('gui - other_windows_functions.py - MyOptions - save_config_dict')
         self.cancel = False
-        self.config_dict.set('LOG', 'level', self.ow_comboBox_1.currentText())
-        self.config_dict.set('LOG', 'path', self.ow_lineEdit.text())
-        self.config_dict.set('OPTIONS', 'check_update', self.ow_checkBox_1.isChecked())
+        self.config_dict.set('LOG', 'level', self.combobox_1.currentText())
+        self.config_dict.set('LOG', 'path', self.line_1.text())
+        self.config_dict.set('SYSTEM', 'read_as_float', str(self.checkbox_2.isChecked()))
+        self.config_dict.set('SYSTEM', 'replace_fill_value', str(self.checkbox_3.isChecked()))
+        self.config_dict.set('SYSTEM', 'switch_fill_value', str(self.checkbox_4.isChecked()))
+        self.config_dict.set('OPTIONS', 'check_update', str(self.checkbox_1.isChecked()))
         self.closeWindow()
+
+    def button_info(self):
+        self.infoWindow = MyInfo(self.information_buttons_text[self.sender().objectName()])
+        self.infoWindow.exec_()
+
+    def get_folder_path(self):
+        logging.debug('gui - other_windows_functions.py - MyOptions - get_folder_path')
+        folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory")
+        if folder_path:
+            self.line_1.setText(str(pathlib.Path(folder_path)))
 
     def closeWindow(self):
         logging.info('gui - other_windows_functions.py - MyOptions - closeWindow')
@@ -524,4 +576,101 @@ class MyWait(QtWidgets.QDialog, Ui_waitWindow):
 
     def closeWindow(self):
         logging.debug('gui - other_windows_functions.py - MyWait - closeWindow')
+        self.close()
+
+
+class MyCoeff(QtWidgets.QDialog, Ui_coefWindow):
+    def __init__(self, matrix_nbr_str, coefficient_data, variable_list):
+        logging.debug('gui - other_windows_functions.py - MyCoeff - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.combobox.setItemDelegate(QtWidgets.QStyledItemDelegate())
+        self.coefficient_data = coefficient_data
+        self.matrix_nbr_str = matrix_nbr_str
+        self.variable_list = variable_list
+        self.ok_button.clicked.connect(self.set_coef)
+        self.cancel_button.clicked.connect(self.closeWindow)
+        self.combobox.currentTextChanged.connect(self.populate_table)
+        self.row = 0
+        self.col = 0
+        self.coef_array = None
+        self.populate_variable_combobox()
+        self.set_table()
+        logging.info('gui - other_windows_functions.py - MyCoeff ready')
+
+    def populate_table(self):
+        logging.debug('gui - other_windows_functions.py - MyCoeff - populate_table')
+        self.table.clear()
+        if self.combobox.currentIndex() != 0:
+            if isinstance(self.variable_list, str):
+                f = egads.input.EgadsNetCdf(self.variable_list, 'r')
+                self.parse_data(f.read_variable(str(self.combobox.currentText())).value)
+                f.close()
+            elif isinstance(self.variable_list, dict):
+                self.parse_data(self.variable_list[str(self.combobox.currentText())][3].value)
+
+    def parse_data(self, data):
+        logging.debug('gui - other_windows_functions.py - MyCoeff - parse_data')
+        try:
+            row, col = data.shape
+            if row == self.row and col == self.col:
+                for i in range(row):
+                    for j in range(col):
+                        self.table.setItem(i, j, QtWidgets.QTableWidgetItem(str(data[i, j])))
+        except ValueError:
+            var_len = data.shape
+            if self.row == 1:
+                if var_len == self.col:
+                    for i in range(var_len):
+                        self.table.setItem(0, i, QtWidgets.QTableWidgetItem(str(data[i])))
+            if self.col == 1:
+                if var_len == self.row:
+                    for i in range(var_len):
+                        self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(str(data[i])))
+
+    def populate_variable_combobox(self):
+        logging.debug('gui - other_windows_functions.py - MyCoeff - populate_variable_combobox')
+        variable_list = []
+        if isinstance(self.variable_list, str):
+            f = egads.input.EgadsNetCdf(self.variable_list, 'r')
+            variable_list = f.get_variable_list()
+            f.close()
+        elif isinstance(self.variable_list, dict):
+            for _, sublist in self.variable_list.items():
+                if sublist[2] != 'deleted':
+                    variable_list.append(sublist[1]["var_name"])
+        self.combobox.addItem('Make a choice...')
+        self.combobox.addItems(sorted(variable_list))
+
+    def set_table(self):
+        logging.debug('gui - other_windows_functions.py - MyCoeff - set_table')
+        self.row = int(self.matrix_nbr_str[0])
+        self.col = int(self.matrix_nbr_str[1])
+        self.table.setColumnCount(self.col)
+        self.table.setRowCount(self.row)
+        x = self.table.verticalHeader().size().width()
+        for i in range(self.table.columnCount()):
+            x += self.table.columnWidth(i)
+        y = self.table.horizontalHeader().size().height()
+        for i in range(self.table.rowCount()):
+            y += self.table.rowHeight(i)
+        w, h = self.size().width(), self.size().height()
+        if x + 30 > w:
+            w = x + 30
+        if y + 187 > h:
+            h = y + 187
+        self.resize(w, h)
+        if self.coefficient_data is not None:
+            self.parse_data(self.coefficient_data)
+
+    def set_coef(self):
+        logging.debug('gui - other_windows_functions.py - MyCoeff - set_coef')
+        self.coef_array = numpy.zeros((self.table.rowCount(), self.table.columnCount()))
+        for i in range(self.table.rowCount()):
+            for j in range(self.table.columnCount()):
+                self.coef_array[i, j] = float(self.table.item(i, j).text())
+        self.close()
+
+    def closeWindow(self):
+        logging.debug('gui - other_windows_functions.py - MyCoeff - closeWindow')
         self.close()

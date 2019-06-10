@@ -3,7 +3,10 @@ import os
 import copy
 import collections
 import numpy
+import ntpath
 import matplotlib
+import webbrowser
+import importlib
 matplotlib.use('Qt5Agg')
 from ui._version import _gui_version, _python_version, _qt_version
 from egads import __version__ as egads_version
@@ -13,19 +16,20 @@ except ImportError:
     egads_branch = 'master'
 from PyQt5 import QtWidgets, QtCore, QtGui
 from ui.Ui_mainwindow import Ui_MainWindow
-from functions.other_windows_functions import MyAbout, MyOptions, MyDisplay, MyInfo, MyUpdate
+from functions.other_windows_functions import MyAbout, MyOptions, MyDisplay, MyInfo, MyUpdate, MyAsk
 from functions.plot_window_functions import PlotWindow
-from functions.metadata_windows_functions import MyGlobalAttributes, MyVariableAttributes
+from functions.metadata_windows_functions import MyGlobalAttributes, MyVariableAttributes, MyNAVariableAttributes
 from functions.algorithm_windows_functions import MyProcessing, MyAlgorithm
-from functions.gui_functions import gui_initialization, algorithm_list_menu_initialization, clear_gui
-from functions.gui_functions import netcdf_gui_initialization, update_icons_state, status_bar_update
-from functions.gui_functions import update_global_attribute_gui, update_variable_attribute_gui
-from functions.gui_functions import update_new_variable_list_gui
-from functions.reading_functions import add_new_variable_gui, netcdf_reading, var_reading, new_var_reading
-from functions.material_functions import objects_initialization
+from functions.gui_functions import gui_initialization, algorithm_menu_initialization, clear_gui
+from functions.gui_functions import update_icons_state, status_bar_update, update_global_attribute_gui, file_drop_layout
+from functions.gui_functions import update_variable_attribute_gui, update_new_variable_list_gui
+from functions.reading_functions import add_new_variable_gui, var_reading, new_var_reading, reading_file
+from functions.material_functions import objects_initialization, setup_fonts
 from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSVersion
-from functions.material_functions import setup_fonts
-from functions.utils import prepare_algorithm_categories, prepare_output_categories, reload_user_folders
+from functions.utils import prepare_algorithm_categories, prepare_output_categories, create_algorithm_dict
+from functions.saving_functions import save_as_netcdf_for_nc, save_as_netcdf_for_na, save_as_nasaames_for_nc
+from functions.saving_functions import save_as_nasaames_for_na
+from functions.batch_processing_window_functions import MyBatchProcessing
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -37,10 +41,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.config_dict = config_dict
         self.setupUi(self)
         self.font_list, self.default_font = setup_fonts()
-        self.list_of_algorithms = dict()
+        self.list_of_algorithms = create_algorithm_dict()
         gui_initialization(self)
         objects_initialization(self)
-        algorithm_list_menu_initialization(self)
+        algorithm_menu_initialization(self)
         self.make_window_title()
         self.variable_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.variable_list.customContextMenuRequested.connect(self.right_click_menu)
@@ -51,6 +55,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_actionExit_triggered(self):
         self.close()
+
+    @QtCore.pyqtSlot()
+    def on_actionHelp_triggered(self):
+        self.open_help()
 
     @QtCore.pyqtSlot()
     def on_actionAbout_EGADS_triggered(self):
@@ -67,6 +75,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_actionSaveAsBar_triggered(self):
         self.save_file()
+
+    @QtCore.pyqtSlot()
+    def on_actionBatch_processing_triggered(self):
+        self.batch_processing()
 
     @QtCore.pyqtSlot()
     def on_actionCloseBar_triggered(self):
@@ -146,24 +158,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.variable_menu.move(parent_position + relative_position)
         self.variable_menu.exec_()
 
-    def open_file(self):
+    def open_file(self, file_path=None):
         logging.debug('gui - mainwindow.py - MainWindow - open_file')
-        self.file_name, self.file_ext = self.get_file_name('open')
+        if file_path is None:
+            self.file_name, self.file_ext = self.get_file_name('open')
+        else:
+            ext_dict = {'.nc': 'NetCDF Files (*.nc)', '.csv': 'CSV Files (*.csv *.dat *.txt)',
+                        '.dat': 'CSV Files (*.csv *.dat *.txt)', '.txt': 'CSV Files (*.csv *.dat *.txt)',
+                        '.na': 'NASA Ames Files (*.na)'}
+            self.file_name = file_path
+            self.file_ext = ext_dict[os.path.splitext(file_path)[1]]
         if self.file_name:
             if self.file_ext == 'NetCDF Files (*.nc)' or self.file_ext == 'NASA Ames Files (*.na)':
-                if self.file_ext == 'NetCDF Files (*.nc)':
-                    netcdf_gui_initialization(self)
-                    netcdf_reading(self)
-                    update_icons_state(self, 'open_file')
-                    status_bar_update(self)
-                    self.file_is_opened = True
-                else:
-                    # elif self.file_ext == 'NASA Ames Files (*.na)':
-                    #     nasaames_gui_initialization(self)
-                    #     nasaames_reading(self)
-                    info_text = 'This format ' + self.file_ext + ' is not supported yet actually.'
-                    self.infoWindow = MyInfo(info_text)
-                    self.infoWindow.exec_()
+                reading_file(self)
             else:
                 info_text = 'This format ' + self.file_ext + ' is not supported actually.'
                 self.infoWindow = MyInfo(info_text)
@@ -172,15 +179,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 info_text = 'The following variable(s) couldn\'t be loaded:<ul>'
                 for var, reason in self.list_of_unread_variables.items():
                     info_text += '<li><b>' + var + '</b> &rarr; ' + reason + '</li>'
-                info_text += '</ul><p>Please read the GUI log file to have more details on the previous issues'
+                info_text += '</ul><p>Please read the GUI log file to have more details on previous issues.'
                 self.infoWindow = MyInfo(info_text)
                 self.infoWindow.exec_()
 
     def save_file(self):
-        info_text = 'The GUI is still in an early stage of development. Thus it is not possible to save a file. It ' \
-                    'will be available in the next version.'
-        self.infoWindow = MyInfo(info_text)
-        self.infoWindow.exec_()
+        logging.debug('gui - mainwindow.py - MainWindow - .save_file')
+        save_file_name, save_file_ext = self.get_file_name('save')
+        if save_file_name:
+            if save_file_ext == "NetCDF Files (*.nc)":
+                if not ntpath.splitext(ntpath.basename(save_file_name))[1]:
+                    save_file_name += ".nc"
+                if self.file_ext == 'NetCDF Files (*.nc)':
+                    save_as_netcdf_for_nc(self, save_file_name)
+                elif self.file_ext == 'NASA Ames Files (*.na)':
+                    save_as_netcdf_for_na(self, save_file_name)
+            elif save_file_ext == "NASA Ames Files (*.na)":
+                if not ntpath.splitext(ntpath.basename(save_file_name))[1]:
+                    save_file_name += ".na"
+                if self.file_ext == 'NetCDF Files (*.nc)':
+                    save_as_nasaames_for_nc(self, save_file_name)
+                elif self.file_ext == 'NASA Ames Files (*.na)':
+                    save_as_nasaames_for_na(self, save_file_name)
+            elif self.save_file_ext == "CSV Files (*.csv *.dat *.txt)":
+                info_text = 'This format is not supported'
+                self.infoWindow = MyInfo(info_text)
+                self.infoWindow.exec_()
 
     def global_attributes(self):
         logging.debug('gui - mainwindow.py - MainWindow - global_attributes')
@@ -188,9 +212,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.globalAttributesWindow.exec_()
         try:
             self.list_of_global_attributes = self.globalAttributesWindow.global_attributes
-            if self.open_file_ext == 'NetCDF Files (*.nc)':
+            if self.file_ext == 'NetCDF Files (*.nc)':
                 update_global_attribute_gui(self, 'NetCDF')
-            elif self.open_file_ext == 'NASA Ames Files (*.na)':
+            elif self.file_ext == 'NASA Ames Files (*.na)':
                 update_global_attribute_gui(self, 'NASA Ames')
             self.modified = True
             self.make_window_title()
@@ -199,36 +223,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def variable_attributes(self):
         logging.debug('gui - mainwindow.py - MainWindow - .variable_attributes')
-        variable = None
         if self.tab_view.currentIndex() == 1:
             variable = str(self.variable_list.currentItem().text())
-            variable_attributes = copy.deepcopy(self.list_of_variables_and_attributes[variable][1])
-            self.variableAttributesWindow = MyVariableAttributes(variable, variable_attributes, self.file_ext)
-        elif self.tab_view.currentIndex() == 2:
+            variable_attributes = copy.deepcopy(self.list_of_variables_and_attributes[variable][0].metadata)
+        else:
             variable = str(self.new_variable_list.currentItem().text())
-            variable_attributes = copy.deepcopy(self.list_of_new_variables_and_attributes[variable][1])
+            variable_attributes = copy.deepcopy(self.list_of_new_variables_and_attributes[variable][0].metadata)
+        if self.file_ext == 'NASA Ames Files (*.na)':
+            self.variableAttributesWindow = MyNAVariableAttributes(variable, variable_attributes)
+        else:
             self.variableAttributesWindow = MyVariableAttributes(variable, variable_attributes, self.file_ext)
         self.variableAttributesWindow.exec_()
         try:
             new_attributes = self.variableAttributesWindow.attributes
             if self.tab_view.currentIndex() == 1:
-                if self.open_file_ext == 'NASA Ames Files (*.na)':
-                    self.list_of_variables_and_attributes[variable][1] = new_attributes
-                    self.list_of_variables_and_attributes[new_attributes['standard_name']] = \
-                        self.list_of_variables_and_attributes.pop(str(self.variable_list.currentItem().text()))
-                    self.variable_list.currentItem().setText(new_attributes['standard_name'])
-                    new_attributes['var_name'] = new_attributes['standard_name']
-                    
-                else:
-                    self.list_of_variables_and_attributes[variable][1] = new_attributes    
+                self.list_of_variables_and_attributes[variable][0].metadata = new_attributes
             elif self.tab_view.currentIndex() == 2:
-                if self.open_file_ext == 'NASA Ames Files (*.na)':
-                    self.list_of_new_variables_and_attributes[variable][1] = new_attributes
-                    self.list_of_new_variables_and_attributes[new_attributes['standard_name']] = \
-                        self.list_of_variables_and_attributes.pop(str(self.new_variable_list.currentItem().text()))
-                    self.new_variable_list.currentItem().setText(new_attributes['standard_name'])
-                    new_attributes['var_name'] = new_attributes['standard_name']
-                self.list_of_new_variables_and_attributes[variable][1] = new_attributes    
+                self.list_of_new_variables_and_attributes[variable][0].metadata = new_attributes
             update_variable_attribute_gui(self)
             self.modified = True
             self.make_window_title()
@@ -239,31 +250,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         logging.debug('gui - mainwindow.py - MainWindow - display_variable')
         variable = None
         if self.tab_view.currentIndex() == 1:
-            variable = self.list_of_variables_and_attributes[str(self.variable_list.currentItem().text())]
+            var_name = str(self.variable_list.currentItem().text())
+            variable = self.list_of_variables_and_attributes[var_name]
         elif self.tab_view.currentIndex() == 2:
-            variable = self.list_of_new_variables_and_attributes[str(self.new_variable_list.currentItem().text())]
-        var_name = variable[1]['var_name']
-        var_units = variable[1]['units']
-        
+            var_name = str(self.new_variable_list.currentItem().text())
+            variable = self.list_of_new_variables_and_attributes[var_name]
+        var_units = variable[0].metadata['units']
         fill_value = None
         try:
-            fill_value = variable[1]['_FillValue']
+            fill_value = variable[0].metadata['_FillValue']
         except KeyError:
             try:
-                fill_value = variable[1]['missing_value']
+                fill_value = variable[0].metadata['missing_value']
             except KeyError:
                 pass
-        var_values = variable[3].value
+        var_values = variable[0].value
         dimensions = collections.OrderedDict()
         i = 0
-        for key, value in variable[2].items():
+        for key, value in variable[1].items():
             dimensions[key] = {'length': value,
-                               'values': self.list_of_variables_and_attributes[key][3].value,
+                               'values': self.list_of_variables_and_attributes[key][0].value,
                                'axis': i,
-                               'units': self.list_of_variables_and_attributes[key][1]['units']}
+                               'units': self.list_of_variables_and_attributes[key][0].metadata['units']}
             i += 1
         logging.debug('gui - mainwindow.py - MainWindow - display_variable : tab index '
-                      + str(self.tab_view.currentIndex()) + ', variable ' + str(variable[1]['var_name']))
+                      + str(self.tab_view.currentIndex()) + ', variable ' + var_name)
         self.displayWindow = MyDisplay(var_name, var_units, fill_value, var_values, dimensions)
         self.displayWindow.exec_()
 
@@ -280,29 +291,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         variables = collections.OrderedDict()
         dimensions = {}
         for variable in variable_list:
-            var_name = list_of_variables_and_attributes[variable][1]['var_name']
-            var_units = list_of_variables_and_attributes[variable][1]['units']
-            var = list_of_variables_and_attributes[variable][3].value
+            var_name = variable
+            var_units = list_of_variables_and_attributes[variable][0].metadata['units']
+            var = list_of_variables_and_attributes[variable][0].value
             try:
-                fill_value = list_of_variables_and_attributes[variable][1]['_FillValue']
-                var[var == fill_value] = numpy.nan
+                fill_value = list_of_variables_and_attributes[variable][0].metadata['_FillValue']
+                try:
+                    var[var == fill_value] = numpy.nan
+                except ValueError:
+                    logging.error('gui - mainwindow.py - MainWindow - plot_variable - impossible to replace missing '
+                                  'values by NaN, check variable type for integers')
             except KeyError:
                 try:
-                    fill_value = list_of_variables_and_attributes[variable][1]['missing_value']
-                    var[var == fill_value] = numpy.nan
+                    fill_value = list_of_variables_and_attributes[variable][0].metadata['missing_value']
+                    try:
+                        var[var == fill_value] = numpy.nan
+                    except ValueError:
+                        logging.error('gui - mainwindow.py - MainWindow - plot_variable - impossible to replace '
+                                      'missing values by NaN, check variable type for integers')
                 except KeyError:
-                    pass
+                    logging.error('gui - mainwindow.py - MainWindow - plot_variable - no missing value found, '
+                                  'impossible to replace missing values by NaN')
             var_dimensions = []
             i = 0
-
             if self.x_axis_variable_name is None:
-                for key in list_of_variables_and_attributes[variable][2]:
+                for key in list_of_variables_and_attributes[variable][1]:
                     var_dimensions.append(key)
                     try:
                         dimensions[key]
                     except KeyError:
-                        dimensions[key] = {'units': self.list_of_variables_and_attributes[key][1]['units'],
-                                           'values': self.list_of_variables_and_attributes[key][3].value,
+                        dimensions[key] = {'units': self.list_of_variables_and_attributes[key][0].metadata['units'],
+                                           'values': self.list_of_variables_and_attributes[key][0].value,
                                            'axis': i}
                     i += 1
             else:
@@ -311,9 +330,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     dimensions[self.x_axis_variable_name]
                 except KeyError:
                     dimensions[self.x_axis_variable_name] = {'units': self.list_of_variables_and_attributes[
-                        self.x_axis_variable_name][1]['units'],
+                        self.x_axis_variable_name][0].metadata['units'],
                                        'values': self.list_of_variables_and_attributes[self.x_axis_variable_name][
-                                           3].value,
+                                           0].value,
                                        'axis': i}
                 i += 1
             variables[var_name] = {'units': var_units,
@@ -343,9 +362,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def create_algorithm(self):
         logging.debug('gui - mainwindow.py - MainWindow - create_algorithm')
-        algorithm_categories = prepare_algorithm_categories(self.list_of_algorithms)
-        output_categories = prepare_output_categories(self.list_of_algorithms)
-        self.myAlgorithm = MyAlgorithm(algorithm_categories, output_categories)
+        self.myAlgorithm = MyAlgorithm(prepare_algorithm_categories(self.list_of_algorithms),
+                                       prepare_output_categories(self.list_of_algorithms))
         self.myAlgorithm.exec_()
         if not self.myAlgorithm.cancel:
             try:
@@ -363,8 +381,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                  + ' couldn\'t be written.')
                 self.infoWindow = MyInfo(info_text)
                 self.infoWindow.exec_()
-                reload_user_folders()
-                algorithm_list_menu_initialization(self)
+                importlib.reload(egads.algorithms.user)
+                self.list_of_algorithms = create_algorithm_dict()
+                algorithm_menu_initialization(self)
             except AttributeError:
                 logging.exception('gui - mainwindow.py - MainWindow - create_algorithm: an exception occurred during '
                                   'the initialization of the algorithm information window.')
@@ -375,8 +394,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         sublist = self.list_of_new_variables_and_attributes[str(self.new_variable_list.currentItem().text())]
         self.list_of_variables_and_attributes[str(self.new_variable_list.currentItem().text())] = sublist
         self.list_of_new_variables_and_attributes.pop(str(self.new_variable_list.currentItem().text()), 0)
+        self.variable_list.addItem(str(self.new_variable_list.currentItem().text()))
         self.new_variable_list.takeItem(self.new_variable_list.currentRow())
-        self.variable_list.addItem(sublist[1]["var_name"])
         self.modified = True
         self.make_window_title()
         try:
@@ -401,32 +420,36 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         logging.debug('gui - mainwindow.py - MainWindow - delete_variable :, tab index ' + str(
             self.tab_view.currentIndex()) + ', variable ' + str(list_object.currentItem().text()))
         variable = str(list_object.currentItem().text())
-        sublist = variables_and_attributes[variable]
-        try:
-            sublist[1], sublist[2], sublist[3] = 'deleted', 'deleted', 'deleted'
-            item = list_object.currentItem()
-            list_object.takeItem(list_object.row(item))
-            clear_gui(self, 'variable')
-            self.modified = True
-            self.make_window_title()
-        except TypeError:
-            logging.exception('gui - mainwindow.py - MainWindow - delete_variable: an exception occured during the '
-                              'deletion of the variable ' + str(variable))
-        try:
-            if not self.new_variable_list:
-                self.tab_view.removeTab(2)
-                self.new_variables = False
-        except AttributeError:
-            logging.exception(
-                'gui - mainwindow.py - MainWindow - delete_variable: an exception occured during the removal '
-                + 'of the tab 2.')
-        if not self.variable_list:
-            self.actionAlgorithmsBar.setEnabled(False)
-            self.actionDeleteVariableBar.setEnabled(False)
-            self.actionVariableAttributesBar.setEnabled(False)
-            self.actionPlotBar.setEnabled(False)
-            self.actionDisplayBar.setEnabled(False)
-            self.actionMigrateVariableBar.setEnabled(False)
+        if variable not in self.list_of_dimensions:
+            try:
+                del variables_and_attributes[variable]
+                item = list_object.currentItem()
+                list_object.takeItem(list_object.row(item))
+                clear_gui(self, 'variable')
+                self.modified = True
+                self.make_window_title()
+            except TypeError:
+                logging.exception('gui - mainwindow.py - MainWindow - delete_variable: an exception occured during the '
+                                  'deletion of the variable ' + str(variable))
+            try:
+                if not self.new_variable_list:
+                    self.tab_view.removeTab(2)
+                    self.new_variables = False
+            except AttributeError:
+                logging.exception('gui - mainwindow.py - MainWindow - delete_variable: an exception occured during the '
+                                  'removal of the tab 2.')
+            if not self.variable_list:
+                self.actionAlgorithmsBar.setEnabled(False)
+                self.actionDeleteVariableBar.setEnabled(False)
+                self.actionVariableAttributesBar.setEnabled(False)
+                self.actionPlotBar.setEnabled(False)
+                self.actionDisplayBar.setEnabled(False)
+                self.actionMigrateVariableBar.setEnabled(False)
+        else:
+            info_text = ('The variable <b>' + variable + '</b> is a dimension/independant variable in the currently '
+                         'opened file. Thus it is not possible to delete it through the GUI.')
+            self.infoWindow = MyInfo(info_text)
+            self.infoWindow.exec_()
 
     def create_variable(self):
         info_text = 'The GUI is still in an early stage of development. Thus it is not possible to create a new ' \
@@ -511,10 +534,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.updade_window = MyUpdate(self.gui_update_url)
         self.updade_window.exec_()
 
+    def batch_processing(self):
+        logging.debug('gui - mainwindow.py - batch_processing')
+        self.batch_processing_window = MyBatchProcessing(self.list_of_algorithms, self.config_dict)
+        self.batch_processing_window.exec_()
+
     def get_file_name(self, action):
         logging.debug('gui - mainwindow.py - get_file_name : action ' + str(action))
         file_dialog = QtWidgets.QFileDialog()
-        filter_types = 'NetCDF Files (*.nc);;CSV Files (*.csv *.dat *.txt);;NASA Ames Files (*.na)'
+        filter_types = 'NetCDF Files (*.nc);;NASA Ames Files (*.na)'
         out_file_name, out_file_ext = None, None
         if action == 'save':
             out_file_name, out_file_ext = file_dialog.getSaveFileName(self, 'Save File', '', filter_types)
@@ -546,6 +574,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tab_view.removeTab(2)
         self.tab_view.setEnabled(False)
         self.tab_view.setVisible(False)
+        self.gridLayout.removeWidget(self.tab_view)
+        file_drop_layout(self)
         self.modified = False
         self.make_window_title()
         self.opened_file = None
@@ -569,24 +599,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def make_window_title(self):
         logging.debug('gui - mainwindow.py - MainWindow - make_window_title : modified ' + str(self.modified))
         if self.modified:
-            title_string = "EGADS GUI v" + _gui_version + ' - modified'
+            title_string = 'EUFAR General Airborne Data-processing Software - GUI' + ' - modified'
         else:
-            title_string = "EGADS GUI v" + _gui_version
+            title_string = 'EUFAR General Airborne Data-processing Software - GUI'
         self.setWindowTitle(title_string)
+
+    def open_help(self):
+        logging.debug('gui - mainwindow.py - MainWindow - open_help')
+        webbrowser.open('https://egads-gui.readthedocs.io/en/lineage/')
 
     def closeEvent(self, event):
         logging.debug('gui - mainwindow.py - MainWindow - closeEvent')
-        logging.info('**********************************')
-        logging.info('EGADS GUI is closing ...')
-        logging.info('**********************************')
-        '''if self.modified == True and self.file_is_opened == True:
-            result = self.make_onsave_msg_box('Close', 'Quit EGADS GUI')
-            if result == "iw_saveButton":
+        if self.modified:
+            self.ask_save_window = MyAsk('Quit')
+            self.ask_save_window.exec_()
+            if self.ask_save_window.choice == 'save':
                 self.save_file()
                 event.accept()
-            elif result == "iw_nosaveButton":
-                event.accept()
-            else:
+            elif self.ask_save_window.choice == 'cancel':
                 event.ignore()
-        if self.file_is_opened == True:
-            self.opened_file.close()'''
+            elif self.ask_save_window.choice == 'close':
+                event.accept()
+        if self.file_is_opened:
+            self.opened_file.close()

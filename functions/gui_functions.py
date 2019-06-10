@@ -5,7 +5,9 @@ import inspect
 import logging
 from PyQt5 import QtWidgets, QtCore, QtGui
 from functions.algorithm_windows_functions import MyAlgorithmDisplay
+from functions.other_windows_functions import MyInfo
 from functions.utils import humansize
+from functions.gui_elements import DropFrame
     
 
 def gui_initialization(self):
@@ -20,6 +22,9 @@ def gui_initialization(self):
     self.tab_view.removeTab(2)
     self.tab_view.setEnabled(False)
     self.tab_view.setVisible(False)
+
+    self.gridLayout.removeWidget(self.tab_view)
+    file_drop_layout(self)
     self.sb_filename_lb = QtWidgets.QLabel()
     self.sb_filename_lb.setMinimumSize(QtCore.QSize(0, 20))
     self.sb_filename_lb.setMaximumSize(QtCore.QSize(16777215, 20))
@@ -50,15 +55,10 @@ def gui_initialization(self):
     self.actionPlotBar.setEnabled(False)
 
 
-def algorithm_list_menu_initialization(self):
+def algorithm_menu_initialization(self):
     logging.debug('gui - gui_functions.py - algorithm_list_initialization')
-    self.list_of_algorithms = {}
     self.menuEmbedded_algorithms.clear()
     self.menuUser_defined_algorithms.clear()
-    self.algorithm_folder_menu = []
-    self.algorithm_folder_actions = []
-    self.user_folder_menu = []
-    self.user_folder_actions = []
     font = QtGui.QFont()
     font.setFamily("fonts/SourceSansPro-Regular.ttf")
     font.setPointSize(10)
@@ -68,92 +68,56 @@ def algorithm_list_menu_initialization(self):
     icon1.addPixmap(QtGui.QPixmap("icons/new_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     icon2 = QtGui.QIcon()
     icon2.addPixmap(QtGui.QPixmap("icons/create_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-    algorithm_path = egads.__path__[0] + '/algorithms'
-    user_algorithm_path = egads.__path__[0] + '/algorithms/user'
-    folder_list = []
-    algorithm_structure = []
-    user_algorithm_structure = []
-    for item in os.walk(algorithm_path):
-        index = item[0].find('algorithms')
-        if item[0][index + 11:]:
-            if 'file_templates' not in item[0][index + 11:] and 'user' not in item[0][index + 11:]:
-                folder_list.append(item[0][index + 11:])
-    for folder in folder_list:
-        if '__pycache__' not in folder:
-            algorithm_tmp_list = dir(getattr(egads.algorithms, folder))
-            algorithm_list = []
-            for item in algorithm_tmp_list:
-                if isinstance(getattr(getattr(egads.algorithms, folder), item), type):
-                    algorithm_list.append(item)
-            algorithm_structure.append([folder, sorted(algorithm_list)])
-            self.list_of_algorithms[folder] = sorted(algorithm_list)      
-    folder_list = []
-    for item in os.walk(user_algorithm_path):
-        index = item[0].find('user')
-        if item[0][index + 5:]:
-            if 'file_templates' not in item[0][index + 5:]:
-                folder_list.append(item[0][index + 5:])  
-    for folder in folder_list:
-        if '__pycache__' not in folder:
-            algorithm_tmp_list = dir(getattr(egads.algorithms.user, folder))
-            algorithm_list = []
-            for item in algorithm_tmp_list:
-                if isinstance(getattr(getattr(egads.algorithms.user, folder), item), type):
-                    algorithm_list.append(item)
-            user_algorithm_structure.append([folder, sorted(algorithm_list)])
-            try:
-                tmp_list = self.list_of_algorithms[folder] + algorithm_list
-                self.list_of_algorithms[folder] = sorted(tmp_list)
-            except KeyError:
-                self.list_of_algorithms[folder] = sorted(algorithm_list) 
-    i = 0
-    for sublist in sorted(algorithm_structure):
-        self.algorithm_folder_menu.append(QtWidgets.QMenu(self.menuEmbedded_algorithms))
-        self.algorithm_folder_menu[i].setObjectName('embedded_category_' + sublist[0])
-        self.algorithm_folder_menu[i].setTitle(sublist[0].title())
-        self.menuEmbedded_algorithms.addAction(self.algorithm_folder_menu[i].menuAction())
-        self.algorithm_folder_actions.append([])
-        j = 0
-        for algorithm in sublist[1]:
-            self.algorithm_folder_actions[i].append(QtWidgets.QAction(self))
-            self.algorithm_folder_actions[i][j].setIcon(icon1)
-            self.algorithm_folder_actions[i][j].setFont(font)
-            self.algorithm_folder_actions[i][j].setObjectName('embedded_' + sublist[0] + '_' + algorithm)
-            self.algorithm_folder_actions[i][j].setText(algorithm)
-            self.algorithm_folder_actions[i][j].triggered.connect(lambda: display_algorithm_information(self))
-            self.algorithm_folder_menu[i].addAction(self.algorithm_folder_actions[i][j])
-            j += 1
-        i += 1
-    i = 0
-    for sublist in sorted(user_algorithm_structure):
-        if sublist[1]:
-            self.user_folder_menu.append(QtWidgets.QMenu(self.menuUser_defined_algorithms))
-            self.user_folder_menu[i].setObjectName('user_category_' + sublist[0])
-            self.user_folder_menu[i].setTitle(sublist[0].title())
-            self.menuUser_defined_algorithms.addAction(self.user_folder_menu[i].menuAction())
-            self.user_folder_actions.append([])
-            j = 0
-            for algorithm in sublist[1]:
-                self.user_folder_actions[i].append(QtWidgets.QAction(self))
-                self.user_folder_actions[i][j].setIcon(icon2)
-                self.user_folder_actions[i][j].setFont(font)
-                self.user_folder_actions[i][j].setObjectName('user_' + sublist[0] + '_' + algorithm)
-                self.user_folder_actions[i][j].setText(algorithm)
-                self.user_folder_actions[i][j].triggered.connect(lambda: display_algorithm_information(self))
-                self.user_folder_menu[i].addAction(self.user_folder_actions[i][j])
-                j += 1
-            i += 1
+    previous_rep = None
+    algo_folder_user = None
+    algo_folder = None
+    for key in sorted(self.list_of_algorithms.keys()):
+        idx = key.find(' - ')
+        rep, algo, user = key[:idx], key[idx + 3:], self.list_of_algorithms[key]['user']
+        algo_action = QtWidgets.QAction(self)
+        algo_action.setIcon(icon1)
+        algo_action.setFont(font)
+        algo_action.setText(algo)
+        algo_action.triggered.connect(lambda: display_algorithm_information(self))
+        if rep == previous_rep:
+            if user:
+                algo_action.setObjectName('user_' + rep + ' - ' + algo)
+                algo_folder_user.addAction(algo_action)
+            else:
+                algo_action.setObjectName('embedded_' + rep + ' - ' + algo)
+                algo_folder.addAction(algo_action)
+        else:
+            previous_rep = rep
+            if user:
+                algo_folder_user = QtWidgets.QMenu(self.menuUser_defined_algorithms)
+                algo_folder_user.setObjectName('user_category_' + rep)
+                algo_folder_user.setTitle(rep.title())
+                self.menuUser_defined_algorithms.addAction(algo_folder_user.menuAction())
+                algo_action.setObjectName('user_' + rep + ' - ' + algo)
+                algo_folder_user.addAction(algo_action)
+            else:
+                algo_folder = QtWidgets.QMenu(self.menuEmbedded_algorithms)
+                algo_folder.setObjectName('embedded_category_' + rep)
+                algo_folder.setTitle(rep.title())
+                self.menuEmbedded_algorithms.addAction(algo_folder.menuAction())
+                algo_action.setObjectName('embedded_' + rep + ' - ' + algo)
+                algo_folder.addAction(algo_action)
 
     
 def netcdf_gui_initialization(self):
     logging.debug('gui - gui_functions.py - netcdf_gui_initialization')
+    clear_layout(self.gridLayout)
+    self.gridLayout.addWidget(self.tab_view, 0, 0, 1, 1)
     self.tab_view.setEnabled(True)
     self.tab_view.setVisible(True)
     self.gm_comments_ln.setVisible(False)
     self.gm_comments_lb.setVisible(False)
     self.gm_button_6.setVisible(False)
-    self.gm_project_lb.setText('Project')
+    self.gm_project_lb.setText('Project:')
     self.gm_history_lb.setText('History:')
+    self.gm_title_lb.setText('Title:')
+    self.gm_source_lb.setText('Source:')
+    self.gm_institution_lb.setText('Institution:')
     self.va_longName_lb.setVisible(True)
     self.va_category_lb.setVisible(True)
     self.va_egadsProcessor_lb.setVisible(True)
@@ -168,41 +132,40 @@ def netcdf_gui_initialization(self):
     
 def nasaames_gui_initialization(self):
     logging.debug('gui - gui_functions.py - nasaames_gui_initialization')
+    clear_layout(self.gridLayout)
+    self.gridLayout.addWidget(self.tab_view, 0, 0, 1, 1)
     self.tab_view.setEnabled(True)
     self.tab_view.setVisible(True)
-    self.gm_details_lb.setVisible(False)
-    self.gm_compatibility_lb.setVisible(False)
-    self.gm_history_ln.setMinimumSize(QtCore.QSize(400, 140))
-    self.gm_history_ln.setMaximumSize(QtCore.QSize(16777215, 140))
-    self.gm_history_ln_2.setMinimumSize(QtCore.QSize(400, 140))
-    self.gm_history_ln_2.setMaximumSize(QtCore.QSize(16777215, 140))
-    self.gm_history_lb.setText('<html><head/><body><p>Normal<br>comments:</p></body></html>')
-    self.gm_project_lb.setText('Author(s):')
-    self.va_longName_lb.setVisible(False)
-    self.va_category_lb.setVisible(False)
-    self.va_egadsProcessor_lb.setVisible(False)
-    self.va_longName_ln.setVisible(False)
-    self.va_category_ln.setVisible(False)
-    self.va_egadsProcessor_ln.setVisible(False)
-    self.va_button_2.setVisible(False)
-    self.va_button_3.setVisible(False)
+    self.gm_comments_ln.setVisible(True)
+    self.gm_comments_lb.setVisible(True)
+    self.gm_title_lb.setText('Title - MNAME:')
+    self.gm_source_lb.setText('Source - SNAME:')
+    self.gm_institution_lb.setText('Institution - ORG:')
+    self.gm_history_lb.setText('Normal<br>comments<br>- NCOM:')
+    self.gm_project_lb.setText('Author - ONAME:')
+    self.va_longName_lb.setVisible(True)
+    self.va_category_lb.setVisible(True)
+    self.va_egadsProcessor_lb.setVisible(True)
+    self.va_longName_ln.setVisible(True)
+    self.va_category_ln.setVisible(True)
+    self.va_egadsProcessor_ln.setVisible(True)
+    self.va_button_2.setVisible(True)
+    self.va_button_3.setVisible(True)
+    self.variable_list.setVisible(True)
+    self.variable_list.setEnabled(True)
      
 
 def display_algorithm_information(self):
     logging.debug('gui - gui_functions.py - display_algorithm_information')
-    second_index = 0
     if 'embedded' in self.sender().objectName():
-        second_index = self.sender().objectName().find('_', 9)
-    elif 'user' in self.sender().objectName():
-        second_index = self.sender().objectName().find('_', 5)
-    first_index = self.sender().objectName().find('_')
-    algorithm_category = self.sender().objectName()[first_index + 1: second_index]
-    algorithm_name = self.sender().objectName()[second_index + 1:]
-    try:
-        algorithm = getattr(getattr(egads.algorithms, algorithm_category), algorithm_name)
-    except AttributeError:
-        algorithm = getattr(getattr(egads.algorithms.user, algorithm_category), algorithm_name)
-    file_path = inspect.getfile(algorithm)
+        rep_algo = self.sender().objectName()[9:]
+    else:
+        rep_algo = self.sender().objectName()[5:]
+    file_path = self.list_of_algorithms[rep_algo]['path']
+    if 'c' == file_path[-1:]:
+        file_path = file_path[:-1]
+    algorithm = self.list_of_algorithms[rep_algo]['method']
+    algorithm_name = self.list_of_algorithms[rep_algo]['name']
     algorithm_metadata = algorithm().metadata
     output_metadata = algorithm().output_metadata
     algorithm_dict = dict()
@@ -288,16 +251,15 @@ def modify_attribute_gui(self, string):
                     elif self.file_ext == 'NASA Ames Files (*.na)':
                         value = value[1]
                 if list_widget is not None:
-                    try:
-                        var_attr_list[str(list_widget.currentItem().text())][1][value] = str(widget[0].text())
-                    except AttributeError:
-                        var_attr_list[str(list_widget.currentItem().text())][1][value] = str(widget[0].toPlainText())
-                    if value == "var_name":
-                        if self.file_ext == 'NASA Ames Files (*.na)':
-                            var_attr_list[str(list_widget.currentItem().text())][1]['standard_name'] = str(widget[0]
-                                                                                                           .text())
+                    if value == 'var_name':
                         var_attr_list[str(widget[0].text())] = var_attr_list.pop(str(list_widget.currentItem().text()))
-                        list_widget.currentItem().setText(str(widget[0].text()))  
+                        list_widget.currentItem().setText(str(widget[0].text()))
+                    else:
+                        var = str(list_widget.currentItem().text())
+                        try:
+                            var_attr_list[var][0].metadata[value] = str(widget[0].text())
+                        except AttributeError:
+                            var_attr_list[var][0].metadata[value] = str(widget[0].toPlainText())
                 else:
                     try:
                         var_attr_list[value] = str(widget[0].text())
@@ -315,11 +277,15 @@ def modify_attribute_gui(self, string):
                     elif self.file_ext == 'NASA Ames Files (*.na)':
                         value = value[1]
                 if list_widget is not None:
-                    try:
-                        widget[0].setText(var_attr_list[str(list_widget.currentItem().text())][1][value])
-                        widget[0].setCursorPosition(0)
-                    except AttributeError:
-                        widget[0].toPlainText(var_attr_list[str(list_widget.currentItem().text())][1][value])
+                    var = str(list_widget.currentItem().text())
+                    if value == 'var_name':
+                        widget[0].setText(var)
+                    else:
+                        try:
+                            widget[0].setText(var_attr_list[var][0].metadata[value])
+                            widget[0].setCursorPosition(0)
+                        except AttributeError:
+                            widget[0].toPlainText(var_attr_list[var][0].metadata[value])
                 else:
                     if isinstance(var_attr_list[value], list):
                         long_string = ''
@@ -349,18 +315,18 @@ def update_global_attribute_gui(self, source):
         read_set_attribute_gui(self.gm_source_ln, 'source', self.list_of_global_attributes)
         read_set_attribute_gui(self.gm_project_ln, 'project', self.list_of_global_attributes)
         read_set_attribute_gui(self.gm_history_ln, 'history', self.list_of_global_attributes)
-        dimension_str = ''
-        for key, value in self.list_of_dimensions.items():
-            dimension_str += key + ': ' + str(value) + ' ; '
-        self.va_dimensionList_ln.setPlainText(dimension_str[:-3])
-        self.new_dimensionList_ln.setPlainText(dimension_str[:-3])
     elif source == 'NASA Ames':
         read_set_attribute_gui(self.gm_title_ln, 'MNAME', self.list_of_global_attributes)
         read_set_attribute_gui(self.gm_institution_ln, 'ORG', self.list_of_global_attributes)
         read_set_attribute_gui(self.gm_source_ln, 'SNAME', self.list_of_global_attributes)
         read_set_attribute_gui(self.gm_history_ln, 'NCOM', self.list_of_global_attributes)
-        read_set_attribute_gui(self.gm_history_ln_2, 'SCOM', self.list_of_global_attributes)
+        read_set_attribute_gui(self.gm_comments_ln, 'SCOM', self.list_of_global_attributes)
         read_set_attribute_gui(self.gm_project_ln, 'ONAME', self.list_of_global_attributes)
+    dimension_str = ''
+    for key, value in self.list_of_dimensions.items():
+        dimension_str += key + ': ' + str(value) + ' ; '
+    self.va_dimensionList_ln.setPlainText(dimension_str[:-3])
+    self.new_dimensionList_ln.setPlainText(dimension_str[:-3])
         
 
 def update_variable_attribute_gui(self, index=None):
@@ -388,16 +354,17 @@ def update_variable_attribute_gui(self, index=None):
         fill_value = self.new_fill_ln
         dimensions = self.new_dimensions_ln
     sublist = variables_and_attributes[str(list_object.currentItem().text())]
-    read_set_attribute_gui(var_name, 'var_name', sublist[1])
-    read_set_attribute_gui(long_name, 'long_name', sublist[1])
-    read_set_attribute_gui(units, 'units', sublist[1])
-    read_set_attribute_gui(category, 'Category', sublist[1])
-    read_set_attribute_gui(processor, 'Processor', sublist[1])
-    read_set_attribute_gui(fill_value, '_FillValue', sublist[1])
+    metadata_dict = sublist[0].metadata
+    var_name.setText(str(list_object.currentItem().text()))
+    read_set_attribute_gui(long_name, 'long_name', metadata_dict)
+    read_set_attribute_gui(units, 'units', metadata_dict)
+    read_set_attribute_gui(category, 'Category', metadata_dict)
+    read_set_attribute_gui(processor, 'Processor', metadata_dict)
+    read_set_attribute_gui(fill_value, '_FillValue', metadata_dict)
     if not fill_value.text():
-        read_set_attribute_gui(fill_value, 'missing_value', sublist[1])
+        read_set_attribute_gui(fill_value, 'missing_value', metadata_dict)
     dimensions_str = ''
-    for key, value in sublist[2].items():
+    for key, value in sublist[1].items():
         dimensions_str = dimensions_str + str(value) + ' (' + key + '), '
     read_set_attribute_gui(dimensions, dimensions_str[:-2])
     
@@ -405,8 +372,8 @@ def update_variable_attribute_gui(self, index=None):
 def update_new_variable_list_gui(self):
     logging.debug('gui - gui_functions.py - update_new_variable_list_gui')
     self.new_variable_list.clear()
-    for _, sublist in self.list_of_new_variables_and_attributes.items():
-        self.new_variable_list.addItem(sublist[0])
+    for key in self.list_of_new_variables_and_attributes:
+        self.new_variable_list.addItem(key)
 
 
 def status_bar_update(self):
@@ -599,8 +566,6 @@ def read_set_attribute_gui(gui_object, attr_name, attr_dict=None):
         try:
             value = attr_dict[attr_name]
         except KeyError:
-            value = '' 
-        if value == 'deleted':
             value = ''
         if isinstance(value, list):
             long_string = ''
@@ -620,14 +585,101 @@ def read_set_attribute_gui(gui_object, attr_name, attr_dict=None):
         except AttributeError:
             gui_object.setPlainText(str(value))
     else:
-        if attr_name == 'deleted':
-            attr_name = ''
         try:
             gui_object.setText(str(attr_name))
             if not isinstance(gui_object, QtWidgets.QLabel):
                 gui_object.setCursorPosition(0)
         except AttributeError:
             gui_object.setPlainText(str(attr_name))
+
+
+def file_drop_layout(self):
+    self.drop_grid_layout_2 = QtWidgets.QGridLayout()
+    self.drop_grid_layout_2.setObjectName("drop_grid_layout_2")
+    self.drop_grid_layout_2.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                                          QtWidgets.QSizePolicy.Expanding), 0, 1, 1, 1)
+    self.drop_grid_layout_2.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                                          QtWidgets.QSizePolicy.Minimum), 1, 0, 1, 1)
+    self.drop_frame = DropFrame()
+    self.drop_frame.setMinimumSize(QtCore.QSize(380, 190))
+    self.drop_frame.setMaximumSize(QtCore.QSize(380, 190))
+    self.drop_frame.setAcceptDrops(True)
+    self.drop_frame.setStyleSheet("QFrame {\n"
+                                  "   background: rgb(230, 230, 230);\n"
+                                  "   border: 3px dashed rgb(150,150,150);\n"
+                                  "}")
+    self.drop_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+    self.drop_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+    self.drop_frame.setObjectName("drop_frame")
+    self.drop_grid_layout = QtWidgets.QGridLayout(self.drop_frame)
+    self.drop_grid_layout.setObjectName("drop_grid_layout")
+    self.drop_grid_layout.addItem(QtWidgets.QSpacerItem(20, 27, QtWidgets.QSizePolicy.Minimum,
+                                                        QtWidgets.QSizePolicy.Expanding), 0, 1, 1, 1)
+    self.drop_grid_layout.addItem(QtWidgets.QSpacerItem(55, 20, QtWidgets.QSizePolicy.Expanding,
+                                                        QtWidgets.QSizePolicy.Minimum), 1, 0, 1, 1)
+    self.drop_vert_layout = QtWidgets.QVBoxLayout()
+    self.drop_vert_layout.setObjectName("drop_vert_layout")
+    self.drop_hor_layout = QtWidgets.QHBoxLayout()
+    self.drop_hor_layout.setObjectName("drop_hor_layout")
+    self.drop_hor_layout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                                       QtWidgets.QSizePolicy.Minimum))
+    self.drop_label_1 = QtWidgets.QLabel(self.drop_frame)
+    self.drop_label_1.setMinimumSize(QtCore.QSize(50, 50))
+    self.drop_label_1.setMaximumSize(QtCore.QSize(50, 50))
+    self.drop_label_1.setStyleSheet("QLabel {\n"
+                                    "   background: transparent;\n"
+                                    "   border: 0px solid black;\n"
+                                    "   color: rgb(45,45,45);\n"
+                                    "}")
+    self.drop_label_1.setText("")
+    self.drop_label_1.setPixmap(QtGui.QPixmap("icons/egads_icon.svg"))
+    self.drop_label_1.setScaledContents(True)
+    self.drop_label_1.setObjectName("drop_label_1")
+    self.drop_hor_layout.addWidget(self.drop_label_1)
+    self.drop_hor_layout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                                       QtWidgets.QSizePolicy.Minimum))
+    self.drop_vert_layout.addLayout(self.drop_hor_layout)
+    self.drop_label_2 = QtWidgets.QLabel(self.drop_frame)
+    self.drop_label_2.setMinimumSize(QtCore.QSize(0, 27))
+    self.drop_label_2.setMaximumSize(QtCore.QSize(16777215, 27))
+    font = QtGui.QFont()
+    font.setFamily("fonts/SourceSansPro-Regular.ttf")
+    font.setPointSize(10)
+    font.setBold(False)
+    font.setWeight(50)
+    font.setKerning(True)
+    font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+    self.drop_label_2.setFont(font)
+    self.drop_label_2.setStyleSheet("QLabel {\n"
+                                    "   background: transparent;\n"
+                                    "   border: 0px solid black;\n"
+                                    "   color: rgb(45,45,45);\n"
+                                    "}")
+    self.drop_label_2.setObjectName("drop_label_2")
+    self.drop_label_2.setText("<html><head/><body><p><span style=\" font-weight:600;\">Choose</span> a file or <span "
+                              "style=\" font-weight:600;\">drop</span> it here.</p></body></html>")
+    self.drop_vert_layout.addWidget(self.drop_label_2)
+    self.drop_grid_layout.addLayout(self.drop_vert_layout, 1, 1, 1, 1)
+    self.drop_grid_layout.addItem(QtWidgets.QSpacerItem(55, 20, QtWidgets.QSizePolicy.Expanding,
+                                                        QtWidgets.QSizePolicy.Minimum), 1, 2, 1, 1)
+    self.drop_grid_layout.addItem(QtWidgets.QSpacerItem(20, 27, QtWidgets.QSizePolicy.Minimum,
+                                                        QtWidgets.QSizePolicy.Expanding), 2, 1, 1, 1)
+    self.drop_grid_layout_2.addWidget(self.drop_frame, 1, 1, 1, 1)
+    self.drop_grid_layout_2.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                                          QtWidgets.QSizePolicy.Minimum), 1, 2, 1, 1)
+    self.drop_grid_layout_2.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                                          QtWidgets.QSizePolicy.Expanding), 2, 1, 1, 1)
+    self.gridLayout.addLayout(self.drop_grid_layout_2, 0, 0, 1, 1)
+    self.drop_frame.leftClick.connect(self.open_file)
+    self.drop_frame.dropFile.connect(self.open_file)
+    self.drop_frame.manyFiles.connect(lambda: too_many_files(self))
+
+
+def too_many_files(self):
+    info_text = 'It is nos possible to open more than one file with the GUI at this time. If multiple files have to ' \
+                'be processed, please use the Bath processing function in the File menu.'
+    self.infoWindow = MyInfo(info_text)
+    self.infoWindow.exec_()
 
 
 def clear_layout(layout):

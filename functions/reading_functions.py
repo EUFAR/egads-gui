@@ -1,99 +1,52 @@
 import ntpath
 import logging
 import copy
-from egads import input, EgadsData
-from PyQt5 import QtCore, QtWidgets
-from functions.gui_functions import modify_attribute_gui
-from functions.gui_functions import update_icons_state
-from functions.gui_functions import clear_gui
-from functions.gui_functions import read_set_attribute_gui
-from functions.gui_functions import update_global_attribute_gui
-from functions.gui_functions import update_variable_attribute_gui
+from PyQt5 import QtCore, QtWidgets, QtGui
+from ui.Ui_waitbatchwindow import Ui_waitBatchWindow
+from functions.gui_functions import modify_attribute_gui, update_icons_state, clear_gui, read_set_attribute_gui
+from functions.gui_functions import update_global_attribute_gui, update_variable_attribute_gui, status_bar_update
+from functions.gui_functions import netcdf_gui_initialization, nasaames_gui_initialization
 from functions.material_functions import add_global_attributes_to_buttons
+from functions.gui_elements import QtWaitingSpinner
+from functions.thread_functions import ReadFileThread
+from functions.other_windows_functions import MyInfo
 
 
-def netcdf_reading(self):
-    logging.debug('gui - reading_functions.py - netcdf_reading')
+def reading_file(self):
     clear_gui(self)
-    self.opened_file = input.EgadsNetCdf(self.file_name, 'a')
-    list_of_variables = sorted(self.opened_file.get_variable_list())
-    self.list_of_global_attributes = self.opened_file.get_attribute_list()
-    self.list_of_dimensions = self.opened_file.get_dimension_list()
-    add_global_attributes_to_buttons(self)
-    for var in list_of_variables:
-        dimensions = self.opened_file.get_dimension_list(str(var))
-        list_of_var_attributes = self.opened_file.get_attribute_list(str(var))
-        list_of_var_attributes['var_name'] = str(var)
-        list_of_var_attributes = add_correct_units(list_of_var_attributes)
-        try:
-            egads_instance = self.opened_file.read_variable(var)
-            self.list_of_variables_and_attributes[var] = [var, list_of_var_attributes, dimensions, egads_instance]
-        except Exception as e:
-            if 'dimensionality' in str(e):
-                reason = 'unit was not handled properly by EGADS'
-            else:
-                reason = 'no reason detected'
-
-            self.list_of_unread_variables[var] = reason
-            logging.exception('gui - reading_functions.py - : an error occured during the reading of a variable, '
-                              'variable ' + str(var))
-    update_global_attribute_gui(self, 'NetCDF')
-    self.variable_list.addItems(list_of_variables)
-    self.variable_list.itemClicked.connect(lambda: var_reading(self))
-    self.tab_view.currentChanged.connect(lambda: update_icons_state(self))
-    all_buttons = self.tab_view.findChildren(QtWidgets.QToolButton)
-    for widget in all_buttons:
-        if widget.objectName() != '':
-            widget.clicked.connect(lambda: modify_attribute_gui(self, 'left'))
-            try:
+    self.reading_window = MyWaitReading(self.file_name, self.file_ext, self.config_dict)
+    self.reading_window.exec_()
+    if self.reading_window.error_occurred:
+        info_str = ('An unexpected error occurred during the reading of the file, thus the GUI decided to stop the '
+                    'reading. Please read the log file to check which kind or error occurred.')
+        self.infoWindow = MyInfo(info_str)
+        self.infoWindow.exec_()
+    if self.reading_window.success:
+        self.opened_file = self.reading_window.final_dict['opened_file']
+        list_of_variables = self.reading_window.final_dict['var_list']
+        self.list_of_global_attributes = self.reading_window.final_dict['glob_attr_list']
+        self.list_of_dimensions = self.reading_window.final_dict['dim_list']
+        self.list_of_variables_and_attributes = self.reading_window.final_dict['var_attr_list']
+        self.list_of_unread_variables = self.reading_window.final_dict['unread_var']
+        add_global_attributes_to_buttons(self)
+        if self.file_ext == 'NetCDF Files (*.nc)':
+            netcdf_gui_initialization(self)
+            update_global_attribute_gui(self, 'NetCDF')
+        elif self.file_ext == 'NASA Ames Files (*.na)':
+            nasaames_gui_initialization(self)
+            update_global_attribute_gui(self, 'NASA Ames')
+        self.variable_list.addItems(list_of_variables)
+        self.variable_list.itemClicked.connect(lambda: var_reading(self))
+        self.tab_view.currentChanged.connect(lambda: update_icons_state(self))
+        all_buttons = self.tab_view.findChildren(QtWidgets.QToolButton)
+        for widget in all_buttons:
+            if widget.objectName() != '':
+                widget.clicked.connect(lambda: modify_attribute_gui(self, 'left'))
                 widget.rightClick.connect(lambda: modify_attribute_gui(self, 'right'))
-            except AttributeError:
-                pass
-    logging.debug('gui - reading_functions.py - netcdf_reading: netcdf file loaded')
-    
-
-def nasaames_reading(self):
-    logging.debug('gui - reading_functions.py - nasaames_reading : open_file_name ' + str(self.open_file_name))
-    clear_gui(self)
-    self.opened_file = input.NasaAmes(self.open_file_name, 'r')
-    list_of_variables = sorted(self.opened_file.get_variable_list(vartype='independant') +
-                               self.opened_file.get_variable_list(vartype='main'))
-    list_of_attributes = self.opened_file.get_attribute_list()
-    self.list_of_global_attributes = {}
-    for attribute in list_of_attributes:
-        if attribute != 'V' and attribute != 'X':
-            self.list_of_global_attributes[attribute] = self.opened_file.get_attribute_value(attribute)
-    self.list_of_dimensions = self.opened_file.get_dimension_list(vartype='independant')
-    list_of_var_dimensions = self.opened_file.get_dimension_list(vartype='main')
-    add_global_attributes_to_buttons(self)
-    for var in list_of_variables:
-        dimensions = self.list_of_dimensions 
-        try:
-            list_of_attributes = self.opened_file.get_attribute_list(str(var), vartype='main')
-        except ValueError:
-            list_of_attributes = self.opened_file.get_attribute_list(str(var), vartype='independant')
-        list_of_var_attributes = {}
-        for attribute in list_of_attributes:
-            try:
-                list_of_var_attributes[attribute] = self.opened_file.get_attribute_value(attribute, var, 'main')
-            except ValueError:
-                list_of_var_attributes[attribute] = self.opened_file.get_attribute_value(attribute, var, 'independant')
-        list_of_var_attributes['var_name'] = str(var)
-        list_of_var_attributes = add_correct_units(list_of_var_attributes)
-        egads_instance = self.opened_file.read_variable(var)
-        self.list_of_variables_and_attributes[var] = [var, list_of_var_attributes, dimensions, egads_instance]
-    out_file_base, out_file_ext = ntpath.splitext(ntpath.basename(self.open_file_name))
-    read_set_attribute_gui(self, self.gm_filename_ln, out_file_base + out_file_ext)
-    update_global_attribute_gui(self, 'NASA Ames')
-    self.listWidget.addItems(list_of_variables)
-    self.listWidget.itemClicked.connect(lambda: var_reading(self))
-    self.tabWidget.currentChanged.connect(lambda: update_icons_state(self))
-    all_buttons = self.tabWidget.findChildren(QtWidgets.QToolButton)
-    for widget in all_buttons:
-        if widget.objectName() != 'gm_button_7' and widget.objectName() != '':
-            widget.clicked.connect(lambda: modify_attribute_gui(self, 'left'))
-            widget.rightClick.connect(lambda: modify_attribute_gui(self, 'right'))
-    logging.debug('gui - reading_functions.py - nasaames_reading : nasa ames file loaded')
+        self.file_is_opened = True
+        update_icons_state(self, 'open_file')
+        status_bar_update(self)
+        logging.debug('gui - reading_functions.py - reading_file: file loaded, file_ext ' + self.file_ext)
 
 
 def var_reading(self):
@@ -132,21 +85,59 @@ def new_var_reading(self):
         update_variable_attribute_gui(self, 2)
 
 
-def add_correct_units(attr_list, egads_instance=None):
-    logging.debug(' gui - reading_functions.py - add_correct_units')
-    if "units" not in attr_list.keys():
-        if "Units" in attr_list.keys():
-            attr_list["units"] = attr_list["Units"]
-        elif "Unit" in attr_list.keys():
-            attr_list["units"] = attr_list["Unit"]
-        elif "unit" in attr_list.keys():
-            attr_list["units"] = attr_list["unit"]
-        else:
-            if isinstance(egads_instance, EgadsData) and egads_instance is not None:
-                try:
-                    attr_list["units"] = egads_instance.units
-                except AttributeError:
-                    attr_list["units"] = 'no units'
-            else:
-                attr_list["units"] = 'no units'
-    return attr_list
+class MyWaitReading(QtWidgets.QDialog, Ui_waitBatchWindow):
+    def __init__(self, file_name, file_ext, config_dict):
+        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.file_name = file_name
+        self.file_ext = file_ext
+        self.config_dict = config_dict
+        self.spinner = None
+        self.read_thread = None
+        self.error_occurred = False
+        self.success = True
+        self.final_dict = None
+        self.setup_spinner()
+        self.launch_reading_thread()
+
+    def update_progress(self, val):
+        progress_str, progress_nbr = val[0], val[1]
+        if len(progress_str) > 65:
+            progress_str = progress_str[:32] + '...' + progress_str[-32:0]
+        self.progress_label.setText(progress_str)
+        self.progress_bar.setValue(progress_nbr)
+
+    def launch_reading_thread(self):
+        self.read_thread = ReadFileThread(self.file_name, self.file_ext, self.config_dict)
+        self.read_thread.start()
+        self.read_thread.progress.connect(self.update_progress)
+        self.read_thread.finished.connect(self.reading_finished)
+        self.read_thread.error.connect(self.reading_failed)
+
+    def reading_finished(self, final_dict):
+        self.final_dict = final_dict
+        self.close()
+
+    def reading_failed(self):
+        self.error_occurred = True
+        self.success = False
+        self.close()
+
+    def setup_spinner(self):
+        self.spinner = QtWaitingSpinner(self, centerOnParent=False)
+        self.spinner_layout.addWidget(self.spinner)
+        self.spinner.setRoundness(70.0)
+        self.spinner.setMinimumTrailOpacity(15.0)
+        self.spinner.setTrailFadePercentage(70.0)
+        self.spinner.setNumberOfLines(12)
+        self.spinner.setLineLength(10)
+        self.spinner.setLineWidth(5)
+        self.spinner.setInnerRadius(10)
+        self.spinner.setRevolutionsPerSecond(1)
+        self.spinner.setColor(QtGui.QColor(45, 45, 45))
+        self.spinner.start()
+
+    def closeWindow(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - closeWindow')
+        self.close()

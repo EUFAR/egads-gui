@@ -4,13 +4,65 @@ CHANGELOG | LINEAGE BRANCH
 
 To do list:
 -----------
-  - add the possibility for the user to change subplot positions. (v 0.12)
-  - check nasa ames file handling in the GUI. (v 0.12)
-  - add bash processing. (v 0.12)
-  - add saving function. (v 0.12)
+
+  - check if it is possible to create KMZ files. (v 0.13)
+  - add the possibility for the user to change subplot positions. (v 0.13)
+  - move saving function to a thread. (v 0.14)
+  - check feasability of a standalone program. (v 0.14)
+  - add egads options to egads GUI options. (v 0.13)
+  - revamp the option window. (v 0.13)
+  - add a window to create variable. (v 0.14)
   
 To fix list:
 ------------
+
+
+June 10 2019, Release version 0.12.0
+===================================
+  EGADS Lineage GUI needs EGADS Lineage 0.9.4 or above to work properly.
+  NASA Ames file format is now handled by the GUI.
+  Batch processing is now available in the GUI.
+  New options hava been introduced, the gui_options.ini file should be deleted manually if it already exists.
+  
+  MODIFIED:
+    - the naming convention has been added in the filename window when a user creates an algorithm.
+	- NASA Ames file global metadata handled automatically by EGADS (NLHEAD, FFI, DX, ...) are not displayed in the metadata window.
+	- NASA Ames file global metadata linked to a variable are not displayed in the global metadat window, but in the variable metadata window.
+	- because of modification in EGADS about data and their type, if a variable contains only integers, missing values can't be replaced by Numpy.nan.
+	- until now, when a coefficient with multiple rows and columns is asked by an algorithm, multiple QLineEdit are drawn in the window. It has been replaced by a button calling a window with a table AND a list of variables in a combobox if the user wants to select the coefficient amongs the variables.
+	- for NetCdf files, as the GUI uses the EgadsNetCdf class now, metadata are not stored into a dedicated object, but are directly read from EgadsData instances.
+	- the documentation has been updated.
+	- the way to create the algorithm dictionary has been totally changed to include path of the algorithm file, class method, folder.
+	
+  FIXED:
+    - in the algorithm creation window, the unit validation for each input variable is performed even if the unit is equal to 'None' or ' ', and lead to a crash. It has been fixed.
+	- in the aglorithm creation window, None was saved as a string.
+	- None wasn't well displayed in the algorithm display window.
+	- once a global metadata is updated in the metadata window with a NASA Ames file, it isn't updated in the GUI. It has been fixed.
+	- fixed a wrong attribute in the metadata window with NASA Ames file.
+	- issues with the name of few widgets in the option window have been corrected.
+	- style has been fixed in the algorithm creation window.
+	- style has been fixed in the algorithm display window.
+	- focus has been fixed in the algorithm creation window.
+	- an issue with the status bar updating method has been fixed.
+	- array variables were not correctly handled by the processing window.
+	- if a new global metadata is created in the global metadata window, the name of the metadata wasn't saved correctly.
+	- if a new variable metadata is created in the variable metadata window, the name of the metadata wasn't saved correctly.
+	- if a variable can't be read, the name of the variable is now removed from the variable list.
+	- the path of the log file in the option window wasn't set properly.
+	- few icons have been cleaned.
+
+  ADDED:
+    - the function to save a netcdf file has been added and modified for Python3.
+	- the function to save a nasa ames file has been added and modified for Python3.
+	- an option has been added to the GUI, available in the option window, to let EGADS read variables as floats (or not).
+	- it is not possible anymore to delete dimension variables in a file through the GUI.
+	- information text has been added to the option window and linked to all info buttons.
+	- link to the EGADS GUI documentation has been added to the Help button.
+	- a batch processing function and window have been added.
+	- drag and drop function has been added to open a file.
+	- if a file has been modified, and if the user wants to quit or close the file, the GUI will ask him if he wants to save the file or not.
+	- the loading of a file has been moved to a dedicated thread.
 
 
 May 9 2019, Release version 0.11.0

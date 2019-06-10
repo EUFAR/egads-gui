@@ -48,7 +48,7 @@ No test system has been introduced at this time.
 Options
 *******
 
-Since version 0.10.0, an .ini file has been added to EGADS GUI to welcome few options: log level and path, automatic check for a new EGADS GUI version on GitHub. If the file is not present in EGADS GUI directory, when importing, EGADS GUI will create it automatically with default options. The modification of the file is made through the option window of the GUI.
+Since version 0.10.0, an .ini file has been added to EGADS GUI to welcome few options: log level and path, automatic check for a new EGADS GUI version on GitHub, and few other options. If the file is not present in EGADS GUI directory, when importing, EGADS GUI will create it automatically with default options. The modification of the file is made through the option window of the GUI.
 
 
 ***

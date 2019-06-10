@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Addfilename(object):
     def setupUi(self, Addfilename):
         Addfilename.setObjectName("Addfilename")
-        Addfilename.resize(475, 206)
+        Addfilename.resize(732, 275)
         Addfilename.setMinimumSize(QtCore.QSize(0, 0))
         Addfilename.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
@@ -160,7 +160,7 @@ class Ui_Addfilename(object):
     def retranslateUi(self, Addfilename):
         _translate = QtCore.QCoreApplication.translate
         Addfilename.setWindowTitle(_translate("Addfilename", "Save an algorithm file"))
-        self.ac_label.setText(_translate("Addfilename", "Please, enter a name for the new algorithm file. Once saved, the file can be found in the \'algorithm/user\' directory of EGADS."))
+        self.ac_label.setText(_translate("Addfilename", "<html><head/><body><p align=\"justify\">Please, enter a name for the new algorithm file. It should follow the EGADS algorithm file naming conventions, which is all lowercase with words separated by underscores and based on the algorithm name.</p><p><span style=\" text-decoration: underline;\">Ex:</span><span style=\" font-weight:600;\"> TemperaturePressureLaboratory </span>&gt;&gt;&gt; <span style=\" font-weight:600;\">temperature_pressure_laboratory.py</span></p><p align=\"center\"><span style=\" color:#c80000;\">Once saved, the file can be found in the \'algorithm/user\' directory of EGADS.</span></p></body></html>"))
         self.ac_submitButton.setText(_translate("Addfilename", "Submit"))
         self.ac_cancelButton.setText(_translate("Addfilename", "Cancel"))
 

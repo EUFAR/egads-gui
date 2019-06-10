@@ -374,8 +374,8 @@ class Ui_displayAlgorithmWindow(object):
         self.daw_plain_3.setObjectName("daw_plain_3")
         self.gridLayout_2.addWidget(self.daw_plain_3, 4, 1, 1, 1)
         self.daw_label_7 = QtWidgets.QLabel(self.tab_3)
-        self.daw_label_7.setMinimumSize(QtCore.QSize(0, 27))
-        self.daw_label_7.setMaximumSize(QtCore.QSize(16777215, 27))
+        self.daw_label_7.setMinimumSize(QtCore.QSize(0, 0))
+        self.daw_label_7.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -385,7 +385,7 @@ class Ui_displayAlgorithmWindow(object):
         self.daw_label_7.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.daw_label_7.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.daw_label_7.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.daw_label_7.setObjectName("daw_label_7")
         self.gridLayout_2.addWidget(self.daw_label_7, 5, 0, 1, 1)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
@@ -595,8 +595,8 @@ class Ui_displayAlgorithmWindow(object):
         self.horizontalLayout_2.addWidget(self.daw_line_3)
         self.gridLayout_2.addLayout(self.horizontalLayout_2, 1, 1, 1, 1)
         self.daw_label_5 = QtWidgets.QLabel(self.tab_3)
-        self.daw_label_5.setMinimumSize(QtCore.QSize(0, 27))
-        self.daw_label_5.setMaximumSize(QtCore.QSize(16777215, 27))
+        self.daw_label_5.setMinimumSize(QtCore.QSize(0, 0))
+        self.daw_label_5.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -606,12 +606,12 @@ class Ui_displayAlgorithmWindow(object):
         self.daw_label_5.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.daw_label_5.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.daw_label_5.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.daw_label_5.setObjectName("daw_label_5")
         self.gridLayout_2.addWidget(self.daw_label_5, 3, 0, 1, 1)
         self.daw_label_6 = QtWidgets.QLabel(self.tab_3)
-        self.daw_label_6.setMinimumSize(QtCore.QSize(0, 27))
-        self.daw_label_6.setMaximumSize(QtCore.QSize(16777215, 27))
+        self.daw_label_6.setMinimumSize(QtCore.QSize(0, 0))
+        self.daw_label_6.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -621,12 +621,12 @@ class Ui_displayAlgorithmWindow(object):
         self.daw_label_6.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.daw_label_6.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.daw_label_6.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.daw_label_6.setObjectName("daw_label_6")
         self.gridLayout_2.addWidget(self.daw_label_6, 4, 0, 1, 1)
         self.daw_label_4 = QtWidgets.QLabel(self.tab_3)
-        self.daw_label_4.setMinimumSize(QtCore.QSize(0, 27))
-        self.daw_label_4.setMaximumSize(QtCore.QSize(16777215, 27))
+        self.daw_label_4.setMinimumSize(QtCore.QSize(0, 0))
+        self.daw_label_4.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -636,7 +636,7 @@ class Ui_displayAlgorithmWindow(object):
         self.daw_label_4.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.daw_label_4.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.daw_label_4.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.daw_label_4.setObjectName("daw_label_4")
         self.gridLayout_2.addWidget(self.daw_label_4, 2, 0, 1, 1)
         self.daw_plain_4 = QtWidgets.QPlainTextEdit(self.tab_3)

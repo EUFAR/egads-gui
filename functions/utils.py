@@ -4,6 +4,8 @@ import logging
 import egads
 import datetime
 import importlib
+import inspect
+import pathlib
 from PyQt5 import QtCore, QtGui
 
 
@@ -11,9 +13,13 @@ def create_option_file(main_path):
     ini_file = open(os.path.join(main_path, 'egads_gui.ini'), 'w')
     config_dict = configparser.ConfigParser()
     config_dict.add_section('LOG')
+    config_dict.add_section('SYSTEM')
     config_dict.add_section('OPTIONS')
     config_dict.set('LOG', 'level', 'DEBUG')
-    config_dict.set('LOG', 'path', '')
+    config_dict.set('LOG', 'path', str(main_path))
+    config_dict.set('SYSTEM', 'read_as_float', 'False')
+    config_dict.set('SYSTEM', 'replace_fill_value', 'False')
+    config_dict.set('SYSTEM', 'switch_fill_value', 'False')
     config_dict.set('OPTIONS', 'check_update', 'False')
     config_dict.write(ini_file)
     ini_file.close()
@@ -144,55 +150,67 @@ class Highlighter(QtGui.QSyntaxHighlighter):
             return False
 
 
+def create_algorithm_dict():
+    algorithm_list = {}
+    rep_list = [item for item in dir(egads.algorithms) if '__' not in item]
+    rep_list.remove('egads')
+    rep_list.remove('user')
+    for rep in rep_list:
+        tmp = [item for item in dir(getattr(egads.algorithms, rep)) if '__' not in item]
+        for algo in tmp:
+            try:
+                _ = getattr(getattr(egads.algorithms, rep), algo)().run
+                item = str(inspect.getmodule(getattr(getattr(egads.algorithms, rep), algo)))
+                algorithm_list[rep + ' - ' + algo] = {'name': algo, 'folder': rep, 'user': False,
+                                                      'path': str(pathlib.Path(item[item.find(' from ') + 7: -2])),
+                                                      'method': getattr(getattr(egads.algorithms, rep), algo)}
+            except (TypeError, AttributeError):
+                pass
+    rep_list = [item for item in dir(egads.algorithms.user) if '__' not in item]
+    rep_list.remove('egads')
+    for rep in rep_list:
+        tmp = [item for item in dir(getattr(egads.algorithms.user, rep)) if '__' not in item]
+        for algo in tmp:
+            try:
+                _ = getattr(getattr(egads.algorithms.user, rep), algo)().run
+                item = str(inspect.getmodule(getattr(getattr(egads.algorithms.user, rep), algo)))
+                algorithm_list[rep + ' - ' + algo] = {'name': algo, 'folder': rep, 'user': True,
+                                                      'path': str(pathlib.Path(item[item.find(' from ') + 7: -2])),
+                                                      'method': getattr(getattr(egads.algorithms.user, rep), algo)}
+            except (TypeError, AttributeError):
+                pass
+    return algorithm_list
+
+
 def prepare_algorithm_categories(algorithm_list):
     algorithm_categories = []
-    for key, _ in algorithm_list.items():
-        algorithm_categories.append(str(key).title())
-    return sorted(algorithm_categories)
+    for key in algorithm_list.keys():
+        algorithm_categories.append(key[:key.find(' - ')].title())
+    return sorted(list(dict.fromkeys(algorithm_categories)))
 
 
 def prepare_output_categories(algorithm_list):
     output_categories = []
-    for key, value in algorithm_list.items():
-        if isinstance(value, list):
-            for item in value:
-                try:
-                    output_metadata = getattr(getattr(egads.algorithms, key), item)().output_metadata
-                except AttributeError:
-                    output_metadata = getattr(getattr(egads.algorithms.user, key), item)().output_metadata
-                if isinstance(output_metadata, list):
-                    for metadata in output_metadata:
-                        if isinstance(metadata['Category'], list):
-                            for category in metadata['Category']:
-                                output_categories.append(category)
-                        else:
-                            output_categories.append(metadata['Category'])
-                else:
-                    if isinstance(output_metadata['Category'], list):
-                        for category in output_metadata['Category']:
-                            output_categories.append(category)
-                    else:
-                        output_categories.append(output_metadata['Category'])
-        else:
-            try:
-                output_metadata = getattr(getattr(egads.algorithms, value), value)().output_metadata
-            except AttributeError:
-                output_metadata = getattr(getattr(egads.algorithms.user, value), value)().output_metadata
-            if isinstance(output_metadata, list):
-                for metadata in output_metadata:
-                    if isinstance(metadata['Category'], list):
-                        for category in metadata['Category']:
-                            output_categories.append(category)
-                    else:
-                        output_categories.append(metadata['Category'])
-            else:
-                if isinstance(output_metadata['Category'], list):
-                    for category in output_metadata['Category']:
+    for key, algo_dict in algorithm_list.items():
+        output_metadata = algo_dict['method']().output_metadata
+        if isinstance(output_metadata, list):
+            for metadata in output_metadata:
+                if isinstance(metadata['Category'], list):
+                    for category in metadata['Category']:
                         output_categories.append(category)
                 else:
-                    output_categories.append(output_metadata['Category'])
+                    output_categories.append(metadata['Category'])
+        else:
+            if isinstance(output_metadata['Category'], list):
+                for category in output_metadata['Category']:
+                    output_categories.append(category)
+            else:
+                output_categories.append(output_metadata['Category'])
     output_categories = sorted(list(dict.fromkeys(output_categories)))
-    output_categories.remove('')
+    try:
+        output_categories.remove('')
+    except ValueError:
+        pass
     return output_categories
 
 
@@ -302,20 +320,6 @@ def write_algorithm(filename, string, category, author):
         algorithm_file = open(algorithm_path + '/' + filename + '.py', 'w')
         algorithm_file.write(string)
         algorithm_file.close()
-
-
-def reload_user_folders():
-    logging.debug('gui - utils.py - reload_user_folders')
-    importlib.reload(egads.algorithms.user)
-    folder_list = []
-    for item in os.walk(egads.__path__[0] + '/algorithms/user'):
-        index = item[0].find('user')
-        if item[0][index + 5:]:
-            if 'file_templates' not in item[0][index + 5:]:
-                folder_list.append(item[0][index + 5:])
-    for folder in folder_list:
-        if '__pycache__' not in folder:
-            importlib.reload(getattr(egads.algorithms.user, folder))
 
 
 def humansize(nbytes):
