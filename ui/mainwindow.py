@@ -1,19 +1,17 @@
 import logging
 import os
+import io
+import configparser
 import copy
 import collections
 import numpy
 import ntpath
 import matplotlib
 import webbrowser
+import egads
 import importlib
 matplotlib.use('Qt5Agg')
 from ui._version import _gui_version, _python_version, _qt_version
-from egads import __version__ as egads_version
-try:
-    from egads import __branch__ as egads_branch
-except ImportError:
-    egads_branch = 'master'
 from PyQt5 import QtWidgets, QtCore, QtGui
 from ui.Ui_mainwindow import Ui_MainWindow
 from functions.other_windows_functions import MyAbout, MyOptions, MyDisplay, MyInfo, MyUpdate, MyAsk
@@ -27,18 +25,21 @@ from functions.reading_functions import add_new_variable_gui, var_reading, new_v
 from functions.material_functions import objects_initialization, setup_fonts
 from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSVersion
 from functions.utils import prepare_algorithm_categories, prepare_output_categories, create_algorithm_dict
-from functions.saving_functions import save_as_netcdf_for_nc, save_as_netcdf_for_na, save_as_nasaames_for_nc
-from functions.saving_functions import save_as_nasaames_for_na
+# from functions.saving_functions import save_as_netcdf_for_nc, save_as_netcdf_for_na, save_as_nasaames_for_nc
+from functions.saving_functions import saving_file  # save_as_nasaames_for_na, saving_file
 from functions.batch_processing_window_functions import MyBatchProcessing
+from functions.export_window_functions import MyExport
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, path, config_dict, parent=None):
-        logging.info('gui - egads version: ' + egads_version)
+        logging.info('gui - egads version: ' + egads.__version__)
         logging.debug('gui - mainwindow.py - MainWindow - __init__')
         QtWidgets.QMainWindow.__init__(self, parent)
         self.gui_path = path
+        self.egads_path = egads.path
         self.config_dict = config_dict
+        self.egads_config_dict = egads.config_dict
         self.setupUi(self)
         self.font_list, self.default_font = setup_fonts()
         self.list_of_algorithms = create_algorithm_dict()
@@ -51,7 +52,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.check_egads_version()
         self.check_egads_gui_update()
         logging.info('gui - mainwindow.py - MainWindow ready')
-    
+
     @QtCore.pyqtSlot()
     def on_actionExit_triggered(self):
         self.close()
@@ -75,6 +76,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_actionSaveAsBar_triggered(self):
         self.save_file()
+
+    @QtCore.pyqtSlot()
+    def on_actionExport_triggered(self):
+        self.export_variables()
 
     @QtCore.pyqtSlot()
     def on_actionBatch_processing_triggered(self):
@@ -121,10 +126,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_variable()
 
     @QtCore.pyqtSlot()
-    def on_actionUpdateBar_triggered(self):
+    def on_actionUpdate_triggered(self):
         self.gui_update_info()
 
     def right_click_menu(self, relative_position):
+        logging.debug('gui - mainwindow.py - MainWindow - right_click_menu')
         if self.tab_view.currentIndex() == 1:
             var_reading(self)
         elif self.tab_view.currentIndex() == 2:
@@ -172,8 +178,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if self.file_ext == 'NetCDF Files (*.nc)' or self.file_ext == 'NASA Ames Files (*.na)':
                 reading_file(self)
             else:
-                info_text = 'This format ' + self.file_ext + ' is not supported actually.'
-                self.infoWindow = MyInfo(info_text)
+                self.infoWindow = MyInfo('This format ' + self.file_ext + ' is not supported actually.')
                 self.infoWindow.exec_()
             if self.list_of_unread_variables:
                 info_text = 'The following variable(s) couldn\'t be loaded:<ul>'
@@ -184,27 +189,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.infoWindow.exec_()
 
     def save_file(self):
-        logging.debug('gui - mainwindow.py - MainWindow - .save_file')
+        logging.debug('gui - mainwindow.py - MainWindow - save_file')
         save_file_name, save_file_ext = self.get_file_name('save')
         if save_file_name:
-            if save_file_ext == "NetCDF Files (*.nc)":
-                if not ntpath.splitext(ntpath.basename(save_file_name))[1]:
-                    save_file_name += ".nc"
-                if self.file_ext == 'NetCDF Files (*.nc)':
-                    save_as_netcdf_for_nc(self, save_file_name)
-                elif self.file_ext == 'NASA Ames Files (*.na)':
-                    save_as_netcdf_for_na(self, save_file_name)
-            elif save_file_ext == "NASA Ames Files (*.na)":
-                if not ntpath.splitext(ntpath.basename(save_file_name))[1]:
-                    save_file_name += ".na"
-                if self.file_ext == 'NetCDF Files (*.nc)':
-                    save_as_nasaames_for_nc(self, save_file_name)
-                elif self.file_ext == 'NASA Ames Files (*.na)':
-                    save_as_nasaames_for_na(self, save_file_name)
-            elif self.save_file_ext == "CSV Files (*.csv *.dat *.txt)":
-                info_text = 'This format is not supported'
-                self.infoWindow = MyInfo(info_text)
+            if save_file_ext == 'NetCDF Files (*.nc)' or save_file_ext == 'NASA Ames Files (*.na)':
+                saving_file(self, save_file_name, save_file_ext, self.file_ext)
+            elif save_file_ext == "CSV Files (*.csv *.dat *.txt)":
+                self.infoWindow = MyInfo('This format ' + save_file_ext + ' is not supported actually.')
                 self.infoWindow.exec_()
+
+    def export_variables(self):
+        logging.debug('gui - mainwindow.py - MainWindow - export_variables')
+        self.export_window = MyExport(self.list_of_variables_and_attributes)
+        self.export_window.exec_()
 
     def global_attributes(self):
         logging.debug('gui - mainwindow.py - MainWindow - global_attributes')
@@ -222,7 +219,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             pass
 
     def variable_attributes(self):
-        logging.debug('gui - mainwindow.py - MainWindow - .variable_attributes')
+        logging.debug('gui - mainwindow.py - MainWindow - variable_attributes')
         if self.tab_view.currentIndex() == 1:
             variable = str(self.variable_list.currentItem().text())
             variable_attributes = copy.deepcopy(self.list_of_variables_and_attributes[variable][0].metadata)
@@ -249,6 +246,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def display_variable(self):
         logging.debug('gui - mainwindow.py - MainWindow - display_variable')
         variable = None
+        var_name = ''
         if self.tab_view.currentIndex() == 1:
             var_name = str(self.variable_list.currentItem().text())
             variable = self.list_of_variables_and_attributes[var_name]
@@ -403,9 +401,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.tab_view.removeTab(2)
                 self.new_variables = False
         except AttributeError:
-            logging.exception(
-                'gui - mainwindow.py - MainWindow - migrate_variable: an exception occurred during the removal '
-                + 'of the tab 2.')
+            logging.exception('gui - mainwindow.py - MainWindow - migrate_variable: an exception occurred during the '
+                              'removal of the tab 2.')
 
     def delete_variable(self):
         logging.debug('gui - mainwindow.py - MainWindow - delete_variable')
@@ -452,6 +449,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.infoWindow.exec_()
 
     def create_variable(self):
+        logging.debug('gui - mainwindow.py - MainWindow - create_variable')
         info_text = 'The GUI is still in an early stage of development. Thus it is not possible to create a new ' \
                     'variable. It will be available in the next version.'
         self.infoWindow = MyInfo(info_text)
@@ -459,6 +457,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def about_egads(self):
         logging.debug('gui - mainwindow.py - MainWindow - about_egads')
+        egads_version = egads.__version__
         text = ('<p align=\"justify\">EGADS (EUFAR General Airborne Data-processing Software, v' + egads_version
                 + ') and its GUI (v' + _gui_version + ') are both Python-based toolboxes for processing airborne '
                 + 'atmospheric data and data visualization. <p align=\"justify\">Based on Python ' + _python_version
@@ -477,16 +476,35 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def show_options(self):
         logging.debug('gui - mainwindow.py - MainWindow - show_options')
-        self.optionWindow = MyOptions(self.config_dict)
+        config_string = io.StringIO()
+        self.config_dict.write(config_string)
+        config_string.seek(0)
+        config_dict_copy = configparser.ConfigParser()
+        config_dict_copy.read_file(config_string)
+        config_string = io.StringIO()
+        self.egads_config_dict.write(config_string)
+        config_string.seek(0)
+        egads_config_dict_copy = configparser.ConfigParser()
+        egads_config_dict_copy.read_file(config_string)
+        self.optionWindow = MyOptions(config_dict_copy, egads_config_dict_copy)
         self.optionWindow.exec_()
         if not self.optionWindow.cancel:
             self.config_dict = self.optionWindow.config_dict
+            self.egads_config_dict = self.optionWindow.egads_config_dict
             ini_file = open(os.path.join(self.gui_path, 'egads_gui.ini'), 'w')
             self.config_dict.write(ini_file)
-            ini_file.close()  
+            ini_file.close()
+            egads_ini_file = open(os.path.join(self.egads_path, 'egads.ini'), 'w')
+            self.egads_config_dict.write(egads_ini_file)
+            egads_ini_file.close()
     
     def check_egads_version(self):
         logging.debug('gui - mainwindow.py - MainWindow - check_egads_version')
+        egads_version = egads.__version__
+        try:
+            egads_branch = egads.__branch__
+        except KeyError:
+            egads_branch = 'master'
         self.check_egads_version_thread = CheckEGADSVersion(egads_version, egads_branch, self.min_egads_version,
                                                             self.min_egads_branch)
         self.check_egads_version_thread.start()
@@ -494,6 +512,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def parse_egads_version(self, version_issue):
         logging.debug('gui - mainwindow.py - MainWindow - parse_egads_version - version_issue ' + str(version_issue))
+        egads_version = egads.__version__
         if not version_issue['version'] or not version_issue['branch']:
             info_text = ''
             if not version_issue['version'] and not version_issue['branch']:
@@ -514,7 +533,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.infoWindow.exec_()
 
     def check_egads_gui_update(self):
-        logging.debug('gui - mainwindow.py - check_egads_gui_updates')
+        logging.debug('gui - mainwindow.py - MainWindow - check_egads_gui_updates')
         if self.config_dict['OPTIONS'].getboolean('check_update'):
             self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version)
             self.check_gui_update_thread.start()
@@ -527,20 +546,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if val != 'no new version':
             self.gui_update_url = val
             self.actionSeparator5.setVisible(True)
-            self.actionUpdateBar.setVisible(True)
+            self.actionUpdate.setVisible(True)
 
     def gui_update_info(self):
-        logging.debug('gui - mainwindow.py - gui_update_info')
+        logging.debug('gui - mainwindow.py - MainWindow - gui_update_info')
         self.updade_window = MyUpdate(self.gui_update_url)
         self.updade_window.exec_()
 
     def batch_processing(self):
-        logging.debug('gui - mainwindow.py - batch_processing')
+        logging.debug('gui - mainwindow.py - Mainwindow - batch_processing')
         self.batch_processing_window = MyBatchProcessing(self.list_of_algorithms, self.config_dict)
         self.batch_processing_window.exec_()
 
     def get_file_name(self, action):
-        logging.debug('gui - mainwindow.py - get_file_name : action ' + str(action))
+        logging.debug('gui - mainwindow.py - MainWindow - get_file_name : action ' + str(action))
         file_dialog = QtWidgets.QFileDialog()
         filter_types = 'NetCDF Files (*.nc);;NASA Ames Files (*.na)'
         out_file_name, out_file_ext = None, None

@@ -1,9 +1,7 @@
-import ntpath
 import logging
-import copy
 from PyQt5 import QtCore, QtWidgets, QtGui
 from ui.Ui_waitbatchwindow import Ui_waitBatchWindow
-from functions.gui_functions import modify_attribute_gui, update_icons_state, clear_gui, read_set_attribute_gui
+from functions.gui_functions import modify_attribute_gui, update_icons_state, clear_gui
 from functions.gui_functions import update_global_attribute_gui, update_variable_attribute_gui, status_bar_update
 from functions.gui_functions import netcdf_gui_initialization, nasaames_gui_initialization
 from functions.material_functions import add_global_attributes_to_buttons
@@ -13,12 +11,13 @@ from functions.other_windows_functions import MyInfo
 
 
 def reading_file(self):
+    logging.debug('gui - reading_functions.py - reading_file - file_name ' + self.file_name)
     clear_gui(self)
     self.reading_window = MyWaitReading(self.file_name, self.file_ext, self.config_dict)
     self.reading_window.exec_()
     if self.reading_window.error_occurred:
         info_str = ('An unexpected error occurred during the reading of the file, thus the GUI decided to stop the '
-                    'reading. Please read the log file to check which kind or error occurred.')
+                    'reading. Please read the log file to check which kind of error occurred.')
         self.infoWindow = MyInfo(info_str)
         self.infoWindow.exec_()
     if self.reading_window.success:
@@ -46,7 +45,7 @@ def reading_file(self):
         self.file_is_opened = True
         update_icons_state(self, 'open_file')
         status_bar_update(self)
-        logging.debug('gui - reading_functions.py - reading_file: file loaded, file_ext ' + self.file_ext)
+        logging.info('gui - reading_functions.py - reading_file: file loaded, file_ext ' + self.file_ext)
 
 
 def var_reading(self):
@@ -87,7 +86,7 @@ def new_var_reading(self):
 
 class MyWaitReading(QtWidgets.QDialog, Ui_waitBatchWindow):
     def __init__(self, file_name, file_ext, config_dict):
-        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - __init__')
+        logging.debug('gui - reading_functions.py - MyWaitReading - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.file_name = file_name
@@ -109,6 +108,7 @@ class MyWaitReading(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.progress_bar.setValue(progress_nbr)
 
     def launch_reading_thread(self):
+        logging.debug('gui - reading_functions.py - MyWaitReading - launch_reading_thread')
         self.read_thread = ReadFileThread(self.file_name, self.file_ext, self.config_dict)
         self.read_thread.start()
         self.read_thread.progress.connect(self.update_progress)
@@ -116,15 +116,18 @@ class MyWaitReading(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.read_thread.error.connect(self.reading_failed)
 
     def reading_finished(self, final_dict):
+        logging.debug('gui - reading_functions.py - MyWaitReading - reading_finished')
         self.final_dict = final_dict
         self.close()
 
     def reading_failed(self):
+        logging.debug('gui - reading_functions.py - MyWaitReading - reading_failed')
         self.error_occurred = True
         self.success = False
         self.close()
 
     def setup_spinner(self):
+        logging.debug('gui - reading_functions.py - MyWaitReading - setup_spinner')
         self.spinner = QtWaitingSpinner(self, centerOnParent=False)
         self.spinner_layout.addWidget(self.spinner)
         self.spinner.setRoundness(70.0)
@@ -139,5 +142,5 @@ class MyWaitReading(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.spinner.start()
 
     def closeWindow(self):
-        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - closeWindow')
+        logging.debug('gui - reading_functions.py - MyWaitReading - closeWindow')
         self.close()

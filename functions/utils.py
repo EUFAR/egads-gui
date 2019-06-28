@@ -3,10 +3,20 @@ import configparser
 import logging
 import egads
 import datetime
-import importlib
 import inspect
 import pathlib
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+def clear_layout(layout):
+    logging.debug('gui - utils.py - clear_layout')
+    for i in reversed(range(layout.count())):
+        item = layout.itemAt(i)
+        if isinstance(item, QtWidgets.QWidgetItem):
+            item.widget().deleteLater()
+        elif isinstance(item, QtWidgets.QLayout):
+            clear_layout(item.layout())
+        layout.removeItem(item)
 
 
 def create_option_file(main_path):
@@ -15,7 +25,7 @@ def create_option_file(main_path):
     config_dict.add_section('LOG')
     config_dict.add_section('SYSTEM')
     config_dict.add_section('OPTIONS')
-    config_dict.set('LOG', 'level', 'DEBUG')
+    config_dict.set('LOG', 'level', 'INFO')
     config_dict.set('LOG', 'path', str(main_path))
     config_dict.set('SYSTEM', 'read_as_float', 'False')
     config_dict.set('SYSTEM', 'replace_fill_value', 'False')
@@ -40,6 +50,7 @@ def create_logging_handlers(config_dict, filename):
 
 
 def str_format(color, style=''):
+    logging.debug('gui - utils.py - str_format')
     _color = QtGui.QColor()
     if type(color) is not str:
         _color.setRgb(color[0], color[1], color[2])
@@ -151,6 +162,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 
 
 def create_algorithm_dict():
+    logging.debug('gui - utils.py - create_algorithm_dict')
     algorithm_list = {}
     rep_list = [item for item in dir(egads.algorithms) if '__' not in item]
     rep_list.remove('egads')
@@ -183,6 +195,7 @@ def create_algorithm_dict():
 
 
 def prepare_algorithm_categories(algorithm_list):
+    logging.debug('gui - utils.py - prepare_algorithm_categories')
     algorithm_categories = []
     for key in algorithm_list.keys():
         algorithm_categories.append(key[:key.find(' - ')].title())
@@ -190,6 +203,7 @@ def prepare_algorithm_categories(algorithm_list):
 
 
 def prepare_output_categories(algorithm_list):
+    logging.debug('gui - utils.py - prepare_output_categories')
     output_categories = []
     for key, algo_dict in algorithm_list.items():
         output_metadata = algo_dict['method']().output_metadata
@@ -244,7 +258,7 @@ def prepare_long_string(string, length, space_num):
 
 
 def check_string_max_length(string_list):
-    logging.debug('gui - algorithm_window_functions.py - MyAlgorithm - check_string_max_length')
+    logging.debug('gui - utils.py - check_string_max_length')
     max_length = 0
     for string in string_list:
         if len(string) > max_length:
@@ -253,8 +267,8 @@ def check_string_max_length(string_list):
 
 
 def write_algorithm(filename, string, category, author):
-    logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - write_algorithm : filename ' + str(filename)
-                  + ', category' + str(category) + ', author ' + str(author) + ', string ' + str(string))
+    logging.debug('gui - utils.py - write_algorithm : filename ' + str(filename) + ', category' + str(category)
+                  + ', author ' + str(author) + ', string ' + str(string))
     category = category.lower()
     algorithm_path = egads.__path__[0] + '/algorithms/user/' + category
     addendum = '    from .' + filename + ' import *'
@@ -323,7 +337,7 @@ def write_algorithm(filename, string, category, author):
 
 
 def humansize(nbytes):
-    logging.debug('gui - gui_functions.py - humansize : nbytes ' + str(nbytes))
+    logging.debug('gui - utils.py - humansize : nbytes ' + str(nbytes))
     suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
     if nbytes == 0:
         return '0 B'
@@ -347,3 +361,109 @@ def populate_combobox(combobox, item_list, make_choice=True, set_index=None):
             combobox.setCurrentIndex(combobox.findText(set_index))
         else:
             combobox.setCurrentIndex(set_index)
+
+
+def transparency_hexa_dict_function():
+    logging.debug('gui - utils.py - transparency_hexa_dict_function')
+    hexa_dict = {100: 'FF',
+                 99: 'FC',
+                 98: 'FA',
+                 97: 'F7',
+                 96: 'F5',
+                 95: 'F2',
+                 94: 'F0',
+                 93: 'ED',
+                 92: 'EB',
+                 91: 'E8',
+                 90: 'E6',
+                 89: 'E3',
+                 88: 'E0',
+                 87: 'DE',
+                 86: 'DB',
+                 85: 'D9',
+                 84: 'D6',
+                 83: 'D4',
+                 82: 'D1',
+                 81: 'CF',
+                 80: 'CC',
+                 79: 'C9',
+                 78: 'C7',
+                 77: 'C4',
+                 76: 'C2',
+                 75: 'BF',
+                 74: 'BD',
+                 73: 'BA',
+                 72: 'B8',
+                 71: 'B5',
+                 70: 'B3',
+                 69: 'B0',
+                 68: 'AD',
+                 67: 'AB',
+                 66: 'A8',
+                 65: 'A6',
+                 64: 'A3',
+                 63: 'A1',
+                 62: '9E',
+                 61: '9C',
+                 60: '99',
+                 59: '96',
+                 58: '94',
+                 57: '91',
+                 56: '8F',
+                 55: '8C',
+                 54: '8A',
+                 53: '87',
+                 52: '85',
+                 51: '82',
+                 50: '80',
+                 49: '7D',
+                 48: '7A',
+                 47: '78',
+                 46: '75',
+                 45: '73',
+                 44: '70',
+                 43: '6E',
+                 42: '6B',
+                 41: '69',
+                 40: '66',
+                 39: '63',
+                 38: '61',
+                 37: '5E',
+                 36: '5C',
+                 35: '59',
+                 34: '57',
+                 33: '54',
+                 32: '52',
+                 31: '4F',
+                 30: '4D',
+                 29: '4A',
+                 28: '47',
+                 27: '45',
+                 26: '42',
+                 25: '40',
+                 24: '3D',
+                 23: '3B',
+                 22: '38',
+                 21: '36',
+                 20: '33',
+                 19: '30',
+                 18: '2E',
+                 17: '2B',
+                 16: '29',
+                 15: '26',
+                 14: '24',
+                 13: '21',
+                 12: '1F',
+                 11: '1C',
+                 10: '1A',
+                 9: '17',
+                 8: '14',
+                 7: '12',
+                 6: '0F',
+                 5: '0D',
+                 4: '0A',
+                 3: '08',
+                 2: '05',
+                 1: '03',
+                 0: '00'}
+    return hexa_dict

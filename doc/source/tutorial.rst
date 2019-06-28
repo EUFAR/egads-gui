@@ -90,13 +90,6 @@ How to close a file?
    :align: center
 
 
-*******************************
-How to launch batch processing?
-*******************************
-
-The processing of multiple files at once has not been implemented yet.
-
-
 *****************************************************
 How to modify the global attributes of a NetCDF file?
 *****************************************************
@@ -515,6 +508,72 @@ By integrating the Python module Matplotlib, the EGADS GUI gives the user a grea
    :scale: 45 %
    :align: center
 
+******************************************
+How to export data to an external format ?
+******************************************
+
+If the user wants to display data into Google Earth software, there is a possibility to export data to KML/KMZ file format. At this time, only data along a georeferenced path (generally time series) can be exported and displayed. Later, it will be possible to generate map and embed it in a KML/KMZ file for gridded data.
+
+* To launch the export window, click on the ``File`` menu and then on |export icon|. The button should be enabled if a netCdf of NasaAmes file has been opened.
+
+.. |export icon| image:: images/icons/export_icon.png
+   :width: 130px
+   :height: 130px
+   :scale: 12 %
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_1.png
+   :width: 936px
+   :height: 647px
+   :scale: 45 %
+   :align: center
+
+* The export window is composed of a combobox to select the new format, a menu on the left for the different sections linked to the selected format and a central widget displaying the different options. First, select the format ``Google Earth - Time series``.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_2.png
+   :width: 772px
+   :height: 479px
+   :scale: 45 %
+   :align: center
+
+* Click on ``Coordinates``. This part is mandatory, it is used to build the path in Google Earth. Choose a variable for the longitude and latitude, then a variable for the altitude, or select Stick to the ground if altitude is not necessary.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_3.png
+   :width: 772px
+   :height: 479px
+   :scale: 45 %
+   :align: center
+  
+* Then click on ``Variables``. Select the variable you want to "display" in Google Earth and click on the arrow button to register if. At this time, only one variable can be registered, but this number should increase once the function is stable.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_4.png
+   :width: 772px
+   :height: 479px
+   :scale: 45 %
+   :align: center
+
+* Click on ``Options``. Here are referenced few options to tweak the look of the path. If the path and the variable to be displayed in Google Earth contain a great number of points, it is possible to reduce the amount of points with the last option.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_5.png
+   :width: 772px
+   :height: 479px
+   :scale: 45 %
+   :align: center
+
+* And finally click on ``Colormap`` to tweak the colormap. Eight colormaps are available at this time and more tweaking options will be available in the future. To save the file, click on ``Export`` once the button has been activated : only ``Coordinates``, ``Variables`` and ``Colormap`` are mandatory to activate it.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_6.png
+   :width: 772px
+   :height: 479px
+   :scale: 45 %
+   :align: center
+
+* Here is the result in Google Earth:
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_7.jpg
+   :width: 1332px
+   :height: 728px
+   :scale: 45 %
+   :align: center
 
 ******************************************
 How to use the batch processing function ?
@@ -575,5 +634,3 @@ EGADS GUI gives the user the possibility to use a batch processing function. Thi
    :height: 596px
    :scale: 45 %
    :align: center
-   
-   

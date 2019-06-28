@@ -1,6 +1,6 @@
 import logging
 import numpy
-import ntpath
+import os
 import cartopy
 import collections
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -55,6 +55,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         logging.info('gui - plot_window_functions.py - PlotWindow - ready')
 
     def select_plot_type(self):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - select_plot_type')
         if len(self.variables) == 1:
             logging.debug('gui - plot_window_functions.py - PlotWindow - select_plot_type - '
                           + 'only one variable has been found.')
@@ -141,6 +142,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                              'different number of dimensions, this is not yet supported')
             
     def plot_timeseries(self, plot_type):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - plot_timeseries')
         if plot_type == 'plot':
             subplot_plot = [self.figure.add_subplot(1, 1, 1)]
             for yname in self.variables:
@@ -149,7 +151,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 xname = self.variables[yname]['dimensions'][0]
                 xvalues = self.dimensions[xname]['values']
                 xunits = self.dimensions[xname]['units']
-                subplot_plot[0].plot(xvalues, yvalues, label = yname)
+                subplot_plot[0].plot(xvalues, yvalues, label=yname)
             subplot_plot[0].set_ylabel(yunits)
             subplot_plot[0].set_xlabel(xunits)
             subplot_plot[0].set_ylim([subplot_plot[0].axes.get_yticks()[0], subplot_plot[0].axes.get_yticks()[-1]])
@@ -192,6 +194,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_update_bt_2.clicked.connect(lambda: self.update_plot_options('timeseries'))
     
     def plot_single_grid_start(self, georeferenced):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - plot_single_grid_start')
         self.tab_view.removeTab(2)
         self.tab_view.removeTab(1)
         
@@ -246,6 +249,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.plot_single_grid_end(subplot_object)
         
     def plot_single_grid_end(self, subplot_object):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - plot_single_grid_end')
         for key, subplot in subplot_object.items():
             if subplot['georeferenced']:
                 coastline_shp_file = 'functions/shape_files/ne_110m_coastline.shp'
@@ -280,6 +284,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         # self.add_figure_options('grids')
 
     def set_figure_options(self, plot_type, subplot_list=None):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - set_figure_options')
         if plot_type == 'plot' or plot_type == 'subplot':
             self.figure_options['title'] = []
             self.figure_options['title_font'] = []
@@ -446,6 +451,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.figure_options['colorbar_axis_yposition'].append(0.13)
 
     def set_plot_options(self, plot_type, subplot_list=None):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - set_plot_options')
         if plot_type == 'plot' or plot_type == 'subplot':
             self.plot_options['line_style'] = []
             self.plot_options['line_marker'] = []
@@ -4328,6 +4334,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.canvas.draw()
     
     def update_plot_options(self, plot_type):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - update_plot_options')
         if "activated" in self.actionPan.objectName():
             self.plot_pan()
         if "activated" in self.actionZoom.objectName():
@@ -4507,10 +4514,10 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         logging.debug('gui - plot_window_functions.py - PlotWindow - plot_save')
         save_file_name, save_file_ext = self.get_file_name()
         if save_file_name:
-            _, out_file_ext = ntpath.splitext(ntpath.basename(save_file_name))
+            out_file_ext = os.path.splitext(os.path.basename(save_file_name))[1]
             if not out_file_ext:
                 save_file_name += self.image_extensions[save_file_ext]
-            _, out_file_ext = ntpath.splitext(ntpath.basename(save_file_name))
+            out_file_ext = os.path.splitext(os.path.basename(save_file_name))[1]
             real_width, real_height = plt.gcf().get_size_inches()
             set_height, set_width = None, None
             if self.pw_saveOptions_ln_1.text():
@@ -4545,11 +4552,13 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.canvas.draw()
     
     def wait_window(self):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - wait_window')
         info_text = 'Rendering figure, please wait...'
         self.waitWindow = MyWait(info_text)
         self.waitWindow.exec_()
         
     def close_wait_window(self, val):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - close_wait_window')
         self.plot_single_grid_end(val)
         self.waitWindow.close()
     
@@ -4628,6 +4637,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.actionOrigin.setToolTip("Reset to original view")
         
     def setup_plot_area(self):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - setup_plot_area')
         self.figure = plt.figure(facecolor='white')
         self.canvas = FigureCanvas(self.figure)
         self.pw_plot_fr.addWidget(self.canvas)
@@ -4669,6 +4679,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_figureOptions_ln_8[index].setText("")
     
     def update_slider_value(self, val):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - update_slider_value')
         object_name = self.sender().objectName()[-1:]
         self.findChild(QtWidgets.QLabel, 'slider_lb_' + str(object_name)).setText(str(float(val) / 100))
         
@@ -4735,6 +4746,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_saveOptions_ln_2.setText(str(width))
     
     def unlock_size_edit(self):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - unlock_size_edit')
         if not self.pw_saveOptions_ln_1.isEnabled():
             icon = QtGui.QIcon()
             icon.addPixmap(QtGui.QPixmap("icons/unlock_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -4753,6 +4765,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.pw_saveOptions_cb_2.setEnabled(False)
         
     def convert_inch_cm(self, index):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - convert_inch_cm')
         if self.sender().objectName() == 'pw_saveOptions_cb_1':
             if index == 0:
                 value = round((float(self.pw_saveOptions_ln_1.text()) * 2.54) * 100) / 100
@@ -4769,9 +4782,11 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 self.pw_saveOptions_ln_2.setText(str(value))
     
     def update_quality_value(self, val):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - update_quality_value')
         self.pw_saveOptions_lb_7.setText(str(val))
     
     def set_axis_ticks_labels(self):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - set_axis_ticks_labels')
         text = None
         label = None
         if 'pw_ticks_bt_1' in self.sender().objectName():
@@ -4798,11 +4813,12 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         return str(out_file_name), str(out_file_ext)
 
     def save_button_information(self):
+        logging.debug('gui - plot_window_functions.py - PlotWindow - save_button_information')
         self.infoWindow = MyInfo(self.save_buttons_text[self.sender().objectName()])
         self.infoWindow.exec_()
 
     def figure_button_information(self):
-        print(self.sender().objectName())
+        logging.debug('gui - plot_window_functions.py - PlotWindow - figure_button_information')
         if self.sender().objectName() != 'pw_commonOptions_bt_1':
             name = self.sender().objectName()[:-1 * (int(''.join(reversed(self.sender().objectName())).find('_')) + 1)]
         else:
@@ -4843,6 +4859,7 @@ class TicksLabelsWindow(QtWidgets.QDialog, Ui_tickslabelsWindow):
         self.cancel_button.clicked.connect(self.close_window)
         self.add_button.clicked.connect(self.add_cell)
         self.del_button.clicked.connect(self.del_cell)
+        logging.info('gui - plot_window_functions.py - TicksLabelsWindow - ready')
     
     def add_cell(self):
         logging.debug('gui - plot_window_functions.py - TicksLabelsWindow - add_cell')

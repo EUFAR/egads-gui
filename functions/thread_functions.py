@@ -1,19 +1,25 @@
 import logging
 import time
-import collections
 import pathlib
 import datetime
 import os
 import egads
 import math
 import copy
+import simplekml
+import numpy
+import zipfile
+import tempfile
+import collections
 from PyQt5 import QtCore, QtWidgets
 from distutils.version import LooseVersion
-import matplotlib.pyplot as plt
+import matplotlib as mpl
+from functions.utils import transparency_hexa_dict_function
 
 
 class CheckEGADSGuiUpdateOnline(QtCore.QThread):
     finished = QtCore.pyqtSignal(str)
+    error = QtCore.pyqtSignal()
 
     def __init__(self, gui_version):
         QtCore.QThread.__init__(self)
@@ -47,8 +53,51 @@ class CheckEGADSGuiUpdateOnline(QtCore.QThread):
                               'error - url ' + url)
          
     def stop(self):
+        logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - stop')
         self.terminate()
-        
+
+
+class CheckEGADSUpdateOnline(QtCore.QThread):
+    finished = QtCore.pyqtSignal(str)
+    error = QtCore.pyqtSignal(str)
+
+    def __init__(self, version):
+        QtCore.QThread.__init__(self)
+        logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - __init__')
+        self.version = version
+
+    def run(self):
+        logging.debug('gui - thread_functions.py - CheckEGADSUpdateOnline - run')
+        url = 'https://api.github.com/repos/eufarn7sp/egads/releases'
+        try:
+            import requests
+            json_object = requests.get(url=url, timeout=5).json()
+            lineage_list = []
+            for egads_package in json_object:
+                if 'Lineage' in egads_package['name']:
+                    lineage_list.append([egads_package['tag_name'], egads_package['assets'][0]['browser_download_url']])
+            lineage_list = sorted(lineage_list)
+            if lineage_list:
+                if LooseVersion(self.version) < LooseVersion(lineage_list[-1][0]):
+                    self.finished.emit(lineage_list[-1][1])
+                else:
+                    logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new version')
+                    self.finished.emit('no new version')
+            else:
+                logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new version')
+                self.finished.emit('no new version')
+        except ImportError:
+            logging.exception('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - requests is not available')
+            self.error.emit('requests is not available')
+        except Exception:
+            logging.exception('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - internet connection '
+                              'error - url ' + url)
+            self.error.emit('internet connection error')
+
+    def stop(self):
+        logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - stop')
+        self.terminate()
+
 
 class CheckEGADSVersion(QtCore.QThread):
     version_issue = QtCore.pyqtSignal(dict)
@@ -76,6 +125,7 @@ class CheckEGADSVersion(QtCore.QThread):
             self.version_issue.emit(version_issue)
     
     def stop(self):
+        logging.debug('gui - thread_functions.py - CheckEGADSVersion - stop')
         self.terminate()
 
 
@@ -836,7 +886,6 @@ class ReadFileThread(QtCore.QThread):
         rfv = self.config_dict['SYSTEM'].getboolean('replace_fill_value')
         sfv = self.config_dict['SYSTEM'].getboolean('switch_fill_value')
         f = None
-        egads_instance = None
         var_attr_list = {}
         var_list = []
         glob_attr_list = {}
@@ -848,7 +897,7 @@ class ReadFileThread(QtCore.QThread):
                 var_list = sorted(f.get_variable_list())
                 glob_attr_list = f.get_attribute_list()
             elif self.file_ext == 'NASA Ames Files (*.na)':
-                f = egads.input.NasaAmes(self.file_path, 'r')
+                f = egads.input.EgadsNasaAmes(self.file_path, 'r')
                 var_list = sorted(f.get_variable_list() + f.get_variable_list(vartype='independant'))
                 for attribute in f.get_attribute_list():
                     if attribute != 'V' and attribute != 'X':
@@ -877,17 +926,520 @@ class ReadFileThread(QtCore.QThread):
                     else:
                         reason = 'no reason detected'
                     unread_var[var] = reason
-                    logging.exception('gui - reading_functions.py - : an error occured during the reading of a '
-                                      'variable, variable ' + str(var))
+                    logging.exception('gui - thread_functions.py - ReadFileThread : an error occured during the '
+                                      'reading of a variable, variable ' + str(var))
             for var in unread_var:
                 var_list.remove(var)
             final_dict = {'dim_list': dim_list, 'var_list': var_list, 'unread_var': unread_var,
                           'var_attr_list': var_attr_list, 'glob_attr_list': glob_attr_list, 'opened_file': f}
             self.finished.emit(final_dict)
         except Exception:
-            logging.exception('gui - reading_functions.py - : an error occured during the reading of a file')
+            logging.exception('gui - thread_functions.py - ReadFileThread : an error occured during the reading of a '
+                              'file')
             self.error.emit()
 
     def stop(self):
         logging.debug('gui - thread_functions.py - ReadFileThread - stop')
+        self.terminate()
+
+
+class SaveFileThread(QtCore.QThread):
+    progress = QtCore.pyqtSignal(list)
+    error = QtCore.pyqtSignal(str)
+    finished = QtCore.pyqtSignal()
+
+    def __init__(self, file_name, file_ext, open_file_ext, glob_attr, dim_list, var_dict):
+        QtCore.QThread.__init__(self)
+        logging.debug('gui - thread_functions.py - SaveFileThread - __init__')
+        self.file_name = file_name
+        self.file_ext = file_ext
+        self.open_file_ext = open_file_ext
+        self.glob_attr = glob_attr
+        self.dim_list = dim_list
+        self.var_dict = var_dict
+
+    def run(self):
+        logging.debug('gui - thread_functions.py - SaveFileThread - run')
+        if self.file_ext == "NetCDF Files (*.nc)":
+            format_dict = {'int32': 'int', 'float64': 'double', 'float32': 'float', 'int16': 'short',
+                           'int8': 'byte', 'str': 'char', 'unicode': 'char', 'str_': 'char', 'unicode_': 'char'}
+            if self.open_file_ext == 'NetCDF Files (*.nc)':
+                try:
+                    self.progress.emit(['Standby...', 0])
+                    step_nbr = 3 + len(self.var_dict.keys())
+                    step_val = 100. / step_nbr
+                    prog_val = 0
+                    new_file = egads.input.EgadsNetCdf(self.file_name, 'w')
+                    prog_val += step_val
+                    self.progress.emit(['Adding dimensions...', int(prog_val)])
+                    for key, value in self.dim_list.items():
+                        new_file.add_dim(key, value)
+                    prog_val += step_val
+                    self.progress.emit(['Adding global attributes...', int(prog_val)])
+                    conventions_bool, history_bool = False, False
+                    for key, value in self.glob_attr.items():
+                        if 'Conventions' in key:
+                            conventions_bool = True
+                        if 'history' in key:
+                            history_bool = True
+                        try:
+                            new_file.add_attribute(key, float(value))
+                        except ValueError:
+                            new_file.add_attribute(key, str(value))
+                    if not conventions_bool:
+                        new_file.add_attribute('Conventions', 'CF-1.0')
+                    if not history_bool:
+                        history = (str(datetime.datetime.now().year) + '-' + str(datetime.datetime.now().month) + '-'
+                                   + str(datetime.datetime.now().day) + ' ' + str(datetime.datetime.now().hour) + ':'
+                                   + str(datetime.datetime.now().minute) + ':' + str(datetime.datetime.now().second)
+                                   + ' - File created by EGADS and its GUI.')
+                        new_file.add_attribute('history', history)
+                    for var_name, var_sublist in self.var_dict.items():
+                        prog_val += step_val
+                        self.progress.emit(['Adding variable ' + var_name + '...', int(prog_val)])
+                        data = var_sublist[0]
+                        dimensions_tuple = []
+                        for key, value in var_sublist[1].items():
+                            dimensions_tuple.append(key)
+                        dimensions_tuple = tuple(dimensions_tuple)
+                        try:
+                            var_format = format_dict[str(data.value.dtype)]
+                        except KeyError:
+                            var_format = 'double'
+                        new_file.write_variable(data, var_name, dimensions_tuple, var_format)
+                    prog_val += step_val
+                    self.progress.emit(['Closing NetCdf file...', int(prog_val)])
+                    new_file.close()
+                    self.finished.emit()
+                except Exception:
+                    logging.exception('gui - thread_functions.py - SaveFileThread : an error occured during the '
+                                      'saving of a file')
+                    self.error.emit('')
+            elif self.open_file_ext == 'NASA Ames Files (*.na)':
+                try:
+                    self.progress.emit(['Standby...', 0])
+                    step_nbr = 3 + len(self.var_dict.keys())
+                    step_val = 100. / step_nbr
+                    prog_val = 0
+                    prog_val += step_val
+                    self.progress.emit(['Adding global attributes...', int(prog_val)])
+                    title = self.glob_attr['MNAME']
+                    source = self.glob_attr['SNAME']
+                    institution = self.glob_attr['ORG']
+                    authors = self.glob_attr['ONAME']
+                    history = (str(datetime.datetime.now().year) + '-' + str(datetime.datetime.now().month) + '-'
+                               + str(datetime.datetime.now().day) + ' ' + str(datetime.datetime.now().hour) + ':'
+                               + str(datetime.datetime.now().minute) + ':' + str(datetime.datetime.now().second)
+                               + ' - NetCDF file created using EGADS and its GUI.')
+                    rev_date = (str(self.glob_attr['RDATE'][0]) + '-' + str(self.glob_attr['RDATE'][1]) + '-'
+                                + str(self.glob_attr['RDATE'][2]))
+                    scom = ''
+                    ncom = ''
+                    if isinstance(self.glob_attr['SCOM'], list):
+                        for i in self.glob_attr['SCOM']:
+                            scom += i + '\n'
+                        scom = scom[:-1]
+                    else:
+                        scom = self.glob_attr['SCOM']
+                        if scom[-1:] == '\n':
+                            scom = scom[:-1]
+                    if isinstance(self.glob_attr['NCOM'], list):
+                        for i in self.glob_attr['NCOM']:
+                            ncom += i + '\n'
+                        ncom = ncom[:-1]
+                    else:
+                        ncom = self.glob_attr['NCOM']
+                        if ncom[-1:] == '\n':
+                            ncom = ncom[:-1]
+                    new_file = egads.input.EgadsNetCdf(self.file_name, 'w')
+                    new_file.add_attribute('Conventions', 'CF-1.0')
+                    new_file.add_attribute('title', title)
+                    new_file.add_attribute('source', source)
+                    new_file.add_attribute('special_comments', scom)
+                    new_file.add_attribute('normal_comments', ncom)
+                    new_file.add_attribute('institution', institution)
+                    new_file.add_attribute('authors', authors)
+                    new_file.add_attribute('history', history)
+                    new_file.add_attribute('data_date_of_revision', rev_date)
+                    prog_val += step_val
+                    self.progress.emit(['Adding dimensions...', int(prog_val)])
+                    for key, value in self.dim_list.items():
+                        new_file.add_dim(key, value)
+                    for var_name, var in self.var_dict.items():
+                        prog_val += step_val
+                        self.progress.emit(['Adding variable ' + var_name + '...', int(prog_val)])
+                        dimensions_tuple = tuple(var[1].keys())
+                        try:
+                            var_format = format_dict[str(var[0].value.dtype)]
+                        except KeyError:
+                            var_format = 'double'
+                        new_file.write_variable(var[0], var_name, dimensions_tuple, var_format)
+                    self.progress.emit(['Closing NetCdf file...', int(prog_val)])
+                    new_file.close()
+                    self.finished.emit()
+                except Exception:
+                    logging.exception('gui - thread_functions.py - SaveFileThread : an error occured during the '
+                                      'saving of a file')
+                    self.error.emit('')
+        elif self.file_ext == "NASA Ames Files (*.na)":
+            if self.open_file_ext == 'NetCDF Files (*.nc)':
+                try:
+                    self.progress.emit(['Standby...', 0])
+                    if len(self.dim_list) > 1:
+                        info_text = ('The actual NASA Ames file class can only handle FFI equal to 1001. Thus it is '
+                                     'not possible at this time to save file with more than one dimension.')
+                        self.error.emit(info_text)
+                    else:
+                        step_nbr = 5 + len(self.var_dict.keys())
+                        step_val = 100. / step_nbr
+                        prog_val = 0
+                        new_file = egads.input.EgadsNasaAmes()
+                        na_dict = new_file.create_na_dict()
+                        prog_val += step_val
+                        self.progress.emit(['Preparing global attributes...', int(prog_val)])
+                        nlhead, ffi, org, oname, sname, mname, dx = -999, 1001, '', '', '', '', 0.0
+                        ivol, nvol = 1, 1
+                        try:
+                            org = self.glob_attr['institution']
+                        except KeyError:
+                            org = 'no institution'
+                        try:
+                            oname = self.glob_attr['authors']
+                        except KeyError:
+                            try:
+                                oname = self.glob_attr['institution']
+                            except KeyError:
+                                oname = 'no author'
+                        try:
+                            sname = self.glob_attr['source']
+                        except KeyError:
+                            sname = 'no source'
+                        try:
+                            mname = self.glob_attr['title']
+                        except KeyError:
+                            mname = 'no title'
+                        rdate = [datetime.datetime.now().year, datetime.datetime.now().month,
+                                 datetime.datetime.now().day]
+                        date = None
+                        niv = 0
+                        prog_val += step_val
+                        self.progress.emit(['Adding dimensions...', int(prog_val)])
+                        for ivar in self.dim_list:
+                            data = self.var_dict[ivar][0]
+                            new_file.write_variable(data, ivar, vartype='independant', na_dict=na_dict)
+                            niv += 1
+                            if 'time' in ivar:
+                                units = data.metadata['units']
+                                ref_time = None
+                                try:
+                                    index = units.index(' since ')
+                                    ref_time = units[index + 7:]
+                                except (KeyError, ValueError):
+                                    pass
+                                try:
+                                    ref_time = dateutil.parser.parse(ref_time).strftime("%Y%m%dT%H%M%S")
+                                    isotime = egads.algorithms.transforms.SecondsToIsotime().run(data, ref_time)
+                                    y, m, d, _, _, _ = egads.algorithms.transforms.IsotimeToElements().run(isotime)
+                                    date = [y.value[0], m.value[0], d.value[0]]
+                                    if not date:
+                                        date = [999, 999, 999]
+                                except Exception:
+                                    date = [999, 999, 999]
+                        prog_val += step_val
+                        self.progress.emit(['Adding global attributes...', int(prog_val)])
+                        new_file.write_attribute_value('NLHEAD', nlhead, na_dict=na_dict)
+                        new_file.write_attribute_value('FFI', ffi, na_dict=na_dict)
+                        new_file.write_attribute_value('ONAME', oname, na_dict=na_dict)
+                        new_file.write_attribute_value('ONAME', oname, na_dict=na_dict)
+                        new_file.write_attribute_value('ORG', org, na_dict=na_dict)
+                        new_file.write_attribute_value('SNAME', sname, na_dict=na_dict)
+                        new_file.write_attribute_value('MNAME', mname, na_dict=na_dict)
+                        new_file.write_attribute_value('DATE', date, na_dict=na_dict)
+                        new_file.write_attribute_value('RDATE', rdate, na_dict=na_dict)
+                        new_file.write_attribute_value('NIV', niv, na_dict=na_dict)
+                        new_file.write_attribute_value('DX', dx, na_dict=na_dict)
+                        name_string = ''
+                        ncom = ['==== Normal Comments follow ====']
+                        for attr in self.glob_attr:
+                            if attr != 'institution' and attr != 'authors' and attr != 'source' and attr != 'title':
+                                ncom.append(attr + ': ' + str(self.glob_attr[attr]))
+                        ncom.append('==== Normal Comments end ====')
+                        ncom.append('=== Data Section begins on the next line ===')
+                        for name in self.dim_list:
+                            name_string += name + '    '
+                        scom = ['==== Special Comments follow ====',
+                                '=== Additional Variable Attributes defined in the source file ===',
+                                '== Variable attributes from source (NetCDF) file follow ==']
+                        for var, sublist in self.var_dict.items():
+                            if var not in self.dim_list:
+                                prog_val += step_val
+                                self.progress.emit(['Adding variable ' + var + '...', int(prog_val)])
+                                new_file.write_variable(sublist[0], var, na_dict=na_dict)
+                                first_line = True
+                                for metadata in sublist[0].metadata:
+                                    if metadata != '_FillValue' and metadata != 'scale_factor' and metadata != \
+                                            'units' and metadata != 'var_name':
+                                        if first_line:
+                                            first_line = False
+                                            scom.append('  Variable ' + var + ':')
+                                        scom.append('    ' + metadata + ' = ' + str(sublist[0].metadata[metadata]))
+                                name_string += var + '    '
+                        prog_val += step_val
+                        self.progress.emit(['Adding last global attributes...', int(prog_val)])
+                        name_string = name_string[:-4]
+                        ncom.append(name_string)
+                        scom.append('== Variable attributes from source (NetCDF) file end ==')
+                        scom.append('==== Special Comments end ====')
+                        new_file.write_attribute_value('NVOL', nvol, na_dict=na_dict)
+                        new_file.write_attribute_value('IVOL', ivol, na_dict=na_dict)
+                        new_file.write_attribute_value('SCOM', scom, na_dict=na_dict)
+                        new_file.write_attribute_value('NCOM', ncom, na_dict=na_dict)
+                        new_file.write_attribute_value('NSCOML', len(scom), na_dict=na_dict)
+                        new_file.write_attribute_value('NNCOML', len(ncom), na_dict=na_dict)
+                        new_file.save_na_file(self.file_name, na_dict)
+                        self.progress.emit(['Closing NasaAmes file...', 100])
+                        new_file.close()
+                        self.finished.emit()
+                except Exception:
+                    logging.exception('gui - thread_functions.py - SaveFileThread : an error occured during the '
+                                      'saving of a file')
+                    self.error.emit('')
+            elif self.open_file_ext == 'NASA Ames Files (*.na)':
+                try:
+                    self.progress.emit(['Standby...', 0])
+                    step_nbr = 3 + len(self.var_dict.keys())
+                    step_val = 100. / step_nbr
+                    prog_val = 0
+                    new_file = egads.input.EgadsNasaAmes()
+                    na_dict = new_file.create_na_dict()
+                    prog_val += step_val
+                    self.progress.emit(['Adding global attributes...', int(prog_val)])
+                    new_file.write_attribute_value('ONAME', self.glob_attr['ONAME'], na_dict=na_dict)
+                    new_file.write_attribute_value('ORG', self.glob_attr['ORG'], na_dict=na_dict)
+                    new_file.write_attribute_value('SNAME', self.glob_attr['SNAME'], na_dict=na_dict)
+                    new_file.write_attribute_value('MNAME', self.glob_attr['MNAME'], na_dict=na_dict)
+                    new_file.write_attribute_value('DATE', self.glob_attr['DATE'], na_dict=na_dict)
+                    new_file.write_attribute_value('NIV', 1, na_dict=na_dict)
+                    new_file.write_attribute_value('NSCOML', len(self.glob_attr['SCOM']), na_dict=na_dict)
+                    new_file.write_attribute_value('NNCOML', len(self.glob_attr['NCOM']), na_dict=na_dict)
+                    new_file.write_attribute_value('SCOM', self.glob_attr['SCOM'], na_dict=na_dict)
+                    new_file.write_attribute_value('NCOM', self.glob_attr['NCOM'], na_dict=na_dict)
+                    for name in sorted(self.var_dict.keys()):
+                        var = self.var_dict[name]
+                        if name in self.dim_list:
+                            prog_val += step_val
+                            self.progress.emit(['Adding dimension ' + name + '...', int(prog_val)])
+                            new_file.write_variable(var[0], vartype="independant", na_dict=na_dict)
+                        else:
+                            prog_val += step_val
+                            self.progress.emit(['Adding variable ' + name + '...', int(prog_val)])
+                            new_file.write_variable(var[0], vartype="main", na_dict=na_dict)
+                    self.progress.emit(['Closing NasaAmes file...', 100])
+                    new_file.save_na_file(self.file_name, na_dict)
+                    new_file.close()
+                    self.finished.emit()
+                except Exception:
+                    logging.exception('gui - thread_functions.py - SaveFileThread : an error occured during the '
+                                      'saving of a file')
+                    self.error.emit('')
+
+    def stop(self):
+        logging.debug('gui - thread_functions.py - SaveFileThread - stop')
+        self.terminate()
+
+
+class ExportThread(QtCore.QThread):
+    error = QtCore.pyqtSignal()
+    finished = QtCore.pyqtSignal()
+
+    def __init__(self, export_format, export_dict, var_dict, file_name, file_ext):
+        QtCore.QThread.__init__(self)
+        logging.debug('gui - thread_functions.py - ExportThread - __init__')
+        self.export_format = export_format
+        self.export_dict = export_dict
+        self.var_dict = var_dict
+        self.file_name = file_name
+        self.file_ext = file_ext
+
+    def run(self):
+        logging.debug('gui - thread_functions.py - ExportThread - run')
+        colormap_dict = {0: {'fig_height': 1, 'fig_width': 8, 'left': 0.05, 'bottom': 0.60, 'width': 0.9,
+                             'height': 0.25, 'position': 'bottom', 'orientation': 'horizontal'},
+                         1: {'fig_height': 1, 'fig_width': 8, 'left': 0.05, 'bottom': 0.60, 'width': 0.9,
+                             'height': 0.25, 'position': 'top', 'orientation': 'horizontal'},
+                         2: {'fig_height': 8, 'fig_width': 1, 'left': 0.05, 'bottom': 0.05, 'width': 0.25,
+                             'height': 0.9, 'position': 'left', 'orientation': 'vertical'},
+                         3: {'fig_height': 8, 'fig_width': 1, 'left': 0.05, 'bottom': 0.05, 'width': 0.25,
+                             'height': 0.9, 'position': 'right', 'orientation': 'vertical'}}
+        if self.export_format == 'GE-TS':
+            try:
+                if self.export_dict['Options']['reduce_samples']:
+                    redux = int(self.export_dict['Options']['reduce_value'])
+                else:
+                    redux = 1
+                lon = self.var_dict[self.export_dict['Coordinates']['lon']][0].value.tolist()[::redux]
+                lat = self.var_dict[self.export_dict['Coordinates']['lat']][0].value.tolist()[::redux]
+                if self.export_dict['Coordinates']['alt'] == 'ground':
+                    alt = None
+                else:
+                    alt = self.var_dict[self.export_dict['Coordinates']['alt']][0].value.tolist()[::redux]
+                var = self.var_dict[self.export_dict['Variables'][0]][0].value.tolist()[::redux]
+                var_units = self.var_dict[self.export_dict['Variables'][0]][0].metadata['units']
+                var_name = self.export_dict['Variables'][0]
+                if self.export_dict['Colormap']['automatic']:
+                    var_min = math.floor(min(var))
+                    var_max = math.ceil(max(var))
+                    var_steps = 15
+                else:
+                    if self.export_dict['Colormap']['min'] is not None:
+                        var_min = float(self.export_dict['Colormap']['min'])
+                    else:
+                        var_min = math.floor(min(var))
+                    if self.export_dict['Colormap']['max'] is not None:
+                        var_max = float(self.export_dict['Colormap']['max'])
+                    else:
+                        var_max = math.ceil(max(var))
+                    if self.export_dict['Colormap']['steps'] is not None:
+                        var_steps = int(self.export_dict['Colormap']['steps'])
+                    else:
+                        var_steps = 15
+                if self.export_dict['Colormap']['auto_dimension']:
+                    fig_width = colormap_dict[self.export_dict['Colormap']['position']]['fig_width']
+                    fig_height = colormap_dict[self.export_dict['Colormap']['position']]['fig_height']
+                    left = colormap_dict[self.export_dict['Colormap']['position']]['left']
+                    bottom = colormap_dict[self.export_dict['Colormap']['position']]['bottom']
+                    width = colormap_dict[self.export_dict['Colormap']['position']]['width']
+                    height = colormap_dict[self.export_dict['Colormap']['position']]['height']
+                else:
+                    if self.export_dict['Colormap']['fig_width'] is not None:
+                        fig_width = self.export_dict['Colormap']['fig_width']
+                    else:
+                        fig_width = colormap_dict[self.export_dict['Colormap']['position']]['fig_width']
+                    if self.export_dict['Colormap']['fig_height'] is not None:
+                        fig_height = self.export_dict['Colormap']['fig_height']
+                    else:
+                        fig_height = colormap_dict[self.export_dict['Colormap']['position']]['fig_height']
+                    if self.export_dict['Colormap']['pos_left'] is not None:
+                        left = self.export_dict['Colormap']['pos_left']
+                    else:
+                        left = colormap_dict[self.export_dict['Colormap']['position']]['left']
+                    if self.export_dict['Colormap']['pos_bottom'] is not None:
+                        bottom = self.export_dict['Colormap']['pos_bottom']
+                    else:
+                        bottom = colormap_dict[self.export_dict['Colormap']['position']]['bottom']
+                    if self.export_dict['Colormap']['width'] is not None:
+                        width = self.export_dict['Colormap']['width']
+                    else:
+                        width = colormap_dict[self.export_dict['Colormap']['position']]['width']
+                    if self.export_dict['Colormap']['height'] is not None:
+                        height = self.export_dict['Colormap']['height']
+                    else:
+                        height = colormap_dict[self.export_dict['Colormap']['position']]['height']
+                fig = mpl.pyplot.figure(figsize=(fig_width, fig_height))
+                ax1 = fig.add_axes([left, bottom, width, height])
+                cmap_name = self.export_dict['Colormap']['colormap']
+                if self.export_dict['Colormap']['reversed']:
+                    cmap_name += '_r'
+                cmap = getattr(mpl.cm, cmap_name)
+                norm = mpl.colors.Normalize(vmin=var_min, vmax=var_max)
+                cb1 = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm,
+                                                orientation=colormap_dict[self.export_dict['Colormap']['position']]
+                                                ['orientation'])
+                cb1.set_label(var_units)
+                value_range = numpy.linspace(var_min, var_max, var_steps + 1)
+                color_range = []
+                for color in cmap(numpy.linspace(0, 1, var_steps)):
+                    color_range.append(mpl.colors.rgb2hex(color[:3])[1:])
+                if self.export_dict['Options']['wall_transparency']:
+                    transparency = transparency_hexa_dict_function()[100 - self.export_dict['Options']['transparency']]
+                else:
+                    transparency = None
+                style_list = []
+                line_list = []
+                for i, color in enumerate(color_range):
+                    style_list.append(simplekml.Style())
+                    style_list[i].linestyle.color = simplekml.Color.hex(color)
+                    style_list[i].linestyle.width = self.export_dict['Options']['path_width']
+                    if transparency is not None:
+                        style_list[i].polystyle.color = simplekml.Color.hexa(color + transparency)
+                    else:
+                        style_list[i].polystyle.color = simplekml.Color.hex(color)
+                kml = simplekml.Kml(name="Aircraft path & data", open=1)
+                doc = kml.newdocument(name='Data', snippet=simplekml.Snippet(str(datetime.datetime.now())))
+                fol = doc.newfolder(name=var_name)
+                for i, _ in enumerate(var[:-1]):
+                    line_list.append(fol.newlinestring(name=var_name))
+                    if alt == 'ground':
+                        alt_val = [0, 0]
+                    else:
+                        alt_val = [alt[i], alt[i + 1]]
+                    line_list[i].coords = [(lon[i], lat[i], alt_val[0]), (lon[i + 1], lat[i + 1], alt_val[1])]
+                    line_list[i].altitudemode = simplekml.AltitudeMode.absolute
+                    if self.export_dict['Options']['wall']:
+                        line_list[i].extrude = 1
+                    else:
+                        line_list[i].extrude = 0
+                    if self.export_dict['Colormap']['color_value'] == 0:
+                        var_moy = float(var[i] + var[i + 1]) / 2.
+                    elif self.export_dict['Colormap']['color_value'] == 1:
+                        var_moy = var[i]
+                    else:
+                        var_moy = var[i + 1]
+                    idx = None
+                    if var_moy < value_range[0]:
+                        idx = 0
+                    elif var_moy > value_range[-1]:
+                        idx = -1
+                    else:
+                        for j, _ in enumerate(value_range):
+                            if value_range[j] <= var_moy < value_range[j + 1]:
+                                idx = j
+                                break
+                    line_list[i].style = style_list[idx]
+                cmap_x = 0
+                cmap_y = 0
+                if colormap_dict[self.export_dict['Colormap']['position']]['position'] == 'bottom':
+                    cmap_x = 0.5
+                    cmap_y = 0
+                elif colormap_dict[self.export_dict['Colormap']['position']]['position'] == 'top':
+                    cmap_x = 0.5
+                    cmap_y = 1
+                elif colormap_dict[self.export_dict['Colormap']['position']]['position'] == 'left':
+                    cmap_x = 0
+                    cmap_y = 0.5
+                elif colormap_dict[self.export_dict['Colormap']['position']]['position'] == 'right':
+                    cmap_x = 1
+                    cmap_y = 0.5
+                screen = doc.newscreenoverlay(name='colormap')
+                screen.icon.href = 'colormap.jpg'
+                screen.overlayxy = simplekml.OverlayXY(x=cmap_x, y=cmap_y, xunits=simplekml.Units.fraction,
+                                                       yunits=simplekml.Units.fraction)
+                screen.screenxy = simplekml.ScreenXY(x=cmap_x, y=cmap_y, xunits=simplekml.Units.fraction,
+                                                     yunits=simplekml.Units.fraction)
+                screen.size.x = -1
+                screen.size.y = -1
+                screen.size.xunits = simplekml.Units.fraction
+                screen.size.yunits = simplekml.Units.fraction
+                if self.file_ext == 'Google Earth KMZ (*.kmz)':
+                    kmz = zipfile.ZipFile(self.file_name, 'w', zipfile.ZIP_DEFLATED)
+                    kml_filename = os.path.basename(self.file_name)[0:-3] + 'kml'
+                    kmz.writestr(kml_filename, kml.kml())
+                    jpg_filename = tempfile.mkstemp('.jpg')
+                    mpl.pyplot.savefig(jpg_filename)
+                    kmz.write(jpg_filename, 'colormap.jpg')
+                    kmz.close()
+                    os.remove(jpg_filename)
+                else:
+                    mpl.pyplot.savefig(os.path.join(os.path.dirname(self.file_name), 'colormap.jpg'))
+                    kml.save(self.file_name)
+                self.finished.emit()
+            except Exception:
+                logging.exception('gui - thread_functions.py - ExportThread - run : an error occured during the '
+                                  'creation of the file')
+                self.error.emit()
+        elif self.export_format == 'GE-MP':
+            pass
+
+    def stop(self):
+        logging.debug('gui - thread_functions.py - ExportThread - stop')
         self.terminate()

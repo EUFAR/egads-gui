@@ -1,21 +1,21 @@
 import logging
 import os
+import egads
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_displayalgorithmwindow import Ui_displayAlgorithmWindow
 from ui.Ui_processingwindow import Ui_processingWindow
 from ui.Ui_creationwindow import Ui_creationWindow
 from functions.utils import Highlighter, create_datestring, prepare_long_string, check_string_max_length
-from functions.utils import write_algorithm
+from functions.utils import write_algorithm, clear_layout
 from functions.other_windows_functions import MyInfo, MyFill, MyUnit, MyFilename, MyCategory, MyOverwriteFilename
 from functions.other_windows_functions import MyWait, MyCoeff
 from functions.thread_functions import VariableProcessingThread
 from functions.material_functions import algorithm_information_buttons_text
-import egads
 
 
 class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
     def __init__(self, algorithm_dict):
-        logging.debug('gui - other_windows_functions.py - MyAlgorithmDisplay - __init__')
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithmDisplay - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.algorithm_dict = algorithm_dict
@@ -59,9 +59,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
         self.populate_algorithm()
         self.populate_inputs()
         self.populate_outputs()
-        logging.info('gui - other_windows_functions.py - MyAlgorithmDisplay ready')
+        logging.info('gui - algorithm_windows_functions.py - MyAlgorithmDisplay ready')
 
     def populate_information(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithmDisplay - populate_information')
         self.daw_line_1.setText(self.algorithm_dict['Name'])
         self.daw_line_2.setText(self.algorithm_dict['Date'])
         self.daw_line_3.setText(self.algorithm_dict['Version'])
@@ -71,6 +72,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
         self.daw_plain_4.setPlainText(self.algorithm_dict['References'])
 
     def populate_inputs(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithmDisplay - populate_inputs')
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -382,6 +384,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.input_nbr += 1
 
     def populate_outputs(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithmDisplay - populate_outputs')
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -961,11 +964,12 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.output_nbr += 1
 
     def populate_algorithm(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithmDisplay - populate_algorithm')
         self.daw_plain_5.setPlainText(self.algorithm_dict['Algorithm'])
         self.highlighter = Highlighter(self.daw_plain_5.document())
 
     def closeWindow(self):
-        logging.debug('gui - other_windows_functions.py - MyAlgorithmDisplay - closeWindow')
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithmDisplay - closeWindow')
         self.close()
 
 
@@ -1005,16 +1009,19 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.thread.start()
 
     def wait_window(self):
+        logging.debug('gui - algorithm_window_functions.py - MyProcessing - wait_window')
         info_text = 'Processing data, please wait...'
         self.waitWindow = MyWait(info_text)
         self.waitWindow.exec_()
 
     def close_wait_window(self, val):
+        logging.debug('gui - algorithm_window_functions.py - MyProcessing - close_wait_window')
         self.list_of_new_variables_and_attributes = val
         self.waitWindow.close()
         self.close()
 
     def processing_error(self):
+        logging.debug('gui - algorithm_window_functions.py - MyProcessing - processing_error')
         self.waitWindow.close()
         info_text = ('Something went wrong during the processing. Please try to launch it again. If the process is'
                      + ' still not working, please check the algorithm and/or contact the developer.')
@@ -1031,7 +1038,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.close()
 
     def populate_combobox_category(self):
-        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_combobox_1')
+        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_combobox_category')
         self.aw_combobox_1.addItem("Make a choice...")
         folder_list = []
         for key in self.list_of_algorithms.keys():
@@ -1039,14 +1046,14 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.aw_combobox_1.addItems(sorted(list(dict.fromkeys(folder_list))))
 
     def populate_combobox_algorithms(self):
-        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_combobox_2')
+        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_combobox_algorithms')
         self.setWindowTitle('Processing')
         self.aw_okButton.setEnabled(False)
         self.aw_combobox_2.clear()
         self.aw_edit_1.setPlainText("")
         self.aw_edit_2.setPlainText("")
-        self.clear_layout(self.input_layout)
-        self.clear_layout(self.output_layout)
+        clear_layout(self.input_layout)
+        clear_layout(self.output_layout)
         if self.aw_combobox_1.currentText() == "Make a choice...":
             self.aw_combobox_2.setEnabled(False)
             self.aw_combobox_2.clear()
@@ -1081,7 +1088,8 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                 pass
 
     def populate_inputs(self):
-        self.clear_layout(self.input_layout)
+        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_inputs')
+        clear_layout(self.input_layout)
         self.input_activate = 0
         self.list_of_inputs = []
         self.list_label_input = []
@@ -1299,7 +1307,8 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                 self.input_num += 1
 
     def populate_outputs(self):
-        self.clear_layout(self.output_layout)
+        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - populate_outputs')
+        clear_layout(self.output_layout)
         self.list_label_output = []
         self.list_edit_output = []
         self.list_button_output = []
@@ -1383,6 +1392,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                 self.output_num += 1
 
     def launch_coeff_window(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - launch_coeff_window')
         index = int(self.sender().objectName()[17:])
         matrix_nbr_idx = self.algorithm().metadata["InputTypes"][index].index('[')
         matrix_nbr_str = self.algorithm().metadata["InputTypes"][index][matrix_nbr_idx + 1:-1]
@@ -1398,6 +1408,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.activate_save_button()
 
     def prepare_variable_list(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyProcessing - prepare_variable_list')
         variable_list = []
         for var in self.list_of_variables_and_attributes:
             variable_list.append(var)
@@ -1466,16 +1477,6 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                               long_name + '<br><br><u>Category:</u> ' + category_str
         self.infoWindow = MyInfo(information_str)
         self.infoWindow.exec_()
-
-    def clear_layout(self, layout):
-        logging.debug('gui - gui_functions.py - clear_layout')
-        for i in reversed(range(layout.count())):
-            item = layout.itemAt(i)
-            if isinstance(item, QtWidgets.QWidgetItem):
-                item.widget().deleteLater()
-            elif isinstance(item, QtWidgets.QLayout):
-                self.clear_layout(item.layout())
-            layout.removeItem(item)
 
 
 class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
@@ -2770,10 +2771,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                 self.cw_output_li_1[i].setObjectName("cw_output_li_1_" + str(i))
 
     def prepare_algorithm_categories(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - prepare_algorithm_categories')
         self.cw_combobox_1.clear()
         self.cw_combobox_1.addItems(['Make a choice...', 'Other...'] + sorted(self.algorithm_categories))
 
     def add_output_category(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - add_output_category')
         index = int(self.sender().objectName()[16:])
         category = ''
         in_list = False
@@ -2798,7 +2801,6 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
 
     def add_algorithm_category(self):
         logging.debug('gui - algorithm_window_functions.py - MyAlgorithm - add_algorithm_category')
-
         if self.cw_combobox_1.currentText() == 'Other...':
             self.cw_line_5.setText('')
             self.cw_label_11.setVisible(True)
@@ -3223,20 +3225,24 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         return result
 
     def reset_tab_title_color(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - reset_tab_title_color')
         for i in range(self.tabWidget.count()):
             self.tabWidget.tabBar().setTabTextColor(i, QtGui.QColor(45, 45, 45))
 
     def reset_labels_color(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - reset_labels_color')
         for label in self.findChildren(QtWidgets.QLabel):
             label.setStyleSheet("QLabel {\n"
                                 "    color: rgb(45,45,45);\n"
                                 "}")
 
     def algorithm_button_info(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - algorithm_button_info')
         self.infoWindow = MyInfo(self.information_buttons_text[self.sender().objectName()])
         self.infoWindow.exec_()
 
     def input_output_button_info(self):
+        logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - input_output_button_info')
         index = -1 * (int(''.join(reversed(self.sender().objectName())).find('_')) + 1)
         self.infoWindow = MyInfo(self.input_output_button_text[self.sender().objectName()[:index]])
         self.infoWindow.exec_()

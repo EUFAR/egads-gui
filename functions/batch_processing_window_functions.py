@@ -11,7 +11,7 @@ from functions.other_windows_functions import MyInfo, MyCoeff
 from functions.gui_elements import QtWaitingSpinner
 from functions.thread_functions import BatchProcessingThread
 from functions.material_functions import batch_processing_information_buttons_text
-from functions.utils import humansize
+from functions.utils import humansize, clear_layout
 
 
 class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
@@ -134,9 +134,10 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.list_of_outputs = []
         self.types_for_combobox = ["vector", "array", "vector_optional", "array_optional"]
         self.populate_combobox_category()
-        logging.info('gui - batch_processing_window_functions.py - MyBatchProcessing ready')
+        logging.info('gui - batch_processing_window_functions.py - MyBatchProcessing - ready')
 
     def process_selection(self, val):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - process_selection')
         self.bw_radiobox_1.setEnabled(True)
         self.bw_radiobox_2.setEnabled(True)
         self.algorithm = None
@@ -299,6 +300,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.bw_combobox_3.addItems(sorted(algo_list))
 
     def activate_filename_creation(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - activate_filename_creation')
         if not self.bw_checkbox_1.isChecked():
             self.bw_label_10.setText('')
             self.bw_label_10.setEnabled(True)
@@ -352,6 +354,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.bw_label_10.setText('')
 
     def set_filename_options(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_filename_options')
         combobox = self.sender()
         index = int(combobox.objectName()[-1:])
         edit = getattr(self, 'bw_edit_' + str(index))
@@ -372,6 +375,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                 edit.setText('')
 
     def set_filename_example(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_filename_example')
         self.bw_label_10.setText('standby...')
         filename_example_str = ''
         for i, combobox in enumerate(self.filename_combobox_list):
@@ -410,6 +414,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                 self.bw_edit_3.setText(str(pathlib.Path(folder_path)))
 
     def populate_file_list_widget(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - populate_file_list_widget')
         self.listWidget.clear()
         if self.bw_combobox_1.currentText() == 'Delete one or more global metadata' or \
                 self.bw_combobox_1.currentText() == 'Delete one or more variables':
@@ -433,6 +438,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.populate_algorithm_input_combobox()
 
     def activate_list_item_buttons(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - activate_list_item_buttons')
         current_items = self.listWidget.selectedItems()
         if current_items:
             if len(current_items) == 1:
@@ -452,6 +458,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.bw_file_info.setEnabled(False)
 
     def move_up_item(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - move_up_item')
         current_row = self.listWidget.currentRow()
         current_item = self.listWidget.takeItem(current_row)
         self.listWidget.insertItem(current_row - 1, current_item)
@@ -460,6 +467,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.populate_algorithm_input_combobox()
 
     def move_down_item(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - move_down_item')
         current_row = self.listWidget.currentRow()
         current_item = self.listWidget.takeItem(current_row)
         self.listWidget.insertItem(current_row + 1, current_item)
@@ -468,6 +476,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.populate_algorithm_input_combobox()
 
     def add_new_item(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - add_new_item')
         file_dialog = QtWidgets.QFileDialog()
         try:
             button_text = self.buttonGroup.checkedButton().text()
@@ -488,6 +497,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.populate_options_file_combobox()
 
     def delete_item(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - delete_item')
         current_items = self.listWidget.selectedItems()
         for item in current_items:
             index = self.listWidget.row(item)
@@ -495,10 +505,31 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.populate_options_file_combobox()
 
     def info_item(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - info_item')
         self.batchInfoWindow = MyBatchInfo(self.listWidget.currentItem().toolTip())
         self.batchInfoWindow.exec_()
 
     def set_algorithm_options(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_algorithm_options')
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        font2 = QtGui.QFont()
+        font2.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font2.setPointSize(10)
+        font2.setKerning(True)
+        font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        font3 = QtGui.QFont()
+        font3.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font3.setPointSize(9)
+        font3.setKerning(True)
+        font3.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("icons/info_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.bw_label_12.setVisible(True)
         self.bw_label_12.setEnabled(True)
         self.bw_edit_4.setVisible(True)
@@ -511,25 +542,6 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.algorithm = self.list_of_algorithms[rep + ' - ' + algo]['method']
         if self.algorithm is not None:
             self.bw_edit_4.setText(self.algorithm().metadata['Description'])
-            font = QtGui.QFont()
-            font.setFamily("fonts/SourceSansPro-Regular.ttf")
-            font.setPointSize(10)
-            font.setBold(True)
-            font.setWeight(75)
-            font.setKerning(True)
-            font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-            font2 = QtGui.QFont()
-            font2.setFamily("fonts/SourceSansPro-Regular.ttf")
-            font2.setPointSize(10)
-            font2.setKerning(True)
-            font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
-            font3 = QtGui.QFont()
-            font3.setFamily("fonts/SourceSansPro-Regular.ttf")
-            font3.setPointSize(9)
-            font3.setKerning(True)
-            font3.setStyleStrategy(QtGui.QFont.PreferAntialias)
-            icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("icons/info_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.input_activate = 0
             self.list_of_inputs = []
             self.list_label_input = []
@@ -579,13 +591,11 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                 self.grid_layout_input_1.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
                                                                        QtWidgets.QSizePolicy.Minimum),
                                                  self.input_num, 1, 1, 1)
-
                 input_type = self.algorithm().metadata["InputTypes"][index]
                 combobox_widget = False
                 for var_type in self.types_for_combobox:
                     if var_type in input_type:
                         combobox_widget = True
-
                 if combobox_widget:
                     self.list_combobox_input.append(QtWidgets.QComboBox())
                     self.list_combobox_input[self.input_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
@@ -862,6 +872,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.populate_algorithm_input_combobox()
 
     def launch_coeff_window(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - launch_coeff_window')
         index = int(self.sender().objectName()[17:])
         matrix_nbr_idx = self.algorithm().metadata["InputTypes"][index].index('[')
         matrix_nbr_str = self.algorithm().metadata["InputTypes"][index][matrix_nbr_idx + 1:-1]
@@ -877,6 +888,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.activate_launch_processing_button()
 
     def set_delete_metadata_options(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_delete_metadata_options')
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -1326,6 +1338,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.options_combobox_2.addItems(item_list)
 
     def set_delete_variable_options(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_delete_variable_options')
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -1775,6 +1788,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.options_combobox_2.addItems(item_list)
 
     def set_concatenation_options(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_concatenation_options')
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -1890,6 +1904,8 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.options_combobox_1.setItemText(2, "deleted (no global metadata)")
 
     def populate_algorithm_input_combobox(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - '
+                      'populate_algorithm_input_combobox')
         if self.bw_combobox_1.currentText() == 'Execute an algorithm':
             if self.algorithm is not None:
                 if self.bw_radiobox_1.isChecked():
@@ -1907,6 +1923,8 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                             widget.addItems(sorted(variable_list))
 
     def populate_options_file_combobox(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - '
+                      'populate_options_file_combobox')
         if self.bw_combobox_1.currentText() == 'Delete one or more global metadata' or \
                 self.bw_combobox_1.currentText() == 'Delete one or more variables':
             self.options_combobox_2.clear()
@@ -1914,6 +1932,8 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                 self.options_combobox_2.addItem(self.listWidget.item(i).text())
 
     def populate_options_metvar_combobox(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - '
+                      'populate_options_metvar_combobox')
         if self.bw_combobox_1.currentText() == 'Delete one or more global metadata':
             if self.options_combobox_2.currentText() != '':
                 item = self.listWidget.findItems(self.options_combobox_2.currentText(), QtCore.Qt.MatchExactly)[0]
@@ -1940,6 +1960,8 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                 f.close()
 
     def add_metadata_variable_to_list(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - '
+                      'add_metadata_variable_to_list')
         in_list = False
         for i in range(self.options_list_1.count()):
             if self.options_combobox_1.currentText() == str(self.options_list_1.item(i).text()):
@@ -1949,10 +1971,12 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.options_list_1.addItem(self.options_combobox_1.currentText())
 
     def remove_metadata_variable_from_list(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - '
+                      'remove_metadata_variable_from_list')
         self.options_list_1.takeItem(self.options_list_1.currentRow())
 
     def algorithm_information_button(self):
-        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - information_button : '
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - algorithm_information_button : '
                       + 'sender().objectName() ' + str(self.sender().objectName()))
         if "optional" in self.sender().objectName():
             optional_str = '[Optional] '
@@ -1991,6 +2015,8 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.infoWindow.exec_()
 
     def activate_launch_processing_button(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - '
+                   'activate_launch_processing_button')
         processing = True
         algorithm = True
         category = True
@@ -2039,6 +2065,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.bw_button_ok.setEnabled(False)
 
     def launch_processing(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - launch_processing')
         filename_options = None
         if not self.bw_checkbox_1.isChecked():
             filename_options = []
@@ -2114,10 +2141,12 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.infoWindow.exec_()
 
     def batch_button_info(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - batch_button_info')
         self.infoWindow = MyInfo(self.information_buttons_text[self.sender().objectName()])
         self.infoWindow.exec_()
 
     def filename_button_info(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - filename_button_info')
         widget = self.information_buttons_text[self.sender().objectName()]
         self.infoWindow = MyInfo(self.information_buttons_text[widget.currentText()])
         self.infoWindow.exec_()
@@ -2140,6 +2169,7 @@ class MyWaitProcessing(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.success = True
         self.setup_spinner()
         self.launch_processing_thread()
+        logging.info('gui - batch_processing_window_functions.py - MyWaitProcessing - ready')
 
     def update_progress(self, val):
         progress_str, progress_nbr = val[0], val[1]
@@ -2149,6 +2179,7 @@ class MyWaitProcessing(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.progress_bar.setValue(progress_nbr)
 
     def launch_processing_thread(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - launch_processing_thread')
         self.batch_thread = BatchProcessingThread(self.batch_dict, self.config_dict)
         self.batch_thread.start()
         self.batch_thread.progress.connect(self.update_progress)
@@ -2156,14 +2187,17 @@ class MyWaitProcessing(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.batch_thread.error.connect(self.processing_failed)
 
     def processing_finished(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - processing_finished')
         self.close()
 
     def processing_failed(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - processing_failed')
         self.error_occurred = True
         self.success = False
         self.close()
 
     def setup_spinner(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyWaitProcessing - setup_spinner')
         self.spinner = QtWaitingSpinner(self, centerOnParent=False)
         self.spinner_layout.addWidget(self.spinner)
         self.spinner.setRoundness(70.0)
@@ -2203,8 +2237,10 @@ class MyBatchInfo(QtWidgets.QDialog, Ui_batchInfoWindow):
         elif self.extension == '.na':
             self.file = egads.input.NasaAmes(self.file_path, 'r')
         self.parse_file_info()
+        logging.info('gui - batch_processing_window_functions.py - MyBatchInfo - ready')
 
     def parse_file_info(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchInfo - parse_file_info')
         self.biw_line_1.setText(str(pathlib.Path(self.file_path).name))
         self.biw_line_2.setText(str(pathlib.Path(self.file_path).parent))
         self.biw_line_3.setText(humansize(pathlib.Path(self.file_path).stat().st_size))
@@ -2438,6 +2474,7 @@ class MyBatchInfo(QtWidgets.QDialog, Ui_batchInfoWindow):
         self.variable_list.addItems(var_list)
 
     def parse_variable_info(self):
+        logging.debug('gui - batch_processing_window_functions.py - MyBatchInfo - parse_variable_info')
         var_attr = self.file.get_attribute_list(self.variable_list.currentItem().text())
         clear_layout(self.variables_layout)
         self.var_label.clear()
@@ -2494,14 +2531,3 @@ class MyBatchInfo(QtWidgets.QDialog, Ui_batchInfoWindow):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchInfo - closeWindow')
         self.file.close()
         self.close()
-
-
-def clear_layout(layout):
-    logging.debug('gui - batch_processing_window_functions.py - clear_layout')
-    for i in reversed(range(layout.count())):
-        item = layout.itemAt(i)
-        if isinstance(item, QtWidgets.QWidgetItem):
-            item.widget().deleteLater()
-        elif isinstance(item, QtWidgets.QLayout):
-            clear_layout(item.layout())
-        layout.removeItem(item)

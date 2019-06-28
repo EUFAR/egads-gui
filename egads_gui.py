@@ -7,8 +7,10 @@ from ui.mainwindow import MainWindow
 from ui._version import _gui_version
 from functions.utils import create_option_file, create_logging_handlers
 import configparser
+from PyQt5.QtCore import QT_VERSION_STR as qt_version
 from matplotlib import __version__ as mpl_version
 from cartopy import __version__ as cy_version
+from simplekml import __version__ as km_version
 
 
 def launch_egads_gui(gui_path):
@@ -28,8 +30,10 @@ def launch_egads_gui(gui_path):
     logging.debug('gui - operating system: ' + system + ' ' + release + ' (' + version + ')')
     python_version = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
     logging.debug('gui - python version: ' + python_version)
+    logging.debug('gui - pyqt5 version: ' + qt_version)
     logging.debug('gui - matplotlib version: ' + mpl_version)
     logging.debug('gui - cartopy version: ' + cy_version)
+    logging.debug('gui - simplekml version: ' + km_version)
     ui = MainWindow(gui_path, config_dict)
     ui.show()
     splash.finish(ui)

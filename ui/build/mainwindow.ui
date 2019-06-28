@@ -9444,6 +9444,8 @@ QMenu::separator {
     <addaction name="actionSaveAsBar"/>
     <addaction name="actionCloseBar"/>
     <addaction name="separator"/>
+    <addaction name="actionExport"/>
+    <addaction name="separator"/>
     <addaction name="actionBatch_processing"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -9660,6 +9662,14 @@ QStatusBar QLabel {
    <property name="toolTip">
     <string>Launch a process</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
   </action>
   <action name="actionCreatealgorithmBar">
    <property name="icon">
@@ -9671,6 +9681,14 @@ QStatusBar QLabel {
    </property>
    <property name="toolTip">
     <string>Create a new algorithm</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
    </property>
   </action>
   <action name="actionCreateVariableBar">
@@ -9687,6 +9705,14 @@ QStatusBar QLabel {
    <property name="toolTip">
     <string>Create a new simple variable</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
   </action>
   <action name="actionMigrateVariableBar">
    <property name="enabled">
@@ -9701,6 +9727,14 @@ QStatusBar QLabel {
    </property>
    <property name="toolTip">
     <string>Migrate the selected variable to the main workspace</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
    </property>
   </action>
   <action name="actionDeleteVariableBar">
@@ -9717,6 +9751,14 @@ QStatusBar QLabel {
    <property name="toolTip">
     <string>Delete the selected variable</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
   </action>
   <action name="actionGlobalAttributesBar">
    <property name="enabled">
@@ -9731,6 +9773,14 @@ QStatusBar QLabel {
    </property>
    <property name="toolTip">
     <string>Add or modify global attributes</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
    </property>
   </action>
   <action name="actionVariableAttributesBar">
@@ -9747,6 +9797,14 @@ QStatusBar QLabel {
    <property name="toolTip">
     <string>Add or modify the selected variable attributes</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
   </action>
   <action name="actionPlotBar">
    <property name="enabled">
@@ -9761,6 +9819,14 @@ QStatusBar QLabel {
    </property>
    <property name="toolTip">
     <string>Display a graph of the selected variable</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
    </property>
   </action>
   <action name="actionBatch_processing">
@@ -9926,6 +9992,14 @@ QStatusBar QLabel {
    <property name="toolTip">
     <string>Display the selected variable</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
   </action>
   <action name="actionOptions">
    <property name="icon">
@@ -9973,6 +10047,37 @@ QStatusBar QLabel {
    </property>
    <property name="toolTip">
     <string>An update is available. Click for more detail</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/export_icon.svg</normaloff>icons/export_icon.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Export...</string>
+   </property>
+   <property name="toolTip">
+    <string>Export variables to another format</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
    </property>
   </action>
  </widget>

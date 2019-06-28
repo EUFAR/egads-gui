@@ -1,12 +1,9 @@
-import ntpath
-import egads
 import os
-import inspect
 import logging
 from PyQt5 import QtWidgets, QtCore, QtGui
 from functions.algorithm_windows_functions import MyAlgorithmDisplay
 from functions.other_windows_functions import MyInfo
-from functions.utils import humansize
+from functions.utils import humansize, clear_layout
 from functions.gui_elements import DropFrame
     
 
@@ -18,11 +15,10 @@ def gui_initialization(self):
     self.actionSeparator4.setText('')
     self.actionSeparator5.setText('')
     self.actionSeparator5.setVisible(False)
-    self.actionUpdateBar.setVisible(False)
+    self.actionUpdate.setVisible(False)
     self.tab_view.removeTab(2)
     self.tab_view.setEnabled(False)
     self.tab_view.setVisible(False)
-
     self.gridLayout.removeWidget(self.tab_view)
     file_drop_layout(self)
     self.sb_filename_lb = QtWidgets.QLabel()
@@ -379,8 +375,8 @@ def update_new_variable_list_gui(self):
 def status_bar_update(self):
     logging.debug('gui - gui_functions.py - status_bar_update')
     if self.file_is_opened:
-        out_file_base, out_file_ext = ntpath.splitext(ntpath.basename(self.file_name))
-        open_file_size = humansize(ntpath.getsize(self.file_name))
+        out_file_base, out_file_ext = os.path.splitext(os.path.basename(self.file_name))
+        open_file_size = humansize(os.path.getsize(self.file_name))
         filename = out_file_base + out_file_ext
         filetype = ''
         try:
@@ -405,6 +401,7 @@ def update_icons_state(self, string=None):
         self.actionOpenBar.setEnabled(True)
         self.actionSaveAsBar.setEnabled(False)
         self.actionCloseBar.setEnabled(False)
+        self.actionExport.setEnabled(False)
         self.actionAlgorithmsBar.setEnabled(False)
         self.actionCreateVariableBar.setEnabled(False)
         self.actionDeleteVariableBar.setEnabled(False)
@@ -416,6 +413,7 @@ def update_icons_state(self, string=None):
     if string == 'open_file':
         self.actionSaveAsBar.setEnabled(True)
         self.actionCloseBar.setEnabled(True)
+        self.actionExport.setEnabled(True)
         self.actionAlgorithmsBar.setEnabled(True)
         self.actionGlobalAttributesBar.setEnabled(True)
         self.actionCreateVariableBar.setEnabled(True)
@@ -594,6 +592,7 @@ def read_set_attribute_gui(gui_object, attr_name, attr_dict=None):
 
 
 def file_drop_layout(self):
+    logging.debug('gui - gui_functions.py - file_drop_layout')
     self.drop_grid_layout_2 = QtWidgets.QGridLayout()
     self.drop_grid_layout_2.setObjectName("drop_grid_layout_2")
     self.drop_grid_layout_2.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
@@ -676,18 +675,8 @@ def file_drop_layout(self):
 
 
 def too_many_files(self):
+    logging.debug('gui - gui_functions.py - too_many_files')
     info_text = 'It is nos possible to open more than one file with the GUI at this time. If multiple files have to ' \
                 'be processed, please use the Bath processing function in the File menu.'
     self.infoWindow = MyInfo(info_text)
     self.infoWindow.exec_()
-
-
-def clear_layout(layout):
-    logging.debug('gui - gui_functions.py - clear_layout')
-    for i in reversed(range(layout.count())):   
-        item = layout.itemAt(i)
-        if isinstance(item, QtWidgets.QWidgetItem):
-            item.widget().deleteLater()
-        elif isinstance(item, QtWidgets.QLayout):
-            clear_layout(item.layout())
-        layout.removeItem(item)

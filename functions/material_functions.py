@@ -4,7 +4,7 @@ import matplotlib
 
 
 def objects_initialization(self):
-    logging.debug('gui - sql_functions.py - objects_initialization')
+    logging.debug('gui - material_functions.py - objects_initialization')
     self.modified = False
     self.opened_file = None
     self.file_name = ''
@@ -60,6 +60,7 @@ def objects_initialization(self):
 
 
 def setup_fonts():
+    logging.debug('gui - material_functions.py - setup_fonts')
     if platform.system() == 'Linux':
         font_list = ([str(f.name) for f in matplotlib.font_manager.fontManager.ttflist] + 
                      [str(f.name) for f in matplotlib.font_manager.fontManager.afmlist])
@@ -67,8 +68,6 @@ def setup_fonts():
         font_list = [matplotlib.font_manager.FontProperties(fname=fname).get_name() for fname in matplotlib.
                      font_manager.win32InstalledFonts()]
     else:
-        logging.exception('gui - plot_window_functions.py - PlotWindow - __init__: an exception occured - the '
-                          + 'program couldnt determined which os is intalled')
         raise Exception('The program couldnt determined which os is intalled')
     for index, item in enumerate(font_list):
         font_list[index] = str(item)
@@ -81,6 +80,7 @@ def setup_fonts():
 
 
 def setup_plot_material(self):
+    logging.debug('gui - material_functions.py - setup_plot_material')
     self.plot_options = {}
     self.figure_options = {}
     self.line_styles = ["Dashed",
@@ -276,7 +276,7 @@ def setup_plot_material(self):
 
 
 def add_global_attributes_to_buttons(self):
-    logging.debug('gui - other_functions.py - add_global_attributes_to_buttons')
+    logging.debug('gui - material_functions.py - add_global_attributes_to_buttons')
     self.buttons_lines_dict['gm_button_1'][2] = self.list_of_global_attributes
     self.buttons_lines_dict['gm_button_2'][2] = self.list_of_global_attributes
     self.buttons_lines_dict['gm_button_3'][2] = self.list_of_global_attributes
@@ -285,6 +285,7 @@ def add_global_attributes_to_buttons(self):
 
 
 def plot_information_buttons_text(self):
+    logging.debug('gui - material_functions.py - plot_information_buttons_text')
     self.save_buttons_text = {'pw_info_bt_1': 'Control the size of the figure when it is saved, if the user wants a '
                                               'size different than the one of the window.',
                               'pw_info_bt_2': 'The resolution of the figure in dot per inch (dpi). Numbers up to 600 '
@@ -294,17 +295,17 @@ def plot_information_buttons_text(self):
                               'pw_info_bt_4': 'This slider controls the quality of the picture if the JPEG format is '
                                               'selected when the picture is saved.'}
 
-    self.figure_buttons_text = {'pw_figureOptions_bt_1': 'Figure margins are set by moving the sliders. The greater '
+    self.figure_buttons_text = {'pw_figureOptions_bt_1': 'It is possible to customize the figure and axis titles, '
+                                                         'their fonts and the size of their fonts.',
+                                'pw_figureOptions_bt_2': 'Ticks are controled from here. Please note that the numbers '
+                                                         'won\'t change if the user uses the pan and zoom functions.',
+                                'pw_figureOptions_bt_6': 'A grid can be display and customized from here.',
+                                'pw_figureOptions_bt_7': 'The legeng can move freely on the figure, this option '
+                                                         'allows the user to set it visible or not.',
+                                'pw_commonOptions_bt_1': 'Figure margins are set by moving the sliders. The greater '
                                                          'the number, the greater the margins. If multiple figures '
                                                          'are displayed, the last sliders control the distance '
                                                          'between those figures.',
-                                'pw_figureOptions_bt_2': 'It is possible to customize the figure and axis titles, '
-                                                         'their fonts and the size of their fonts.',
-                                'pw_figureOptions_bt_6': 'Ticks are controled from here. Please note that the numbers '
-                                                         'won\'t change if the user uses the pan and zoom functions.',
-                                'pw_figureOptions_bt_7': 'A grid can be display and customized from here.',
-                                'pw_commonOptions_bt_1': 'The legeng can move freely on the figure, this option '
-                                                         'allows the user to set it visible or not.',
                                 'pw_plotOptions_bt_1': 'The line style is controled from here. The selection of the '
                                                        'style impacts the way the line is customized below.',
                                 'pw_plotOptions_bt_2': 'The color of the line can be changed to a predefined color, '
@@ -318,6 +319,7 @@ def plot_information_buttons_text(self):
 
 
 def algorithm_information_buttons_text(self):
+    logging.debug('gui - material_functions.py - algorithm_information_buttons_text')
     self.information_buttons_text = {'cw_info_3': 'The name of the algorithm as implemented in EGADS. To aid in '
                                                   'algorithm usage and discovery, there is a general naming scheme '
                                                   'for egads algorithms. Generally, algorithm names are composed as '
@@ -403,6 +405,7 @@ def algorithm_information_buttons_text(self):
 
 
 def options_information_buttons_text(self):
+    logging.debug('gui - material_functions.py - options_information_buttons_text')
     self.information_buttons_text = {'info_button_1': 'The user can change the verbose level of the logging system. '
                                                       'If an issue is noticed, it is a good idea to change the level '
                                                       'to DEBUG and send the log file to the developer.',
@@ -421,10 +424,19 @@ def options_information_buttons_text(self):
                                                       'replace missing values in variables composed of integer '
                                                       'values. By checking this option, the user allows EGADS to '
                                                       'switch back to the default option if the read of a variable '
-                                                      'fails in this particular situation.'}
+                                                      'fails in this particular situation.',
+                                     'info_button_8': 'The user can change the verbose level of the logging system. '
+                                                      'If an issue is noticed, it is a good idea to change the level '
+                                                      'to DEBUG and send the log file to the developer.',
+                                     'info_button_7': 'The path and folder where to save the log file, modifying this '
+                                                      'option assumes to restart the GUI',
+                                     'info_button_9': 'This option allows the GUI to check for an update online at '
+                                                      'startup automatically. The user has the possibility to check '
+                                                      'manually by clicking on the left button.'}
 
 
 def batch_processing_information_buttons_text(self):
+    logging.debug('gui - material_functions.py - batch_processing_information_buttons_text')
     self.information_buttons_text = {'bw_info_1': 'At this time, the batch processing function has 6 different '
                                                   'processes:<ul><li>the concatenation of multiple files</li><li>the '
                                                   'conversion of multiple NetCDF files to NASA Ames file '
@@ -483,3 +495,70 @@ def batch_processing_information_buttons_text(self):
                                      'bw_info_9': self.bw_combobox_7,
                                      'bw_info_10': self.bw_combobox_8,
                                      'bw_info_11': self.bw_combobox_9}
+
+
+def export_main_information_buttons_text():
+    logging.debug('gui - material_functions.py - export_main_information_buttons_text')
+    info_dict = {'info_button_1': 'The GUI gives to the user the possibility to export data into few external '
+                                  'formats. At this time, it is possible to export data along a path ('
+                                  'georeferenced time series generally) to Google Earth KML/KMZ file format. Please '
+                                  'read the documentation for more details.'}
+    return info_dict
+
+
+def export_ge_ts_information_buttons_text():
+    logging.debug('gui - material_functions.py - export_ge_ts_information_buttons_text')
+    info_dict = {'info_button_2': 'Data in Google Earth are georeferenced. Thus it is mandatory to provide longitude, '
+                                  'latitude and (if possible) altitude to create a path. All data have to be vectors '
+                                  'with the same amount of samples.',
+                 'info_button_3': 'Choose here one or more variables to be displayed in Google Earth. The chosen '
+                                  'variables are not strictly drawn and displayed. Only the path is displayed with '
+                                  'a colormap and units for each variable.<br><br>Important note : at this time, '
+                                  'only one variable is handled by the export function, due to the size of the output '
+                                  'file. It will change in the next version.',
+                 'info_button_12': 'The width of the path in pixel. Minimum is 1 px and maximum is 20 px.',
+                 'info_button_4': 'By default, only a path is rendered. If checked, and if the path is not stuck to '
+                                  'the ground, this option allow the GUI to connect the path to the ground with '
+                                  'polygons.',
+                 'info_button_5': 'If the above option is checked, by default, the polygons are filled with the same '
+                                  'color chosen for the path. This option will add a certain amount of transparency '
+                                  'to the polygons.',
+                 'info_button_6': 'Sometime, a path can be composed of a great number of samples, in particular '
+                                  'with airborne data, increasing greatly the size of the KML/KMZ file. Thus with this '
+                                  'option, it is possible to reduce the number of samples by keeping 1 sample on N '
+                                  'samples. Only integers are accepted.',
+                 'info_button_7': 'A colormap is mandatory to display the values of a variable along a path in Google '
+                                  'Earth. The different colormaps are from Matplotlib. Select one of them to activate '
+                                  'all colormap options.',
+                 'info_button_11': 'The colormap can be displayed at four different positions in Google Earth and '
+                                   'following two orientations:<ul><li>horizontal and at the '
+                                   'bottom</li><li>horizontal and at the top</li><li>vertical and on the '
+                                   'left</li><li>vertical and on the right</li></ul>',
+                 'info_button_8': 'This option is used to reverse the colormap. If the colormap is starting with blue '
+                                  'and ending with red, the reversed colormap will start with red and and end with '
+                                  'blue.',
+                 'info_button_13': 'The path is a succession of segments. Each segment is composed of a starting '
+                                   'point and a ending point, each of them defined by its coordinates and its value. '
+                                   'In Google Earth, for a path, the points are not colored, but the segments are. '
+                                   'This option is used to choose how each segment is colored:<ul><li>mean: the color '
+                                   'of the segment is based on the value of the mean between the starting point and '
+                                   'the ending point</li><li>first point: the color of the segment is based on the '
+                                   'value of the starting point</li><li>last point: the color of the segment is based '
+                                   'on the value of the ending point',
+                 'info_button_9': 'If handled automaticallu, the minimum and maximum values of the colormap are the '
+                                  'minimum (integer) and the maximum value (integer + 1) of the displayed variable. '
+                                  'The number of steps is set to 15 and is the number of intervals equally distributed '
+                                  'between the minimum and maximum values. Uncheck this option to handle those values '
+                                  'manually.',
+                 'info_button_10': 'If checked, the GUI handles the colormap dimensions automatically. Uncheck this '
+                                   'option to set the dimensions according to your needs. By default, dimensions are '
+                                   'set this way:<ul><li>for a vertical colormap:<ul><li>figure width = 1 ('
+                                   'inches)</li><li>figure height = 8 (inches)</li><li>position from left = '
+                                   '0.05 (fraction)</li><li>position from bottom = 0.05 (fraction)</li><li>colormap '
+                                   'width = 0.25 (fraction)</li><li>colormap height = 0.9 ('
+                                   'fraction)</li></ul></li></ul>'
+                                   '<ul><li>for an horizontal colormap:<ul><li>figure width = 8 (inches)</li><li>figure'
+                                   ' height = 1 (inches)</li><li>position from left = 0.05 (fraction)</li><li>position '
+                                   'from bottom = 0.60 (fraction)</li><li>colormap width = 0.9 ('
+                                   'fraction)</li><li>colormap height = 0.25 (fraction)</li></ul></li></ul>'}
+    return info_dict

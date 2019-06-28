@@ -5,24 +5,40 @@ CHANGELOG | LINEAGE BRANCH
 To do list:
 -----------
 
-  - check if it is possible to create KMZ files. (v 0.13)
-  - add the possibility for the user to change subplot positions. (v 0.13)
-  - move saving function to a thread. (v 0.14)
+  - add map export possibility for GE. (v 0.14)
+  - add the possibility for the user to change subplot positions. (v 0.14)
   - check feasability of a standalone program. (v 0.14)
-  - add egads options to egads GUI options. (v 0.13)
-  - revamp the option window. (v 0.13)
   - add a window to create variable. (v 0.14)
   
 To fix list:
 ------------
 
 
+June 28 2019, Release version 0.13.0
+====================================
+  EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly.
+  The GUI can now take care of EGADS options.
+  It is also prossible to save airborne data (time series) or data along a path to KML / KMZ file for Google Earth (File > Export).
+  
+  MODIFIED:
+    - the option window has been redone to take into account EGADS options, and future GUI options.
+	- the saving function has been moved to a QThread.
+	- the documentation has been updated.
+	- all logging messages have reviewed and corrected.
+
+  ADDED:
+    - a function to save kml/kmz files for Google Earth has been added.
+  
+  FIXED:
+    - few logging messages have been corrected.
+
+
 June 10 2019, Release version 0.12.0
-===================================
+====================================
   EGADS Lineage GUI needs EGADS Lineage 0.9.4 or above to work properly.
   NASA Ames file format is now handled by the GUI.
   Batch processing is now available in the GUI.
-  New options hava been introduced, the gui_options.ini file should be deleted manually if it already exists.
+  New options have been introduced, the gui_options.ini file should be deleted manually if it already exists.
   
   MODIFIED:
     - the naming convention has been added in the filename window when a user creates an algorithm.

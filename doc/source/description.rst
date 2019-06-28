@@ -68,7 +68,7 @@ File is a submenu of the menu bar.
    :scale: 45 %
    :align: center
 
-From here, it is possible to ``Open``, `Save As`` and ``Close`` a file. If a user wants to launch the same processing on a certain amount of files, he has access to ``Batch processing``. And to quit the software, the job is done by clicking on ``Quit``.
+From here, it is possible to ``Open``, `Save As`` and ``Close`` a file. The ``Export`` allow the user to save data to KML/KMZ file format for Google Earth. If a user wants to launch the same processing on a certain amount of files, he has access to ``Batch processing``. And to quit the software, the job is done by clicking on ``Quit``.
 
 
 ^^^^^^^^^^^
@@ -350,6 +350,19 @@ For those who want to process more than one file at a time, they can use the bat
    :align: center
 
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The export window
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For those who want to export their data into another external format, they can use the export function from the File menu. At this time, only KML/KMZ file format for Google Earth (data along a path, generally time series) is available. The export possibilities will expand in the future.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_export_window_8.png
+   :width: 772px
+   :height: 479px
+   :scale: 45 %
+   :align: center
+
+
 ----------------------------------------------
 The central widget, example with a NetCDF file
 ----------------------------------------------
@@ -433,9 +446,9 @@ EGADS and GUI options
 The options of EGADS and its GUI are controled through the option window, in the About menu.
 
 .. image:: images/egads_gui_screencaptures/EGADS_GUI_option_window.png
-   :width: 748px
-   :height: 525px
+   :width: 732px
+   :height: 339px
    :scale: 45 %
    :align: center
 
-In the Log options section, the user will find options to control the logging system: the log level and the path where to save the log file. In the System options section, the user can control options usually set in EGADS. Please refer to the documentation of EGADS for more details about those options.
+In the Log options section, the user will find options to control the logging system: the log level and the path where to save the log file. In the EGADS options section, the user can control options usually set in EGADS. Please refer to the documentation of EGADS for more details about those options.

@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_globalattributewindow import Ui_globalAttributeWindow
 from ui.Ui_variableattributewindow import Ui_variableAttributeWindow
 from ui.Ui_navariableattributewindow import Ui_naVariableAttributeWindow
+from functions.utils import clear_layout
 
 
 class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
@@ -20,7 +21,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
         if self.open_file_ext == 'NetCDF Files (*.nc)':
             self.populate_attribute_netcdf()
         elif self.open_file_ext == 'NASA Ames Files (*.na)':
-            self.clear_layout(self.verticalLayout_3)
+            clear_layout(self.verticalLayout_3)
             self.gw_addAttribute_lb.setVisible(False)
             self.gw_addAttribute_rl.setVisible(False)
             self.gw_button_1.setVisible(False)
@@ -70,8 +71,9 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
         self.close()
         
     def close_window_save(self):
+        logging.debug('gui - metadata_windows_functions.py - MyGlobalAttributes - close_window_save')
         try:
-            logging.debug('gui - metadata_windows_functions.py - MyGlobalAttributes - close_window_save')
+
             if self.open_file_ext == 'NetCDF Files (*.nc)':
                 self.global_attributes["Conventions"] = str(self.gw_conventions_ln.text())
                 self.global_attributes["title"] = str(self.gw_title_ln.text())
@@ -561,7 +563,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
             self.list_line = []
             self.list_del = []
             self.attribute_num = 0
-            self.clear_layout(self.other_attributes_layout)
+            clear_layout(self.other_attributes_layout)
             self.gw_showButton.setText("Show other attributes")
 
     def delete_attribute(self):
@@ -608,16 +610,6 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
             except KeyError:
                 self.gw_addAttribute_rl.addItem(item)
 
-    def clear_layout(self, layout):
-        logging.debug('gui - metadata_windows_functions.py - MyGlobalAttributes - clear_layout')
-        for i in reversed(range(layout.count())):   
-            item = layout.itemAt(i)
-            if isinstance(item, QtWidgets.QWidgetItem):
-                item.widget().deleteLater()
-            elif isinstance(item, QtWidgets.QLayout):
-                self.clear_layout(item.layout())
-            layout.removeItem(item)
-
 
 class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
     def __init__(self, var, variable_attributes, open_file_ext):
@@ -658,7 +650,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
         self.populate_attribute()
         self.populate_combobox()
         if self.open_file_ext == 'NASA Ames Files (*.na)':
-            self.clear_layout(self.verticalLayout_3)
+            clear_layout(self.verticalLayout_3)
             self.vw_addAttribute_lb.setVisible(False)
             self.vw_addAttribute_rl.setVisible(False)
             self.vw_button_1.setVisible(False)
@@ -826,7 +818,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
             self.list_line = []
             self.list_del = []
             self.attribute_num = 0
-            self.clear_layout(self.other_attributes_layout)
+            clear_layout(self.other_attributes_layout)
             self.vw_showButton.setText("Show other attributes")
 
     def add_attribute(self):
@@ -973,16 +965,6 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                     self.list_label[i].setObjectName("label_" + str(i))
                     self.list_del[i].setObjectName("list_del_" + str(i))
 
-    def clear_layout(self, layout):
-        logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - clear_layout')
-        for i in reversed(range(layout.count())):   
-            item = layout.itemAt(i)
-            if isinstance(item, QtWidgets.QWidgetItem):
-                item.widget().deleteLater()
-            elif isinstance(item, QtWidgets.QLayout):
-                self.clear_layout(item.layout())
-            layout.removeItem(item)
-
     def populate_combobox(self):
         logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - populate_combobox')
         self.vw_addAttribute_rl.addItem("Make a choice...")
@@ -997,7 +979,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
 
 class MyNAVariableAttributes(QtWidgets.QDialog, Ui_naVariableAttributeWindow):
     def __init__(self, var, variable_attributes):
-        logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - __init__ : var ' + str(var))
+        logging.debug('gui - metadata_windows_functions.py - MyNAVariableAttributes - __init__ : var ' + str(var))
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.variable = var
@@ -1006,40 +988,40 @@ class MyNAVariableAttributes(QtWidgets.QDialog, Ui_naVariableAttributeWindow):
         self.vw_okButton.clicked.connect(self.close_window_save)
         self.vw_cancelButton.clicked.connect(self.close_window)
         self.populate_attribute()
-        logging.info('gui - metadata_windows_functions.py - MyVariableAttributes - ready')
+        logging.info('gui - metadata_windows_functions.py - MyNAVariableAttributes - ready')
 
     def close_window_save(self):
-        logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - close_window_save')
+        logging.debug('gui - metadata_windows_functions.py - MyNAVariableAttributes - close_window_save')
         self.attributes['units'] = str(self.vw_units_ln.text())
         self.attributes['_FillValue'] = str(self.vw_fillValue_ln.text())
         self.attributes['scale_factor'] = str(self.vw_scalefactor_ln.text())
         self.close()
 
     def populate_attribute(self):
-        logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - populate_attribute')
+        logging.debug('gui - metadata_windows_functions.py - MyNAVariableAttributes - populate_attribute')
         try:
             self.vw_units_ln.setText(str(self.attributes["units"]))
             self.vw_units_ln.setCursorPosition(0)
         except KeyError:
-            logging.error('gui - metadata_windows_functions.py - MyVariableAttributes - populate_attribute :no Units '
+            logging.error('gui - metadata_windows_functions.py - MyNAVariableAttributes - populate_attribute :no Units '
                           'attribute')
             pass
         try:
             self.vw_fillValue_ln.setText(str(self.attributes["_FillValue"]))
             self.vw_fillValue_ln.setCursorPosition(0)
         except KeyError:
-            logging.error('gui - metadata_windows_functions.py - MyVariableAttributes - populate_attribute : no '
+            logging.error('gui - metadata_windows_functions.py - MyNAVariableAttributes - populate_attribute : no '
                           'FillValue attribute')
             pass
         try:
             self.vw_scalefactor_ln.setText(str(self.attributes["scale_factor"]))
             self.vw_scalefactor_ln.setCursorPosition(0)
         except KeyError:
-            logging.error('gui - metadata_windows_functions.py - MyVariableAttributes - populate_attribute : no '
+            logging.error('gui - metadata_windows_functions.py - MyNAVariableAttributes - populate_attribute : no '
                           'scale_factor attribute')
             pass
 
     def close_window(self):
-        logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - close_window')
+        logging.debug('gui - metadata_windows_functions.py - MyNAVariableAttributes - close_window')
         del self.attributes
         self.close()
