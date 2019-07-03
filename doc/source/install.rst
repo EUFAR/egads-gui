@@ -16,6 +16,7 @@ The use of the EGADS GUI requires the following packages:
 * EGADS 0.9.3 or newer. Available at https://pypi.python.org/pypi/egads
 * Matplotlib 2.2.2 or newer. Available at https://pypi.python.org/pypi/matplotlib
 * Cartopy 0.17.0 or newer. Available at https://pypi.org/project/Cartopy/
+* Simplekml 1.3.1 or newer. Available at https://pypi.org/project/simplekml/
 * Requests 2.18.4 or newer. Optional, only for update checking. Available at https://pypi.org/project/requests/
 
 
@@ -32,7 +33,7 @@ Installation
 
 The EGADS GUI is actually available as a common Python script, thus it doesn't need any particular installation. To use it, the package must be downloaded and uncompressed somewhere on the hard drive, and the script executed with the usual command ``python egads_gui.py`` from a terminal launched in the EGADS GUI directory. This version can be executed on any version of Linux, Windows and MacOS as soon as prerequisites are installed and working.
 
-In the future, a stand-alone version will be available, embedding or not the last version of EGADS core.
+In the future, a stand-alone version will be available.
 
 To learn how to install EGADS, please read the EGADS documentation available at the following places: https://github.com/EUFAR/egads/tree/Lineage/Documentation & https://egads.readthedocs.io/en/lineage/
 
@@ -48,7 +49,7 @@ No test system has been introduced at this time.
 Options
 *******
 
-Since version 0.10.0, an .ini file has been added to EGADS GUI to welcome few options: log level and path, automatic check for a new EGADS GUI version on GitHub, and few other options. If the file is not present in EGADS GUI directory, when importing, EGADS GUI will create it automatically with default options. The modification of the file is made through the option window of the GUI.
+Since version 0.10.0, an .ini file has been added to EGADS GUI to welcome few options: log level and path, automatic check for a new EGADS GUI version on GitHub, and few other options. If the file is not present in EGADS GUI directory, when importing, EGADS GUI will create it automatically with default options. The modification of the file is made through the option window of the GUI. Since version 0.13.0, the GUI can control the EGADS options.
 
 
 ***

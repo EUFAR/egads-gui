@@ -13,6 +13,12 @@ To fix list:
 ------------
 
 
+July 03 2019, Release version 0.14.1
+====================================
+  MODIFIED:
+    - the documentation has been updated.
+
+
 July 03 2019, Release version 0.14.0
 ====================================
   EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly.

@@ -1,4 +1,4 @@
-_gui_version = '0.13.0'
+_gui_version = '0.14.1'
 _gui_branch = 'Lineage'
 _eclipse_version = '2019.1.3'
 _qt_version = '5.11.3'
