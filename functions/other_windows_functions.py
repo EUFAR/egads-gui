@@ -4,6 +4,7 @@ import datetime
 import webbrowser
 import egads
 import pathlib
+import textwrap
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_infowindow import Ui_infoWindow
 from ui.Ui_displaywindow import Ui_displayWindow
@@ -17,11 +18,96 @@ from ui.Ui_waitwindow import Ui_waitWindow
 from ui.Ui_downloadwindow import Ui_downloadWindow
 from ui.Ui_coefwindow import Ui_coefWindow
 from ui.Ui_asksavewindow import Ui_asksaveWindow
+from ui.Ui_subplotwindow import Ui_subplotWindow
 from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSUpdateOnline
 from functions.gui_elements import QtWaitingSpinner
 from ui._version import _gui_version
-from functions.material_functions import options_information_buttons_text
 from functions.utils import clear_layout
+
+
+class MySubplot(QtWidgets.QDialog, Ui_subplotWindow):
+    def __init__(self, var_list):
+        logging.debug('gui - other_windows_functions.py - MyTest - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.var_list = var_list
+        self.sw_ok_button.clicked.connect(self.create_layout)
+        self.sw_cancel_button.clicked.connect(self.closeWindow)
+        self.add_column.clicked.connect(self.add_table_column)
+        self.add_row.clicked.connect(self.add_table_row)
+        self.subplot_layout = {}
+        self.parse_var_list()
+        logging.info('gui - other_windows_functions.py - MyTest - ready')
+
+    def parse_var_list(self):
+        k = 0
+        for i in range(0, 3):
+            for j in range(0, 3):
+                try:
+                    var = ''
+                    if len(textwrap.wrap(self.var_list[k], 10)) > 1:
+                        for text in textwrap.wrap(self.var_list[k], 10):
+                            var += text + '\n'
+                        var = var[:-1]
+                    else:
+                        var = textwrap.wrap(self.var_list[k], 10)[0]
+                    self.sw_table.setItem(j, i, QtWidgets.QTableWidgetItem(var))
+                except IndexError:
+                    self.sw_table.setItem(j, i, QtWidgets.QTableWidgetItem(''))
+                k += 1
+
+    def add_table_column(self):
+        idx = int(self.sw_table.columnCount())
+        self.sw_table.insertColumn(idx)
+        for i in range(0, int(self.sw_table.rowCount())):
+            self.sw_table.setItem(i, idx, QtWidgets.QTableWidgetItem(''))
+
+    def add_table_row(self):
+        idx = int(self.sw_table.rowCount())
+        self.sw_table.insertRow(idx)
+        for i in range(0, int(self.sw_table.columnCount())):
+            self.sw_table.setItem(idx, i, QtWidgets.QTableWidgetItem(''))
+
+    def create_layout(self):
+        self.remove_empty_row()
+        self.remove_empty_column()
+        k = 1
+        self.subplot_layout['mpl_nrow'] = int(self.sw_table.rowCount())
+        self.subplot_layout['mpl_ncol'] = int(self.sw_table.columnCount())
+        for i in range(0, self.sw_table.rowCount()):
+            for j in range(0, self.sw_table.columnCount()):
+                if self.sw_table.item(i, j).text():
+                    self.subplot_layout[str(self.sw_table.item(i, j).text()).replace('\n', '')] = k
+                k += 1
+        self.close()
+
+    def remove_empty_row(self):
+        empty_row = []
+        for i in range(0, int(self.sw_table.rowCount())):
+            empty = True
+            for j in range(0, int(self.sw_table.columnCount())):
+                if self.sw_table.item(i, j).text():
+                    empty = False
+            if empty:
+                empty_row.append(i)
+        for i in reversed(empty_row):
+            self.sw_table.removeRow(i)
+
+    def remove_empty_column(self):
+        empty_col = []
+        for i in range(0, int(self.sw_table.columnCount())):
+            empty = True
+            for j in range(0, int(self.sw_table.rowCount())):
+                if self.sw_table.item(j, i).text():
+                    empty = False
+            if empty:
+                empty_col.append(i)
+        for i in reversed(empty_col):
+            self.sw_table.removeColumn(i)
+
+    def closeWindow(self):
+        logging.debug('gui - other_windows_functions.py - MyInfo - closeWindow')
+        self.close()
 
 
 class MyAsk(QtWidgets.QDialog, Ui_asksaveWindow):
@@ -78,20 +164,77 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
         self.fill_value = fill_value
         self.var = var_values
         self.dimensions = dimensions
-        self.splitter.setSizes([100, 200])
+        self.splitter.setSizes([107, 282])  # 389
         self.dw_line_1.setText(var_name)
         self.dw_line_2.setText(var_units)
         self.dw_okButton.clicked.connect(self.closeWindow)
         self.current_row = 0
         self.current_col = 0
+        self.current_lay = 0
+        self.lay_count = None
+        self.row_count = None
+        self.col_count = None
+        self.shape_length = len(self.var.shape)
+        self.scroll_connect = False
         self.dw_label_4.setVisible(False)
         self.dw_label_5.setText('')
         self.dw_label_5.setVisible(False)
         self.gridLayout_2.removeWidget(self.dw_label_5)
         self.dw_label_5.deleteLater()
+        self.dw_label_7.setVisible(False)
+        self.dw_label_8.setVisible(False)
         self.populate_dimensions()
         self.populate_table()
         logging.info('gui - other_windows_functions.py - MyDisplay - ready')
+
+    def populate_dimensions(self):
+        logging.debug('gui - other_windows_functions.py - MyDisplay - populate_dimensions')
+        dimensions_str = ''
+        for key, value in self.dimensions.items():
+            dimensions_str = dimensions_str + str(value['length']) + ' (' + key + '), '
+        self.dw_line_3.setText(dimensions_str[:-2])
+
+    def populate_table(self):
+        logging.debug('gui - other_windows_functions.py - MyDisplay - populate_table')
+        if self.shape_length > 3:
+            text = 'It is not possible to display data with more than 3 dimensions.'
+            info_window = MyInfo(text)
+            info_window.exec_()
+        else:
+            if self.fill_value is not None:
+                try:
+                    self.var[self.var == self.fill_value] = numpy.nan
+                except ValueError:
+                    pass
+            self.lay_count, self.row_count, self.col_count = self.populate_headers()
+            if self.shape_length == 1:
+                for x in range(self.col_count):
+                    self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem(str(self.var[x])))
+            elif self.shape_length == 2:
+                self.scroll_connect = False
+                if self.var.shape[0] > 50:
+                    self.row_count = 50
+                    self.scroll_connect = True
+                if self.var.shape[1] > 50:
+                    self.col_count = 50
+                    self.scroll_connect = True
+                if self.scroll_connect:
+                    self.connect_scrollbars()
+                for x in range(self.col_count):
+                    for y in range(self.row_count):
+                        self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[y, x])))
+            elif self.shape_length == 3:
+                if self.var.shape[1] > 50:
+                    self.row_count = 50
+                    self.scroll_connect = True
+                if self.var.shape[2] > 50:
+                    self.col_count = 50
+                    self.scroll_connect = True
+                if self.scroll_connect:
+                    self.connect_scrollbars()
+                for x in range(self.col_count):
+                    for y in range(self.row_count):
+                        self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[0, y, x])))
 
     def connect_scrollbars(self):
         logging.debug('gui - other_windows_functions.py - MyDisplay - connect_scrollbars')
@@ -110,55 +253,35 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
             for y in range(self.current_row - 20, self.current_row + 20):
                 try:     
                     if not self.dw_table.item(y, x):
-                        self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[y, x])))
+                        if self.shape_length == 2:
+                            self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[y, x])))
+                        else:
+                            self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[self.current_lay, y,
+                                                                                                x])))
                 except IndexError:
                     pass
 
-    def populate_dimensions(self):
-        logging.debug('gui - other_windows_functions.py - MyDisplay - populate_dimensions')
-        dimensions_str = ''
-        for key, value in self.dimensions.items():
-            dimensions_str = dimensions_str + str(value['length']) + ' (' + key + '), '
-        self.dw_line_3.setText(dimensions_str[:-2])
-        
-    def populate_table(self):
-        logging.debug('gui - other_windows_functions.py - MyDisplay - populate_table')
-        if self.fill_value is not None:
-            try:
-                self.var[self.var == self.fill_value] = numpy.nan
-            except ValueError:
-                pass
-        data_shape = self.var.shape
-        row, col = None, None
-        if len(data_shape) >= 3 and data_shape[0] > 1 and data_shape[1] > 1 and data_shape[2] > 1:
-            print('It is not possible to display data with 3 dimensions and more yet.')
+    def load_new_layer_data(self):
+        self.dw_table.clearContents()
+        if self.scroll_connect:
+            for x in range(self.current_col - 20, self.current_col + 20):
+                for y in range(self.current_row - 20, self.current_row + 20):
+                    try:
+                        if not self.dw_table.item(y, x):
+                            self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[self.current_lay, y,
+                                                                                                x])))
+                    except IndexError:
+                        pass
         else:
-            row, col = self.populate_headers()
-        if row is not None:
-            data_shape = self.var.shape
-            if len(data_shape) > 1:
-                connect = False
-                if data_shape[0] > 50:
-                    row = 50
-                    connect = True
-                if data_shape[1] > 50:
-                    col = 50
-                    connect = True
-                if connect:
-                    self.connect_scrollbars()
-                for x in range(col):
-                    for y in range(row):
-                        self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[y, x])))
-            else:
-                for x in range(col):
-                    self.dw_table.setItem(0, x, QtWidgets.QTableWidgetItem(str(self.var[x])))
+            for x in range(self.col_count):
+                for y in range(self.row_count):
+                    self.dw_table.setItem(y, x, QtWidgets.QTableWidgetItem(str(self.var[self.current_lay, y, x])))
 
     def populate_headers(self):
         logging.debug('gui - other_windows_functions.py - MyDisplay - populate_headers')
-        dim_num = len(self.var.shape)
-        row_size, col_size = None, None
-        if dim_num == 1:
-            col_size, row_size = self.var.shape[0], 1
+        lay_size, row_size, col_size = None, None, None
+        if self.shape_length == 1:
+            lay_size, col_size, row_size = 1, self.var.shape[0], 1
             self.dw_table.setColumnCount(col_size)
             self.dw_table.setRowCount(row_size) 
             for dim, value in self.dimensions.items():
@@ -178,7 +301,8 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                     self.dw_label_4.setText('Latitude')
                 val_list = [str(i) for i in value['values']]
                 self.dw_table.setHorizontalHeaderLabels(val_list)
-        elif dim_num == 2:
+        elif self.shape_length == 2:
+            lay_size = 1
             time_in, lon_in, lat_in = False, False, False
             time_name = None
             lon_name = None
@@ -224,75 +348,296 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                     row_size, col_size = self.var.shape
                     self.dw_table.setColumnCount(col_size)
                     self.dw_table.setRowCount(row_size)
-        elif dim_num == 3:
+        elif self.shape_length == 3:
             time_in, lon_in, lat_in = False, False, False
-            time_name, lon_name = None, None
-            for dim, value in self.dimensions.items():
-                if value['length'] == 1:
-                    self.var = numpy.squeeze(self.var, value['axis'])
-                    break
-            self.dimensions.pop(dim)
-            for dim, value in self.dimensions.items():
-                if 'time' in dim.lower():
-                    time_in = True
-                    time_name = dim
-                if dim.lower() in ['longitude', 'lon', 'long']:
-                    lon_in = True
-                    lon_name = dim
-            if time_in:
-                if self.dimensions[time_name]['axis'] == 0:
-                    self.var = numpy.transpose(self.var)
-                val_list = [str(i) for i in self.dimensions[time_name]['values']]
-                row_size, col_size = self.var.shape
-                self.dw_table.setColumnCount(col_size)
-                self.dw_table.setRowCount(row_size)
-                self.dw_label_4.setVisible(True)
-                self.dw_label_4.setText('Time')
-                self.dw_table.setHorizontalHeaderLabels(val_list)
-                self.dimensions.pop(time_name)
-                for key, value in self.dimensions.items():
-                    val_list = [str(i) for i in value['values']]
-                    self.dw_table.setVerticalHeaderLabels(val_list)
-                    self.set_row_label(key.title())
+
+            dim_list = list(self.dimensions.keys())
+            if 'time' in dim_list[0]:
+                time_in = True
+            if 'longitude' in dim_list[2] or 'long' in dim_list[2] or 'lon' in dim_list[2]:
+                lon_in = True
+            if 'latitude' in dim_list[1] or 'lati' in dim_list[1] or 'lat' in dim_list[1]:
+                lat_in = True
+
+            lay = self.dimensions[dim_list[0]]
+            row = self.dimensions[dim_list[1]]
+            col = self.dimensions[dim_list[2]]
+            lay_size = lay['length']
+            row_size = row['length']
+            col_size = col['length']
+
+            self.dw_table.setColumnCount(col_size)
+            self.dw_table.setRowCount(row_size)
+            self.dw_table.setHorizontalHeaderLabels([str(i) for i in col['values']])
+            self.dw_table.setVerticalHeaderLabels([str(i) for i in row['values']])
+            self.dw_label_4.setVisible(True)
+
+            if lon_in:
+                self.dw_label_4.setText('Longitude')
             else:
-                if lon_in:
-                    if self.dimensions[lon_name]['axis'] == 0:
-                        self.var = numpy.transpose(self.var)
-                    val_list = [str(i) for i in self.dimensions[lon_name]['values']]
-                    row_size, col_size = self.var.shape
-                    self.dw_table.setColumnCount(col_size)
-                    self.dw_table.setRowCount(row_size)
-                    self.dw_label_4.setVisible(True)
-                    self.dw_label_4.setText('Longitude')
-                    self.dw_table.setHorizontalHeaderLabels(val_list)
-                    self.dimensions.pop(lon_name)
-                    for key, value in self.dimensions.items():
-                        val_list = [str(i) for i in value['values']]
-                        self.dw_table.setVerticalHeaderLabels(val_list)
-                        self.set_row_label(key.title())
-                else:
-                    row_size, col_size = self.var.shape
-                    self.dw_table.setColumnCount(col_size)
-                    self.dw_table.setRowCount(row_size)   
-        return row_size, col_size
+                self.dw_label_4.setText(dim_list[2])
+            if lat_in:
+                self.set_row_label('Latitude')
+            else:
+                self.set_row_label(dim_list[1])
+            if time_in:
+                self.set_layer_options([str(i) for i in lay['values']], str(lay['values'][0]), lay_size - 1, 'Time:',
+                                       'Time:')
+            else:
+                self.set_layer_options([str(i) for i in lay['values']], str(lay['values'][0]), lay_size - 1)
+
+        return lay_size, row_size, col_size
             
     def set_row_label(self, text):
         logging.debug('gui - other_windows_functions.py - MyDisplay - set_row_label')
-        self.dw_label_5 = QtWidgets.QLabel()
+        text_str = ''
+        for i in text:
+            text_str += i + '<br>'
+        dw_label_5 = QtWidgets.QLabel()
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(9)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.dw_label_5.setFont(font)
-        self.dw_label_5.setStyleSheet("QLabel {\n"
+        dw_label_5.setFont(font)
+        dw_label_5.setStyleSheet("QLabel {\n"
+                                 "    color: rgb(45,45,45);\n"
+                                 "    margin-bottom: 5px;\n"
+                                 "    margin-right: 10px;\n"
+                                 "}")
+        dw_label_5.setText(text_str[:-4])
+        dw_label_5.setAlignment(QtCore.Qt.AlignCenter)
+        dw_label_5.setObjectName("dw_label_5")
+        self.gridLayout_2.addWidget(dw_label_5, 1, 0, 1, 1)
+
+    def set_layer_options(self, cb_values, lb8_value, sl_value, lb6_value='Layer:', lb7_value='Layer:'):
+        logging.debug('gui - other_windows_functions.py - MyDisplay - set_layer_options')
+        font1 = QtGui.QFont()
+        font1.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font1.setPointSize(10)
+        font1.setKerning(True)
+        font1.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        font2 = QtGui.QFont()
+        font2.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font2.setPointSize(9)
+        font2.setKerning(True)
+        font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.dw_label_6 = QtWidgets.QLabel(self.layoutWidget1)
+        self.dw_label_6.setMinimumSize(QtCore.QSize(0, 27))
+        self.dw_label_6.setMaximumSize(QtCore.QSize(16777215, 27))
+        self.dw_label_6.setFont(font1)
+        self.dw_label_6.setStyleSheet("QLabel {\n"
                                       "    color: rgb(45,45,45);\n"
-                                      "    margin-bottom: 5px;\n"
+                                      "}\n"
+                                      "\n"
+                                      "QLabel:disabled {\n"
+                                      "    color: rgb(145,145,145);\n"
                                       "}")
-        self.dw_label_5.setText(text)
-        self.dw_label_5.setAlignment(QtCore.Qt.AlignCenter)
-        self.dw_label_5.setObjectName("dw_label_5")
-        self.gridLayout_2.addWidget(self.dw_label_5, 1, 0, 1, 1)
+        self.dw_label_6.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.dw_label_6.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.dw_label_6.setLineWidth(0)
+        self.dw_label_6.setMidLineWidth(0)
+        self.dw_label_6.setTextFormat(QtCore.Qt.AutoText)
+        self.dw_label_6.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.dw_label_6.setWordWrap(False)
+        self.dw_label_6.setObjectName("dw_label_6")
+        self.horizontalLayout_4.addWidget(self.dw_label_6)
+        self.dw_slider_1 = QtWidgets.QSlider(self.layoutWidget1)
+        self.dw_slider_1.setMinimumSize(QtCore.QSize(250, 27))
+        self.dw_slider_1.setMaximumSize(QtCore.QSize(250, 27))
+        self.dw_slider_1.setStyleSheet("QSlider::groove:horizontal {\n"
+                                       "    border: 1px solid #999999;\n"
+                                       "    height: 1px;\n"
+                                       "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                       "    margin: 2px 0;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QSlider::handle:horizontal {\n"
+                                       "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                       "    border: 1px solid #5c5c5c;\n"
+                                       "    width: 10px;\n"
+                                       "    margin: -5px 0;\n"
+                                       "    border-radius: 5px;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QSlider::handle:horizontal:hover {\n"
+                                       "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                       "}\n"
+                                       "\n"
+                                       "QSlider::add-page:horizontal {\n"
+                                       "    background: rgb(200,200,200);\n"
+                                       "}\n"
+                                       "\n"
+                                       "QSlider::sub-page:horizontal {\n"
+                                       "    background: rgb(0,0,200);\n"
+                                       "}\n"
+                                       "\n"
+                                       "QSlider::sub-page:horizontal:disabled {\n"
+                                       "    background: rgb(145,145,145);\n"
+                                       "}\n"
+                                       "")
+        self.dw_slider_1.setMinimum(1)
+        self.dw_slider_1.setMaximum(100)
+        self.dw_slider_1.setSingleStep(1)
+        self.dw_slider_1.setPageStep(1)
+        self.dw_slider_1.setProperty("value", 1)
+        self.dw_slider_1.setSliderPosition(1)
+        self.dw_slider_1.setOrientation(QtCore.Qt.Horizontal)
+        self.dw_slider_1.setTickPosition(QtWidgets.QSlider.NoTicks)
+        self.dw_slider_1.setObjectName("dw_slider_1")
+        self.horizontalLayout_4.addWidget(self.dw_slider_1)
+        self.dw_navigate_1 = QtWidgets.QToolButton(self.layoutWidget1)
+        self.dw_navigate_1.setMaximumSize(QtCore.QSize(23, 23))
+        self.dw_navigate_1.setStyleSheet("QToolButton {\n"
+                                         "    border: 1px solid transparent;\n"
+                                         "    background-color: transparent;\n"
+                                         "    width: 27px;\n"
+                                         "    height: 27px;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QToolButton:flat {\n"
+                                         "    border: none;\n"
+                                         "}")
+        self.dw_navigate_1.setText("")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap("icons/left_arrow_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.dw_navigate_1.setIcon(icon1)
+        self.dw_navigate_1.setIconSize(QtCore.QSize(19, 19))
+        self.dw_navigate_1.setAutoRaise(False)
+        self.dw_navigate_1.setObjectName("dw_navigate_1")
+        self.horizontalLayout_4.addWidget(self.dw_navigate_1)
+        self.dw_navigate_2 = QtWidgets.QToolButton(self.layoutWidget1)
+        self.dw_navigate_2.setMaximumSize(QtCore.QSize(23, 23))
+        self.dw_navigate_2.setStyleSheet("QToolButton {\n"
+                                         "    border: 1px solid transparent;\n"
+                                         "    background-color: transparent;\n"
+                                         "    width: 27px;\n"
+                                         "    height: 27px;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QToolButton:flat {\n"
+                                         "    border: none;\n"
+                                         "}")
+        self.dw_navigate_2.setText("")
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap("icons/right_arrow_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.dw_navigate_2.setIcon(icon2)
+        self.dw_navigate_2.setIconSize(QtCore.QSize(19, 19))
+        self.dw_navigate_2.setAutoRaise(False)
+        self.dw_navigate_2.setObjectName("dw_navigate_2")
+        self.horizontalLayout_4.addWidget(self.dw_navigate_2)
+        self.horizontalLayout_4.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                                              QtWidgets.QSizePolicy.Minimum))
+        self.dw_combobox_1 = QtWidgets.QComboBox(self.layoutWidget1)
+        self.dw_combobox_1.setMinimumSize(QtCore.QSize(180, 27))
+        self.dw_combobox_1.setMaximumSize(QtCore.QSize(180, 27))
+        self.dw_combobox_1.setFont(font2)
+        self.dw_combobox_1.setStyleSheet("QComboBox {\n"
+                                         "    border: 1px solid #acacac;\n"
+                                         "    border-radius: 1px;\n"
+                                         "    padding-left: 5px;\n"
+                                         "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+                                         "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
+                                         "    color: rgb(45,45,45);\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox:disabled {\n"
+                                         "    background-color:  rgb(200,200,200);\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox:hover {\n"
+                                         "    border: 1px solid #7eb4ea;\n"
+                                         "    border-radius: 1px;\n"
+                                         "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+                                         "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox::drop-down {\n"
+                                         "    subcontrol-origin: padding;\n"
+                                         "    subcontrol-position: top right;\n"
+                                         "    width: 27px;\n"
+                                         "    border-left-width: 1px;\n"
+                                         "    border-left-color: darkgray;\n"
+                                         "    border-left-style: solid;\n"
+                                         "    border-top-right-radius: 3px;\n"
+                                         "    border-bottom-right-radius: 3px;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox::down-arrow {\n"
+                                         "    image: url(icons/down_arrow_icon.svg); \n"
+                                         "    width: 16px;\n"
+                                         "    height: 16px\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox QAbstractItemView {\n"
+                                         "    selection-background-color: rgb(200,200,200);\n"
+                                         "    selection-color: black;\n"
+                                         "    background: #f0f0f0;\n"
+                                         "    border: 0px solid #f0f0f0;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox QAbstractItemView::item {\n"
+                                         "    margin: 5px 5px 5px 5px;\n"
+                                         "}")
+        self.dw_combobox_1.setFrame(False)
+        self.dw_combobox_1.setObjectName("dw_combobox_1")
+        self.dw_combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
+        self.horizontalLayout_4.addWidget(self.dw_combobox_1)
+        self.verticalLayout.insertLayout(1, self.horizontalLayout_4)
+        self.dw_combobox_1.addItems(cb_values)
+        self.dw_slider_1.setMinimum(0)
+        self.dw_slider_1.setMaximum(sl_value)
+        self.dw_slider_1.setSingleStep(1)
+        self.dw_slider_1.setPageStep(1)
+        self.dw_label_7.setVisible(True)
+        self.dw_label_8.setVisible(True)
+        self.dw_label_6.setText(lb6_value)
+        self.dw_label_7.setText(lb7_value)
+        self.dw_label_8.setText(lb8_value)
+        self.dw_slider_1.valueChanged.connect(self.update_layer)
+        self.dw_navigate_1.clicked.connect(self.update_layer)
+        self.dw_navigate_2.clicked.connect(self.update_layer)
+        self.dw_combobox_1.currentIndexChanged.connect(self.update_layer)
+
+    def update_layer(self):
+        logging.debug('gui - other_windows_functions.py - MyDisplay - update_layer')
+        if self.sender().objectName() == 'dw_slider_1':
+            self.dw_combobox_1.currentIndexChanged.disconnect(self.update_layer)
+            val = int(self.dw_slider_1.value())
+            self.dw_combobox_1.setCurrentIndex(val)
+            self.dw_label_8.setText(self.dw_combobox_1.currentText())
+            self.current_lay = val
+            self.dw_combobox_1.currentIndexChanged.connect(self.update_layer)
+        elif self.sender().objectName() == 'dw_navigate_1':
+            if self.current_lay > 0:
+                self.dw_slider_1.valueChanged.disconnect(self.update_layer)
+                self.dw_combobox_1.currentIndexChanged.disconnect(self.update_layer)
+                self.current_lay -= 1
+                self.dw_combobox_1.setCurrentIndex(self.current_lay)
+                self.dw_label_8.setText(self.dw_combobox_1.currentText())
+                self.dw_slider_1.setValue(self.current_lay)
+                self.dw_slider_1.valueChanged.connect(self.update_layer)
+                self.dw_combobox_1.currentIndexChanged.connect(self.update_layer)
+        elif self.sender().objectName() == 'dw_navigate_2':
+            if self.current_lay < self.dw_combobox_1.count() - 1:
+                self.dw_slider_1.valueChanged.disconnect(self.update_layer)
+                self.dw_combobox_1.currentIndexChanged.disconnect(self.update_layer)
+                self.current_lay += 1
+                self.dw_combobox_1.setCurrentIndex(self.current_lay)
+                self.dw_label_8.setText(self.dw_combobox_1.currentText())
+                self.dw_slider_1.setValue(self.current_lay)
+                self.dw_slider_1.valueChanged.connect(self.update_layer)
+                self.dw_combobox_1.currentIndexChanged.connect(self.update_layer)
+        elif self.sender().objectName() == 'dw_combobox_1':
+            self.dw_slider_1.valueChanged.disconnect(self.update_layer)
+            val = self.dw_combobox_1.currentIndex()
+            self.dw_label_8.setText(self.dw_combobox_1.currentText())
+            self.dw_slider_1.setValue(val)
+            self.current_lay = val
+            self.dw_slider_1.valueChanged.connect(self.update_layer)
+        self.load_new_layer_data()
 
     def closeWindow(self):
         logging.debug('gui - other_windows_functions.py - MyDisplay - closeWindow')
@@ -453,849 +798,6 @@ class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
     def submitBox(self):
         logging.debug('gui - other_windows_functions.py - MyUnit - submitBox')
         self.accept()
-
-
-class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
-    def __init__(self, config_dict, egads_config_dict):
-        logging.debug('gui - other_windows_functions.py - MyOptions - __init__ ')
-        QtWidgets.QWidget.__init__(self)
-        self.setupUi(self)
-        self.config_dict = config_dict
-        self.egads_config_dict = egads_config_dict
-        self.ow_splitter.setSizes([110, 590])
-        options_information_buttons_text(self)
-        self.ow_ok_button.clicked.connect(self.save_config_dict)
-        self.ow_cancel_button.clicked.connect(self.closeWindow)
-        self.cancel = True
-        self.ow_section_list.itemSelectionChanged.connect(self.populate_options)
-        self.ow_section_list.setCurrentRow(0)
-        logging.info('gui - other_windows_functions.py - MyOptions - ready ')
-
-    def populate_options(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - populate_options')
-        clear_layout(self.ow_vertical_layout)
-        if self.ow_section_list.currentItem().text() == 'EGADS':
-            self.populate_egads_options()
-        elif self.ow_section_list.currentItem().text() == 'General':
-            self.populate_general_options()
-        elif self.ow_section_list.currentItem().text() == 'Update':
-            self.populate_update_options()
-
-    def populate_egads_options(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - populate_egads_options')
-        font1 = QtGui.QFont()
-        font1.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font1.setPointSize(10)
-        font1.setKerning(True)
-        font1.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        font2 = QtGui.QFont()
-        font2.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font2.setPointSize(9)
-        font2.setBold(False)
-        font2.setWeight(50)
-        font2.setKerning(True)
-        font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        icon_info = QtGui.QIcon()
-        icon_info.addPixmap(QtGui.QPixmap("icons/info_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon_open = QtGui.QIcon()
-        icon_open.addPixmap(QtGui.QPixmap("icons/open_popup_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.horizontalLayout_1 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_1.setObjectName("horizontalLayout_1")
-        self.checkbox_2 = QtWidgets.QCheckBox()
-        self.checkbox_2.setMinimumSize(QtCore.QSize(0, 27))
-        self.checkbox_2.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.checkbox_2.setFont(font1)
-        self.checkbox_2.setStyleSheet("QCheckBox {\n"
-                                      "   color: rgb(45,45,45);\n"
-                                      "}")
-        self.checkbox_2.setObjectName("checkbox_2")
-        self.horizontalLayout_1.addWidget(self.checkbox_2)
-        self.horizontalLayout_1.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_4 = QtWidgets.QToolButton()
-        self.info_button_4.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_4.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_4.setText("")
-        self.info_button_4.setIcon(icon_info)
-        self.info_button_4.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_4.setAutoRaise(False)
-        self.info_button_4.setObjectName("info_button_4")
-        self.horizontalLayout_1.addWidget(self.info_button_4)
-        self.horizontalLayout_1.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.checkbox_3 = QtWidgets.QCheckBox()
-        self.checkbox_3.setMinimumSize(QtCore.QSize(0, 27))
-        self.checkbox_3.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.checkbox_3.setFont(font1)
-        self.checkbox_3.setStyleSheet("QCheckBox {\n"
-                                      "   color: rgb(45,45,45);\n"
-                                      "}")
-        self.checkbox_3.setObjectName("checkbox_3")
-        self.horizontalLayout_2.addWidget(self.checkbox_3)
-        self.horizontalLayout_2.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_5 = QtWidgets.QToolButton()
-        self.info_button_5.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_5.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_5.setText("")
-        self.info_button_5.setIcon(icon_info)
-        self.info_button_5.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_5.setAutoRaise(False)
-        self.info_button_5.setObjectName("info_button_5")
-        self.horizontalLayout_2.addWidget(self.info_button_5)
-        self.horizontalLayout_2.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.horizontalLayout_3.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.checkbox_4 = QtWidgets.QCheckBox()
-        self.checkbox_4.setEnabled(False)
-        self.checkbox_4.setMinimumSize(QtCore.QSize(0, 27))
-        self.checkbox_4.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.checkbox_4.setFont(font1)
-        self.checkbox_4.setStyleSheet("QCheckBox {\n"
-                                      "   color: rgb(45,45,45);\n"
-                                      "}\n"
-                                      "\n"
-                                      "QCheckBox:disabled {\n"
-                                      "    color: rgb(145,145,145);\n"
-                                      "}")
-        self.checkbox_4.setObjectName("checkbox_4")
-        self.horizontalLayout_3.addWidget(self.checkbox_4)
-        self.horizontalLayout_3.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_6 = QtWidgets.QToolButton()
-        self.info_button_6.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_6.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_6.setText("")
-        self.info_button_6.setIcon(icon_info)
-        self.info_button_6.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_6.setAutoRaise(False)
-        self.info_button_6.setObjectName("info_button_6")
-        self.horizontalLayout_3.addWidget(self.info_button_6)
-        self.horizontalLayout_3.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_1)
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_2)
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_3)
-        self.ow_vertical_layout.setAlignment(QtCore.Qt.AlignTop)
-        self.checkbox_2.setText("Read variables as float")
-        self.checkbox_3.setText("Replace automatically missing values in variables by NaN")
-        self.checkbox_4.setText("Do not replace missing values if a variable can\'t be read.")
-        self.info_button_4.clicked.connect(self.button_info)
-        self.info_button_5.clicked.connect(self.button_info)
-        self.info_button_6.clicked.connect(self.button_info)
-        self.checkbox_3.clicked.connect(self.activate_checkbox_4)
-        self.checkbox_2.clicked.connect(self.set_checkbox_options)
-        self.checkbox_3.clicked.connect(self.set_checkbox_options)
-        self.checkbox_4.clicked.connect(self.set_checkbox_options)
-        self.read_config_dict()
-
-    def populate_general_options(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - populate_general_options')
-        font1 = QtGui.QFont()
-        font1.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font1.setPointSize(10)
-        font1.setKerning(True)
-        font1.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        font2 = QtGui.QFont()
-        font2.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font2.setPointSize(9)
-        font2.setBold(False)
-        font2.setWeight(50)
-        font2.setKerning(True)
-        font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        font3 = QtGui.QFont()
-        font3.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font3.setBold(True)
-        font3.setPointSize(10)
-        font3.setWeight(75)
-        font3.setKerning(True)
-        font3.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        icon_info = QtGui.QIcon()
-        icon_info.addPixmap(QtGui.QPixmap("icons/info_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon_open = QtGui.QIcon()
-        icon_open.addPixmap(QtGui.QPixmap("icons/open_popup_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_4)
-        self.ow_label_3 = QtWidgets.QLabel()
-        self.ow_label_3.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_label_3.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_label_3.setFont(font3)
-        self.ow_label_3.setText('GUI log options')
-        self.ow_label_3.setStyleSheet("QLabel {\n"
-                                      "    color: rgb(45,45,45);\n"
-                                      "}")
-        self.ow_label_3.setObjectName("ow_label_3")
-        self.horizontalLayout_4.addWidget(self.ow_label_3)
-        self.horizontalLayout_4.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.horizontalLayout_5.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.setObjectName("gridLayout")
-        self.horizontalLayout_5.addLayout(self.gridLayout)
-        self.horizontalLayout_1 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_1.setObjectName("horizontalLayout_1")
-        self.ow_line_1 = QtWidgets.QLineEdit()
-        self.ow_line_1.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_line_1.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_line_1.setFont(font2)
-        self.ow_line_1.setStyleSheet("QLineEdit {\n"
-                                     "    border-radius: 3px;\n"
-                                     "    padding: 1px 4px 1px 4px;\n"
-                                     "    background-color:  rgb(240, 240, 240);\n"
-                                     "    color: rgb(45,45,45);\n"
-                                     "}")
-        self.ow_line_1.setObjectName("ow_line_1")
-        self.horizontalLayout_1.addWidget(self.ow_line_1)
-        self.ow_openButton_1 = QtWidgets.QToolButton()
-        self.ow_openButton_1.setMaximumSize(QtCore.QSize(27, 27))
-        self.ow_openButton_1.setStyleSheet("QToolButton {\n"
-                                           "    border: 1px solid transparent;\n"
-                                           "    background-color: transparent;\n"
-                                           "    width: 27px;\n"
-                                           "    height: 27px;\n"
-                                           "}\n"
-                                           "\n"
-                                           "QToolButton:flat {\n"
-                                           "    border: none;\n"
-                                           "}")
-        self.ow_openButton_1.setText("")
-        self.ow_openButton_1.setIcon(icon_open)
-        self.ow_openButton_1.setIconSize(QtCore.QSize(23, 23))
-        self.ow_openButton_1.setAutoRaise(False)
-        self.ow_openButton_1.setObjectName("ow_openButton_1")
-        self.horizontalLayout_1.addWidget(self.ow_openButton_1)
-        self.horizontalLayout_1.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_2 = QtWidgets.QToolButton()
-        self.info_button_2.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_2.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_2.setText("")
-        self.info_button_2.setIcon(icon_info)
-        self.info_button_2.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_2.setAutoRaise(False)
-        self.info_button_2.setObjectName("info_button_2")
-        self.horizontalLayout_1.addWidget(self.info_button_2)
-        self.horizontalLayout_1.addItem(QtWidgets.QSpacerItem(13, 24, QtWidgets.QSizePolicy.Preferred,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.gridLayout.addLayout(self.horizontalLayout_1, 1, 1, 1, 1)
-        self.ow_label_2 = QtWidgets.QLabel()
-        self.ow_label_2.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_label_2.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_label_2.setFont(font1)
-        self.ow_label_2.setStyleSheet("QLabel {\n"
-                                      "    color: rgb(45,45,45);\n"
-                                      "}")
-        self.ow_label_2.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
-        self.ow_label_2.setObjectName("ow_label_2")
-        self.gridLayout.addWidget(self.ow_label_2, 1, 0, 1, 1)
-        self.ow_label_1 = QtWidgets.QLabel()
-        self.ow_label_1.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_label_1.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_label_1.setFont(font1)
-        self.ow_label_1.setStyleSheet("QLabel {\n"
-                                      "    color: rgb(45,45,45);\n"
-                                      "}")
-        self.ow_label_1.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
-        self.ow_label_1.setObjectName("ow_label_1")
-        self.gridLayout.addWidget(self.ow_label_1, 0, 0, 1, 1)
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.ow_combobox_1 = QtWidgets.QComboBox()
-        self.ow_combobox_1.setMinimumSize(QtCore.QSize(100, 27))
-        self.ow_combobox_1.setMaximumSize(QtCore.QSize(100, 27))
-        self.ow_combobox_1.setFont(font2)
-        self.ow_combobox_1.setStyleSheet("QComboBox {\n"
-                                         "    border: 1px solid #acacac;\n"
-                                         "    border-radius: 1px;\n"
-                                         "    padding-left: 5px;\n"
-                                         "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                                         "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                                         "    color: rgb(45,45,45);\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox:disabled {\n"
-                                         "    background-color:  rgb(200,200,200);\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox:hover {\n"
-                                         "    border: 1px solid #7eb4ea;\n"
-                                         "    border-radius: 1px;\n"
-                                         "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                                         "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox::drop-down {\n"
-                                         "    subcontrol-origin: padding;\n"
-                                         "    subcontrol-position: top right;\n"
-                                         "    width: 27px;\n"
-                                         "    border-left-width: 1px;\n"
-                                         "    border-left-color: darkgray;\n"
-                                         "    border-left-style: solid;\n"
-                                         "    border-top-right-radius: 3px;\n"
-                                         "    border-bottom-right-radius: 3px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox::down-arrow {\n"
-                                         "    image: url(icons/down_arrow_icon.svg); \n"
-                                         "    width: 16px;\n"
-                                         "    height: 16px\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox QAbstractItemView {\n"
-                                         "    selection-background-color: rgb(200,200,200);\n"
-                                         "    selection-color: black;\n"
-                                         "    background: #f0f0f0;\n"
-                                         "    border: 0px solid #f0f0f0;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox QAbstractItemView::item {\n"
-                                         "    margin: 5px 5px 5px 5px;\n"
-                                         "}")
-        self.ow_combobox_1.setObjectName("ow_combobox_1")
-        self.ow_combobox_1.addItem("")
-        self.ow_combobox_1.addItem("")
-        self.ow_combobox_1.addItem("")
-        self.ow_combobox_1.addItem("")
-        self.ow_combobox_1.addItem("")
-        self.ow_combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
-        self.horizontalLayout_2.addWidget(self.ow_combobox_1)
-        self.horizontalLayout_2.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_1 = QtWidgets.QToolButton()
-        self.info_button_1.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_1.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_1.setText("")
-        self.info_button_1.setIcon(icon_info)
-        self.info_button_1.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_1.setAutoRaise(False)
-        self.info_button_1.setObjectName("info_button_1")
-        self.horizontalLayout_2.addWidget(self.info_button_1)
-        self.horizontalLayout_2.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.gridLayout.addLayout(self.horizontalLayout_2, 0, 1, 1, 1)
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_5)
-        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_6)
-        self.ow_label_4 = QtWidgets.QLabel()
-        self.ow_label_4.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_label_4.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_label_4.setFont(font3)
-        self.ow_label_4.setText('EGADS log options')
-        self.ow_label_4.setStyleSheet("QLabel {\n"
-                                      "    color: rgb(45,45,45);\n"
-                                      "}")
-        self.ow_label_4.setObjectName("ow_label_4")
-        self.horizontalLayout_6.addWidget(self.ow_label_4)
-        self.horizontalLayout_6.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.horizontalLayout_7.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.gridLayout_2 = QtWidgets.QGridLayout()
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.horizontalLayout_7.addLayout(self.gridLayout_2)
-        self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-        self.ow_line_2 = QtWidgets.QLineEdit()
-        self.ow_line_2.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_line_2.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_line_2.setFont(font2)
-        self.ow_line_2.setStyleSheet("QLineEdit {\n"
-                                     "    border-radius: 3px;\n"
-                                     "    padding: 1px 4px 1px 4px;\n"
-                                     "    background-color:  rgb(240, 240, 240);\n"
-                                     "    color: rgb(45,45,45);\n"
-                                     "}")
-        self.ow_line_2.setObjectName("ow_line_2")
-        self.horizontalLayout_8.addWidget(self.ow_line_2)
-        self.ow_openButton_2 = QtWidgets.QToolButton()
-        self.ow_openButton_2.setMaximumSize(QtCore.QSize(27, 27))
-        self.ow_openButton_2.setStyleSheet("QToolButton {\n"
-                                           "    border: 1px solid transparent;\n"
-                                           "    background-color: transparent;\n"
-                                           "    width: 27px;\n"
-                                           "    height: 27px;\n"
-                                           "}\n"
-                                           "\n"
-                                           "QToolButton:flat {\n"
-                                           "    border: none;\n"
-                                           "}")
-        self.ow_openButton_2.setText("")
-        self.ow_openButton_2.setIcon(icon_open)
-        self.ow_openButton_2.setIconSize(QtCore.QSize(23, 23))
-        self.ow_openButton_2.setAutoRaise(False)
-        self.ow_openButton_2.setObjectName("ow_openButton_2")
-        self.horizontalLayout_8.addWidget(self.ow_openButton_2)
-        self.horizontalLayout_8.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_7 = QtWidgets.QToolButton()
-        self.info_button_7.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_7.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_7.setText("")
-        self.info_button_7.setIcon(icon_info)
-        self.info_button_7.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_7.setAutoRaise(False)
-        self.info_button_7.setObjectName("info_button_7")
-        self.horizontalLayout_8.addWidget(self.info_button_7)
-        self.horizontalLayout_8.addItem(QtWidgets.QSpacerItem(13, 24, QtWidgets.QSizePolicy.Preferred,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.gridLayout_2.addLayout(self.horizontalLayout_8, 1, 1, 1, 1)
-        self.ow_label_5 = QtWidgets.QLabel()
-        self.ow_label_5.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_label_5.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_label_5.setFont(font1)
-        self.ow_label_5.setStyleSheet("QLabel {\n"
-                                      "    color: rgb(45,45,45);\n"
-                                      "}")
-        self.ow_label_5.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
-        self.ow_label_5.setObjectName("ow_label_5")
-        self.gridLayout_2.addWidget(self.ow_label_5, 1, 0, 1, 1)
-        self.ow_label_6 = QtWidgets.QLabel()
-        self.ow_label_6.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_label_6.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_label_6.setFont(font1)
-        self.ow_label_6.setStyleSheet("QLabel {\n"
-                                      "    color: rgb(45,45,45);\n"
-                                      "}")
-        self.ow_label_6.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
-        self.ow_label_6.setObjectName("ow_label_1")
-        self.gridLayout_2.addWidget(self.ow_label_6, 0, 0, 1, 1)
-        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
-        self.ow_combobox_2 = QtWidgets.QComboBox()
-        self.ow_combobox_2.setMinimumSize(QtCore.QSize(100, 27))
-        self.ow_combobox_2.setMaximumSize(QtCore.QSize(100, 27))
-        self.ow_combobox_2.setFont(font2)
-        self.ow_combobox_2.setStyleSheet("QComboBox {\n"
-                                         "    border: 1px solid #acacac;\n"
-                                         "    border-radius: 1px;\n"
-                                         "    padding-left: 5px;\n"
-                                         "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                                         "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-                                         "    color: rgb(45,45,45);\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox:disabled {\n"
-                                         "    background-color:  rgb(200,200,200);\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox:hover {\n"
-                                         "    border: 1px solid #7eb4ea;\n"
-                                         "    border-radius: 1px;\n"
-                                         "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-                                         "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox::drop-down {\n"
-                                         "    subcontrol-origin: padding;\n"
-                                         "    subcontrol-position: top right;\n"
-                                         "    width: 27px;\n"
-                                         "    border-left-width: 1px;\n"
-                                         "    border-left-color: darkgray;\n"
-                                         "    border-left-style: solid;\n"
-                                         "    border-top-right-radius: 3px;\n"
-                                         "    border-bottom-right-radius: 3px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox::down-arrow {\n"
-                                         "    image: url(icons/down_arrow_icon.svg); \n"
-                                         "    width: 16px;\n"
-                                         "    height: 16px\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox QAbstractItemView {\n"
-                                         "    selection-background-color: rgb(200,200,200);\n"
-                                         "    selection-color: black;\n"
-                                         "    background: #f0f0f0;\n"
-                                         "    border: 0px solid #f0f0f0;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QComboBox QAbstractItemView::item {\n"
-                                         "    margin: 5px 5px 5px 5px;\n"
-                                         "}")
-        self.ow_combobox_2.setObjectName("ow_combobox_2")
-        self.ow_combobox_2.addItem("")
-        self.ow_combobox_2.addItem("")
-        self.ow_combobox_2.addItem("")
-        self.ow_combobox_2.addItem("")
-        self.ow_combobox_2.addItem("")
-        self.ow_combobox_2.setItemDelegate(QtWidgets.QStyledItemDelegate())
-        self.horizontalLayout_9.addWidget(self.ow_combobox_2)
-        self.horizontalLayout_9.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_8 = QtWidgets.QToolButton()
-        self.info_button_8.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_8.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_8.setText("")
-        self.info_button_8.setIcon(icon_info)
-        self.info_button_8.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_8.setAutoRaise(False)
-        self.info_button_8.setObjectName("info_button_8")
-        self.horizontalLayout_9.addWidget(self.info_button_8)
-        self.horizontalLayout_9.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.gridLayout_2.addLayout(self.horizontalLayout_9, 0, 1, 1, 1)
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_7)
-        self.ow_label_2.setText("Logging path:")
-        self.ow_label_1.setText("Logging level:")
-        self.ow_label_5.setText("Logging path:")
-        self.ow_label_6.setText("Logging level:")
-        self.ow_combobox_1.setItemText(0, "DEBUG")
-        self.ow_combobox_1.setItemText(1, "INFO")
-        self.ow_combobox_1.setItemText(2, "WARNING")
-        self.ow_combobox_1.setItemText(3, "CRITICAL")
-        self.ow_combobox_1.setItemText(4, "ERROR")
-        self.ow_combobox_2.setItemText(0, "DEBUG")
-        self.ow_combobox_2.setItemText(1, "INFO")
-        self.ow_combobox_2.setItemText(2, "WARNING")
-        self.ow_combobox_2.setItemText(3, "CRITICAL")
-        self.ow_combobox_2.setItemText(4, "ERROR")
-        self.info_button_1.clicked.connect(self.button_info)
-        self.info_button_2.clicked.connect(self.button_info)
-        self.info_button_7.clicked.connect(self.button_info)
-        self.info_button_8.clicked.connect(self.button_info)
-        self.ow_openButton_1.clicked.connect(self.get_folder_path)
-        self.ow_openButton_2.clicked.connect(self.get_folder_path)
-        self.ow_combobox_1.currentTextChanged.connect(self.set_combobox_options)
-        self.ow_combobox_2.currentTextChanged.connect(self.set_combobox_options)
-        self.ow_line_1.textChanged.connect(self.set_lineedit_options)
-        self.ow_line_2.textChanged.connect(self.set_lineedit_options)
-        self.read_config_dict()
-
-    def populate_update_options(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - populate_update_options')
-        font1 = QtGui.QFont()
-        font1.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font1.setPointSize(10)
-        font1.setKerning(True)
-        font1.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        icon_info = QtGui.QIcon()
-        icon_info.addPixmap(QtGui.QPixmap("icons/info_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.horizontalLayout_1 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_1.setObjectName("horizontalLayout_1")
-        self.ow_checkbox_1 = QtWidgets.QCheckBox()
-        self.ow_checkbox_1.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_checkbox_1.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_checkbox_1.setFont(font1)
-        self.ow_checkbox_1.setStyleSheet("QCheckBox {\n"
-                                         "    color: rgb(45,45,45);\n"
-                                         "}")
-        self.ow_checkbox_1.setObjectName("ow_checkbox_1")
-        self.horizontalLayout_1.addWidget(self.ow_checkbox_1)
-        self.horizontalLayout_1.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_1")
-        self.horizontalLayout_2.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.ow_check_button = QtWidgets.QToolButton()
-        self.ow_check_button.setMinimumSize(QtCore.QSize(120, 27))
-        self.ow_check_button.setMaximumSize(QtCore.QSize(250, 27))
-        self.ow_check_button.setFont(font1)
-        self.ow_check_button.setStyleSheet("QToolButton {\n"
-                                           "    border: 1px solid #acacac;\n"
-                                           "    border-radius: 1px;\n"
-                                           "    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
-                                           "                                    stop:0 #f0f0f0, stop:1 #e5e5e5);\n"
-                                           "    color: rgb(45,45,45);\n"
-                                           "}\n"
-                                           "\n"
-                                           "QToolButton:hover {\n"
-                                           "    border: 1px solid #7eb4ea;\n"
-                                           "    border-radius: 1px;\n"
-                                           "    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
-                                           "                                    stop:0 #ecf4fc, stop:1 #dcecfc);\n"
-                                           "}\n"
-                                           "\n"
-                                           "QToolButton:pressed {\n"
-                                           "    border: 1px solid #579de5;\n"
-                                           "    border-radius: 1px;\n"
-                                           "    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
-                                           "                                    stop:0 #daecfc, stop:1 #c4e0fc);\n"
-                                           "}")
-        self.ow_check_button.setObjectName("ow_check_button")
-        self.horizontalLayout_2.addWidget(self.ow_check_button)
-        self.horizontalLayout_2.addItem(QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_6 = QtWidgets.QToolButton()
-        self.info_button_6.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_6.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_6.setText("")
-        self.info_button_6.setIcon(icon_info)
-        self.info_button_6.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_6.setAutoRaise(False)
-        self.info_button_6.setObjectName("info_button_6")
-        self.horizontalLayout_1.addWidget(self.info_button_6)
-        self.horizontalLayout_1.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_1)
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_2)
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.ow_checkbox_5 = QtWidgets.QCheckBox()
-        self.ow_checkbox_5.setMinimumSize(QtCore.QSize(0, 27))
-        self.ow_checkbox_5.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.ow_checkbox_5.setFont(font1)
-        self.ow_checkbox_5.setStyleSheet("QCheckBox {\n"
-                                         "    color: rgb(45,45,45);\n"
-                                         "}")
-        self.ow_checkbox_5.setObjectName("ow_checkbox_5")
-        self.horizontalLayout_3.addWidget(self.ow_checkbox_5)
-        self.horizontalLayout_3.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_4.setObjectName("horizontalLayout_1")
-        self.horizontalLayout_4.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.ow_check_button_2 = QtWidgets.QToolButton()
-        self.ow_check_button_2.setMinimumSize(QtCore.QSize(120, 27))
-        self.ow_check_button_2.setMaximumSize(QtCore.QSize(250, 27))
-        self.ow_check_button_2.setFont(font1)
-        self.ow_check_button_2.setStyleSheet("QToolButton {\n"
-                                           "    border: 1px solid #acacac;\n"
-                                           "    border-radius: 1px;\n"
-                                           "    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
-                                           "                                    stop:0 #f0f0f0, stop:1 #e5e5e5);\n"
-                                           "    color: rgb(45,45,45);\n"
-                                           "}\n"
-                                           "\n"
-                                           "QToolButton:hover {\n"
-                                           "    border: 1px solid #7eb4ea;\n"
-                                           "    border-radius: 1px;\n"
-                                           "    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
-                                           "                                    stop:0 #ecf4fc, stop:1 #dcecfc);\n"
-                                           "}\n"
-                                           "\n"
-                                           "QToolButton:pressed {\n"
-                                           "    border: 1px solid #579de5;\n"
-                                           "    border-radius: 1px;\n"
-                                           "    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
-                                           "                                    stop:0 #daecfc, stop:1 #c4e0fc);\n"
-                                           "}")
-        self.ow_check_button_2.setObjectName("ow_check_button_2")
-        self.horizontalLayout_4.addWidget(self.ow_check_button_2)
-        self.horizontalLayout_4.addItem(QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.info_button_9 = QtWidgets.QToolButton()
-        self.info_button_9.setMaximumSize(QtCore.QSize(27, 27))
-        self.info_button_9.setStyleSheet("QToolButton {\n"
-                                         "    border: 1px solid transparent;\n"
-                                         "    background-color: transparent;\n"
-                                         "    width: 27px;\n"
-                                         "    height: 27px;\n"
-                                         "}\n"
-                                         "\n"
-                                         "QToolButton:flat {\n"
-                                         "    border: none;\n"
-                                         "}")
-        self.info_button_9.setText("")
-        self.info_button_9.setIcon(icon_info)
-        self.info_button_9.setIconSize(QtCore.QSize(23, 23))
-        self.info_button_9.setAutoRaise(False)
-        self.info_button_9.setObjectName("info_button_9")
-        self.horizontalLayout_3.addWidget(self.info_button_9)
-        self.horizontalLayout_3.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
-                                                              QtWidgets.QSizePolicy.Minimum))
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_3)
-        self.ow_vertical_layout.addLayout(self.horizontalLayout_4)
-        self.ow_checkbox_1.setText("Check EGADS Lineage GUI updates on GitHub at startup")
-        self.ow_checkbox_5.setText("Check EGADS Lineage updates on GitHub at startup")
-        self.ow_check_button.setText("Check now")
-        self.ow_check_button_2.setText("Check now")
-        self.info_button_6.clicked.connect(self.button_info)
-        self.info_button_9.clicked.connect(self.button_info)
-        self.ow_check_button.clicked.connect(self.check_gui_update)
-        self.ow_check_button_2.clicked.connect(self.check_egads_update)
-        self.ow_checkbox_1.clicked.connect(self.set_checkbox_options)
-        self.ow_checkbox_5.clicked.connect(self.set_checkbox_options)
-        self.read_config_dict()
-
-    def activate_checkbox_4(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - activate_checkbox_4')
-        if self.checkbox_3.isChecked():
-            self.checkbox_4.setEnabled(True)
-        else:
-            self.checkbox_4.setChecked(False)
-            self.checkbox_4.setEnabled(False)
-            self.config_dict.set('SYSTEM', 'switch_fill_value', str(False))
-
-    def set_combobox_options(self, val):
-        logging.debug('gui - other_windows_functions.py - MyOptions - set_combobox_options')
-        if self.sender().objectName() == 'ow_combobox_1':
-            self.config_dict.set('LOG', 'level', str(val))
-        if self.sender().objectName() == 'ow_combobox_2':
-            self.egads_config_dict.set('LOG', 'level', str(val))
-
-    def set_checkbox_options(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - set_checkbox_options')
-        if self.sender().objectName() == 'ow_checkbox_1':
-            self.config_dict.set('OPTIONS', 'check_update', str(self.sender().isChecked()))
-        if self.sender().objectName() == 'ow_checkbox_5':
-            self.egads_config_dict.set('OPTIONS', 'check_update', str(self.sender().isChecked()))
-        if self.sender().objectName() == 'checkbox_2':
-            self.config_dict.set('SYSTEM', 'read_as_float', str(self.sender().isChecked()))
-        if self.sender().objectName() == 'checkbox_3':
-            self.config_dict.set('SYSTEM', 'replace_fill_value', str(self.sender().isChecked()))
-        if self.sender().objectName() == 'checkbox_4':
-            self.config_dict.set('SYSTEM', 'switch_fill_value', str(self.sender().isChecked()))
-
-    def set_lineedit_options(self, val):
-        logging.debug('gui - other_windows_functions.py - MyOptions - set_lineedit_options')
-        if self.sender().objectName() == 'ow_line_1':
-            self.config_dict.set('LOG', 'path', str(val))
-        if self.sender().objectName() == 'ow_line_2':
-            self.egads_config_dict.set('LOG', 'path', str(val))
-
-    def read_config_dict(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - read_config_dict')
-        if self.ow_section_list.currentItem().text() == 'EGADS':
-            self.checkbox_2.setChecked(self.config_dict.getboolean('SYSTEM', 'read_as_float'))
-            self.checkbox_3.setChecked(self.config_dict.getboolean('SYSTEM', 'replace_fill_value'))
-            self.checkbox_4.setChecked(self.config_dict.getboolean('SYSTEM', 'switch_fill_value'))
-            self.activate_checkbox_4()
-        elif self.ow_section_list.currentItem().text() == 'General':
-            self.ow_combobox_1.setCurrentIndex(self.ow_combobox_1.findText(self.config_dict.get('LOG', 'level')))
-            self.ow_line_1.setText(self.config_dict.get('LOG', 'path'))
-            self.ow_combobox_2.setCurrentIndex(self.ow_combobox_1.findText(self.egads_config_dict.get('LOG', 'level')))
-            self.ow_line_2.setText(self.egads_config_dict.get('LOG', 'path'))
-        elif self.ow_section_list.currentItem().text() == 'Update':
-            self.ow_checkbox_1.setChecked(self.config_dict.getboolean('OPTIONS', 'check_update'))
-            self.ow_checkbox_5.setChecked(self.egads_config_dict.getboolean('OPTIONS', 'check_update'))
-
-    def check_gui_update(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - check_gui_update')
-        self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version)
-        self.check_gui_update_thread.start()
-        self.check_gui_update_thread.finished.connect(self.parse_gui_update)
-        
-    def parse_gui_update(self, val):
-        logging.debug('gui - other_windows_functions.py - MyOptions - parse_gui_update - val ' + str(val))
-        if val != 'no new version':
-            self.updade_window = MyUpdate(val)
-            self.updade_window.exec_()
-        else:
-            info_text = 'No new update available on GitHub for the GUI.'
-            self.infoWindow = MyInfo(info_text)
-            self.infoWindow.exec_()
-
-    def check_egads_update(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - check_egads_update')
-        self.check_egads_update_thread = CheckEGADSUpdateOnline(egads.__version__)
-        self.check_egads_update_thread.start()
-        self.check_egads_update_thread.finished.connect(self.parse_egads_update)
-
-    def parse_egads_update(self, val):
-        logging.debug('gui - other_windows_functions.py - MyOptions - parse_egads_update - val ' + str(val))
-        if val != 'no new version':
-            self.updade_window = MyUpdate(val)
-            self.updade_window.exec_()
-        else:
-            info_text = 'No new update available on GitHub for EGADS.'
-            self.infoWindow = MyInfo(info_text)
-            self.infoWindow.exec_()
-
-    def save_config_dict(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - save_config_dict')
-        self.cancel = False
-        self.closeWindow()
-
-    def button_info(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - button_info')
-        self.infoWindow = MyInfo(self.information_buttons_text[self.sender().objectName()])
-        self.infoWindow.exec_()
-
-    def get_folder_path(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - get_folder_path')
-        folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory")
-        if folder_path:
-            self.ow_line_1.setText(str(pathlib.Path(folder_path)))
-
-    def closeWindow(self):
-        logging.debug('gui - other_windows_functions.py - MyOptions - closeWindow')
-        self.close()
 
 
 class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):

@@ -145,8 +145,8 @@ class DrawGriddedMap(QtCore.QThread):
             pcolormesh = subplot['ax'].pcolormesh(subplot['lon_values'], subplot['lat_values'],
                                                   subplot['var_values'], transform=subplot['projection'], cmap='jet')
             self.subplot_object[key]['pcolormesh'] = pcolormesh
-            cax = plt.axes([0.9, 0.13, 0.02, 0.72])
-            plt.colorbar(pcolormesh, cax=cax, orientation='vertical')
+            cax = mpl.pyplot.axes([0.9, 0.13, 0.02, 0.72])
+            mpl.pyplot.colorbar(pcolormesh, cax=cax, orientation='vertical')
         self.finished.emit(self.subplot_object)
     
     def stop(self):
@@ -1424,11 +1424,10 @@ class ExportThread(QtCore.QThread):
                     kmz = zipfile.ZipFile(self.file_name, 'w', zipfile.ZIP_DEFLATED)
                     kml_filename = os.path.basename(self.file_name)[0:-3] + 'kml'
                     kmz.writestr(kml_filename, kml.kml())
-                    jpg_filename = tempfile.mkstemp('.jpg')
+                    jpg_filename = tempfile.mkstemp('.jpg')[1]
                     mpl.pyplot.savefig(jpg_filename)
                     kmz.write(jpg_filename, 'colormap.jpg')
                     kmz.close()
-                    os.remove(jpg_filename)
                 else:
                     mpl.pyplot.savefig(os.path.join(os.path.dirname(self.file_name), 'colormap.jpg'))
                     kml.save(self.file_name)

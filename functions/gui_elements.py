@@ -2,6 +2,25 @@ import math
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 
+class MyTableWidget(QtWidgets.QTableWidget):
+
+    def __init__(self, parent):
+        QtWidgets.QTableWidget.__init__(self, parent)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, e):
+        e.accept()
+
+    def dropEvent(self, e):
+        drag_item = self.item(self.currentRow(), self.currentColumn())
+        drop_item = self.item(self.rowAt(e.pos().y()), self.columnAt(e.pos().x()))
+        if not drop_item.text():
+            e.accept()
+            drop_item.setText(drag_item.text())
+        else:
+            e.ignore()
+
+
 class DropFrame (QtWidgets.QFrame):
     leftClick = QtCore.pyqtSignal()
     dropFile = QtCore.pyqtSignal(str)

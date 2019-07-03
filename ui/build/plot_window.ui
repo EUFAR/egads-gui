@@ -655,7 +655,7 @@ QScrollBar::right-arrow:horizontal:pressed {
              </property>
              <property name="font">
               <font>
-               <family>Source Sans Pro</family>
+               <family>FreeSans</family>
                <pointsize>10</pointsize>
                <stylestrategy>PreferAntialias</stylestrategy>
                <kerning>true</kerning>
@@ -1019,7 +1019,7 @@ QScrollBar::right-arrow:horizontal:pressed {
              </property>
              <property name="font">
               <font>
-               <family>Source Sans Pro</family>
+               <family>FreeSans</family>
                <pointsize>10</pointsize>
                <stylestrategy>PreferAntialias</stylestrategy>
                <kerning>true</kerning>
@@ -1399,13 +1399,13 @@ QScrollBar::right-arrow:horizontal:pressed {
                   <widget class="QLabel" name="pw_saveOptions_lb_2">
                    <property name="minimumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>27</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>27</height>
                     </size>
                    </property>
@@ -1424,6 +1424,9 @@ QScrollBar::right-arrow:horizontal:pressed {
                    </property>
                    <property name="text">
                     <string>height:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -1503,6 +1506,7 @@ QLineEdit:disabled {
 
 QComboBox:disabled {
 	background-color:  rgb(200,200,200);
+    color: rgb(145,145,145);
 }
 
 QComboBox:hover {
@@ -1525,6 +1529,12 @@ QComboBox::drop-down {
 
 QComboBox::down-arrow {
 	image: url(icons/down_arrow_icon.svg); 
+	width: 16px;
+	height: 16px
+}
+
+QComboBox::down-arrow:disabled {
+	image: url(icons/down_arrow_icon_deactivated.svg); 
 	width: 16px;
 	height: 16px
 }
@@ -1559,13 +1569,13 @@ QComboBox QAbstractItemView::item {
                   <widget class="QLabel" name="pw_saveOptions_lb_3">
                    <property name="minimumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>27</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>27</height>
                     </size>
                    </property>
@@ -1584,6 +1594,9 @@ QComboBox QAbstractItemView::item {
                    </property>
                    <property name="text">
                     <string>width:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -1663,6 +1676,7 @@ QLineEdit:disabled {
 
 QComboBox:disabled {
 	background-color:  rgb(200,200,200);
+    color: rgb(145,145,145);
 }
 
 QComboBox:hover {
@@ -1685,6 +1699,12 @@ QComboBox::drop-down {
 
 QComboBox::down-arrow {
 	image: url(icons/down_arrow_icon.svg); 
+	width: 16px;
+	height: 16px
+}
+
+QComboBox::down-arrow:disabled {
+	image: url(icons/down_arrow_icon_deactivated.svg); 
 	width: 16px;
 	height: 16px
 }
@@ -1781,7 +1801,7 @@ QToolButton:flat {
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>20</width>
+                   <width>10</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -1832,7 +1852,7 @@ QToolButton:flat {
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>248</width>
+                   <width>40</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -1932,7 +1952,7 @@ QToolButton:flat {
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>20</width>
+                   <width>10</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -2139,7 +2159,7 @@ QSlider::sub-page:horizontal {
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>20</width>
+                   <width>10</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -2288,7 +2308,7 @@ QToolButton:flat {
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>20</width>
+                   <width>10</width>
                    <height>20</height>
                   </size>
                  </property>

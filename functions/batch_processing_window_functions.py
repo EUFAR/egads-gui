@@ -10,7 +10,7 @@ from ui.Ui_batchinfowindow import Ui_batchInfoWindow
 from functions.other_windows_functions import MyInfo, MyCoeff
 from functions.gui_elements import QtWaitingSpinner
 from functions.thread_functions import BatchProcessingThread
-from functions.material_functions import batch_processing_information_buttons_text
+from functions.help_functions import batch_processing_information_text
 from functions.utils import humansize, clear_layout
 
 
@@ -19,7 +19,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        batch_processing_information_buttons_text(self)
+        self.information_text = batch_processing_information_text()
         self.listWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.list_of_algorithms = list_of_algorithms
         self.config_dict = config_dict
@@ -2142,13 +2142,13 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
 
     def batch_button_info(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - batch_button_info')
-        self.infoWindow = MyInfo(self.information_buttons_text[self.sender().objectName()])
+        self.infoWindow = MyInfo(self.information_text[self.sender().objectName()])
         self.infoWindow.exec_()
 
     def filename_button_info(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - filename_button_info')
-        widget = self.information_buttons_text[self.sender().objectName()]
-        self.infoWindow = MyInfo(self.information_buttons_text[widget.currentText()])
+        widget = self.information_text[self.sender().objectName()]
+        self.infoWindow = MyInfo(self.information_text[getattr(self, widget).currentText()])
         self.infoWindow.exec_()
 
     def closeWindow(self):

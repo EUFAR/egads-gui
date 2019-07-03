@@ -258,6 +258,7 @@ class Ui_processingWindow(object):
 "\n"
 "QComboBox:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"    color: rgb(145,145,145);\n"
 "}\n"
 "\n"
 "QComboBox:hover {\n"
@@ -280,6 +281,12 @@ class Ui_processingWindow(object):
 "\n"
 "QComboBox::down-arrow {\n"
 "    image: url(icons/down_arrow_icon.svg); \n"
+"    width: 16px;\n"
+"    height: 16px\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:disabled {\n"
+"    image: url(icons/down_arrow_icon_deactivated.svg); \n"
 "    width: 16px;\n"
 "    height: 16px\n"
 "}\n"
@@ -323,7 +330,7 @@ class Ui_processingWindow(object):
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.aw_label_4 = QtWidgets.QLabel(self.tab_4)
         self.aw_label_4.setMinimumSize(QtCore.QSize(100, 27))
-        self.aw_label_4.setMaximumSize(QtCore.QSize(100, 27))
+        self.aw_label_4.setMaximumSize(QtCore.QSize(100, 16777215))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -333,12 +340,12 @@ class Ui_processingWindow(object):
         self.aw_label_4.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.aw_label_4.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.aw_label_4.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.aw_label_4.setObjectName("aw_label_4")
         self.gridLayout_2.addWidget(self.aw_label_4, 0, 0, 1, 1)
         self.aw_label_5 = QtWidgets.QLabel(self.tab_4)
         self.aw_label_5.setMinimumSize(QtCore.QSize(100, 27))
-        self.aw_label_5.setMaximumSize(QtCore.QSize(100, 27))
+        self.aw_label_5.setMaximumSize(QtCore.QSize(100, 16777215))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -348,7 +355,7 @@ class Ui_processingWindow(object):
         self.aw_label_5.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.aw_label_5.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.aw_label_5.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.aw_label_5.setObjectName("aw_label_5")
         self.gridLayout_2.addWidget(self.aw_label_5, 1, 0, 1, 1)
         self.aw_edit_2 = QtWidgets.QTextEdit(self.tab_4)
@@ -893,7 +900,7 @@ class Ui_processingWindow(object):
         self.scrollArea_4.setWidgetResizable(True)
         self.scrollArea_4.setObjectName("scrollArea_4")
         self.scrollAreaWidgetContents_4 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 618, 356))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 618, 352))
         self.scrollAreaWidgetContents_4.setObjectName("scrollAreaWidgetContents_4")
         self.gridLayout_8 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_4)
         self.gridLayout_8.setObjectName("gridLayout_8")
@@ -1082,7 +1089,7 @@ class Ui_processingWindow(object):
         self.scrollArea_5.setWidgetResizable(True)
         self.scrollArea_5.setObjectName("scrollArea_5")
         self.scrollAreaWidgetContents_5 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 618, 334))
+        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 618, 328))
         self.scrollAreaWidgetContents_5.setObjectName("scrollAreaWidgetContents_5")
         self.gridLayout_10 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_5)
         self.gridLayout_10.setObjectName("gridLayout_10")

@@ -981,7 +981,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.aw_combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.aw_combobox_2.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.list_of_algorithms = list_of_algorithms
-        self.list_of_new_variables_and_attributes = list_of_new_variables_and_attributes
+        self.new_var_list = None
         self.list_of_variables_and_attributes = dict(list_of_variables_and_attributes,
                                                      **list_of_new_variables_and_attributes)
         self.algorithm = None
@@ -1016,7 +1016,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
 
     def close_wait_window(self, val):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - close_wait_window')
-        self.list_of_new_variables_and_attributes = val
+        self.new_var_list = val
         self.waitWindow.close()
         self.close()
 
@@ -1025,16 +1025,13 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.waitWindow.close()
         info_text = ('Something went wrong during the processing. Please try to launch it again. If the process is'
                      + ' still not working, please check the algorithm and/or contact the developer.')
-        self.infoWindow = MyInfo(info_text)
-        self.infoWindow.exec_()
-        del self.list_of_variables_and_attributes
-        del self.list_of_new_variables_and_attributes
-        self.close()
+        info_window = MyInfo(info_text)
+        info_window.exec_()
+        self.close_window()
 
     def close_window(self):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - close_window')
-        del self.list_of_variables_and_attributes
-        del self.list_of_new_variables_and_attributes
+        self.new_var_list = None
         self.close()
 
     def populate_combobox_category(self):
@@ -1475,8 +1472,8 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
             information_str = '<u>Description:</u> ' + optional_str + description + '<br><br><u>Units:</u> ' + units \
                               + '<br><br><u>Standard name:</u> ' + standard_name + '<br><br><u>Long name:</u> ' + \
                               long_name + '<br><br><u>Category:</u> ' + category_str
-        self.infoWindow = MyInfo(information_str)
-        self.infoWindow.exec_()
+        info_window = MyInfo(information_str)
+        info_window.exec_()
 
 
 class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):

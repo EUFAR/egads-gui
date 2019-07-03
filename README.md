@@ -1,7 +1,7 @@
 Version:
 -------
 
-EGADS Lineage GUI 0.13.0 (Python 3).
+EGADS Lineage GUI 0.14.0 (Python 3).
 
 
 Developments:
@@ -37,7 +37,7 @@ Features:
 * read/write NASA/Ames files
 * use of algorithms
 * creation of new algorithms
-* display/plot/print data
+* display/plot/print data (time series and gridded data)
 * batch processing
 * export to KML/KMZ format (Google Earth)
 

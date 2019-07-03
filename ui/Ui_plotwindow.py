@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'plot_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -228,7 +228,6 @@ class Ui_plotWindow(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.tab)
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         spacerItem = QtWidgets.QSpacerItem(10, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_2.addItem(spacerItem, 0, 2, 1, 1)
@@ -245,7 +244,6 @@ class Ui_plotWindow(object):
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.tab_2)
-        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_4.setObjectName("gridLayout_4")
         spacerItem4 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_4.addItem(spacerItem4, 2, 0, 1, 1)
@@ -427,7 +425,6 @@ class Ui_plotWindow(object):
         self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 1202, 593))
         self.scrollAreaWidgetContents_3.setObjectName("scrollAreaWidgetContents_3")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_3)
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
         spacerItem5 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_3.addItem(spacerItem5, 0, 1, 1, 1)
@@ -452,7 +449,7 @@ class Ui_plotWindow(object):
         self.pw_update_bt_1.setMinimumSize(QtCore.QSize(100, 27))
         self.pw_update_bt_1.setMaximumSize(QtCore.QSize(100, 27))
         font = QtGui.QFont()
-        font.setFamily("Source Sans Pro")
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
@@ -489,7 +486,6 @@ class Ui_plotWindow(object):
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
         self.gridLayout_7 = QtWidgets.QGridLayout(self.tab_4)
-        self.gridLayout_7.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_7.setObjectName("gridLayout_7")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -667,7 +663,6 @@ class Ui_plotWindow(object):
         self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 1202, 593))
         self.scrollAreaWidgetContents_5.setObjectName("scrollAreaWidgetContents_5")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_5)
-        self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setObjectName("gridLayout_5")
         spacerItem11 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_5.addItem(spacerItem11, 0, 1, 1, 1)
@@ -690,7 +685,7 @@ class Ui_plotWindow(object):
         self.pw_update_bt_2.setMinimumSize(QtCore.QSize(100, 27))
         self.pw_update_bt_2.setMaximumSize(QtCore.QSize(100, 27))
         font = QtGui.QFont()
-        font.setFamily("Source Sans Pro")
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
@@ -729,7 +724,6 @@ class Ui_plotWindow(object):
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.gridLayout_8 = QtWidgets.QGridLayout(self.tab_3)
-        self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_8.setObjectName("gridLayout_8")
         self.pw_saveOptions_sa = QtWidgets.QScrollArea(self.tab_3)
         self.pw_saveOptions_sa.setMinimumSize(QtCore.QSize(540, 0))
@@ -905,7 +899,6 @@ class Ui_plotWindow(object):
         self.scrollAreaWidgetContents_6.setGeometry(QtCore.QRect(0, 0, 1204, 665))
         self.scrollAreaWidgetContents_6.setObjectName("scrollAreaWidgetContents_6")
         self.gridLayout_9 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_6)
-        self.gridLayout_9.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_9.setObjectName("gridLayout_9")
         spacerItem18 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_9.addItem(spacerItem18, 0, 1, 1, 1)
@@ -939,8 +932,8 @@ class Ui_plotWindow(object):
         self.gridLayout_6 = QtWidgets.QGridLayout()
         self.gridLayout_6.setObjectName("gridLayout_6")
         self.pw_saveOptions_lb_2 = QtWidgets.QLabel(self.scrollAreaWidgetContents_6)
-        self.pw_saveOptions_lb_2.setMinimumSize(QtCore.QSize(60, 27))
-        self.pw_saveOptions_lb_2.setMaximumSize(QtCore.QSize(60, 27))
+        self.pw_saveOptions_lb_2.setMinimumSize(QtCore.QSize(70, 27))
+        self.pw_saveOptions_lb_2.setMaximumSize(QtCore.QSize(70, 27))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -950,6 +943,7 @@ class Ui_plotWindow(object):
         self.pw_saveOptions_lb_2.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
+        self.pw_saveOptions_lb_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.pw_saveOptions_lb_2.setObjectName("pw_saveOptions_lb_2")
         self.gridLayout_6.addWidget(self.pw_saveOptions_lb_2, 0, 0, 1, 1)
         self.pw_saveOptions_ln_1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_6)
@@ -995,6 +989,7 @@ class Ui_plotWindow(object):
 "\n"
 "QComboBox:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"    color: rgb(145,145,145);\n"
 "}\n"
 "\n"
 "QComboBox:hover {\n"
@@ -1021,6 +1016,12 @@ class Ui_plotWindow(object):
 "    height: 16px\n"
 "}\n"
 "\n"
+"QComboBox::down-arrow:disabled {\n"
+"    image: url(icons/down_arrow_icon_deactivated.svg); \n"
+"    width: 16px;\n"
+"    height: 16px\n"
+"}\n"
+"\n"
 "QComboBox QAbstractItemView {\n"
 "    selection-background-color: rgb(200,200,200);\n"
 "    selection-color: black;\n"
@@ -1036,8 +1037,8 @@ class Ui_plotWindow(object):
         self.pw_saveOptions_cb_1.addItem("")
         self.gridLayout_6.addWidget(self.pw_saveOptions_cb_1, 0, 2, 1, 1)
         self.pw_saveOptions_lb_3 = QtWidgets.QLabel(self.scrollAreaWidgetContents_6)
-        self.pw_saveOptions_lb_3.setMinimumSize(QtCore.QSize(60, 27))
-        self.pw_saveOptions_lb_3.setMaximumSize(QtCore.QSize(60, 27))
+        self.pw_saveOptions_lb_3.setMinimumSize(QtCore.QSize(70, 27))
+        self.pw_saveOptions_lb_3.setMaximumSize(QtCore.QSize(70, 27))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -1047,6 +1048,7 @@ class Ui_plotWindow(object):
         self.pw_saveOptions_lb_3.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
+        self.pw_saveOptions_lb_3.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.pw_saveOptions_lb_3.setObjectName("pw_saveOptions_lb_3")
         self.gridLayout_6.addWidget(self.pw_saveOptions_lb_3, 1, 0, 1, 1)
         self.pw_saveOptions_ln_2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_6)
@@ -1092,6 +1094,7 @@ class Ui_plotWindow(object):
 "\n"
 "QComboBox:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"    color: rgb(145,145,145);\n"
 "}\n"
 "\n"
 "QComboBox:hover {\n"
@@ -1114,6 +1117,12 @@ class Ui_plotWindow(object):
 "\n"
 "QComboBox::down-arrow {\n"
 "    image: url(icons/down_arrow_icon.svg); \n"
+"    width: 16px;\n"
+"    height: 16px\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:disabled {\n"
+"    image: url(icons/down_arrow_icon_deactivated.svg); \n"
 "    width: 16px;\n"
 "    height: 16px\n"
 "}\n"
@@ -1154,7 +1163,7 @@ class Ui_plotWindow(object):
         self.pw_lock_bt_1.setIconSize(QtCore.QSize(23, 23))
         self.pw_lock_bt_1.setObjectName("pw_lock_bt_1")
         self.horizontalLayout.addWidget(self.pw_lock_bt_1)
-        spacerItem23 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        spacerItem23 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem23)
         self.pw_info_bt_1 = QtWidgets.QToolButton(self.scrollAreaWidgetContents_6)
         self.pw_info_bt_1.setMinimumSize(QtCore.QSize(27, 27))
@@ -1213,7 +1222,7 @@ class Ui_plotWindow(object):
 "}")
         self.pw_saveOptions_ln_3.setObjectName("pw_saveOptions_ln_3")
         self.horizontalLayout_7.addWidget(self.pw_saveOptions_ln_3)
-        spacerItem26 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        spacerItem26 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem26)
         self.pw_info_bt_2 = QtWidgets.QToolButton(self.scrollAreaWidgetContents_6)
         self.pw_info_bt_2.setMinimumSize(QtCore.QSize(27, 27))
@@ -1302,7 +1311,7 @@ class Ui_plotWindow(object):
 "}")
         self.pw_saveOptions_lb_7.setObjectName("pw_saveOptions_lb_7")
         self.horizontalLayout_9.addWidget(self.pw_saveOptions_lb_7)
-        spacerItem29 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        spacerItem29 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_9.addItem(spacerItem29)
         self.pw_info_bt_4 = QtWidgets.QToolButton(self.scrollAreaWidgetContents_6)
         self.pw_info_bt_4.setMinimumSize(QtCore.QSize(27, 27))
@@ -1355,7 +1364,7 @@ class Ui_plotWindow(object):
         self.pw_saveOptions_ck_1.setText("")
         self.pw_saveOptions_ck_1.setObjectName("pw_saveOptions_ck_1")
         self.horizontalLayout_8.addWidget(self.pw_saveOptions_ck_1)
-        spacerItem32 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        spacerItem32 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_8.addItem(spacerItem32)
         self.pw_info_bt_3 = QtWidgets.QToolButton(self.scrollAreaWidgetContents_6)
         self.pw_info_bt_3.setMinimumSize(QtCore.QSize(27, 27))

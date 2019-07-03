@@ -8,7 +8,7 @@ from ui.Ui_plotwindow import Ui_plotWindow
 from ui.Ui_plottypewindow import Ui_plottypeWindow
 from ui.Ui_tickslabelswindow import Ui_tickslabelsWindow
 from functions.utils import populate_combobox
-from functions.other_windows_functions import MyWait, MyInfo
+from functions.other_windows_functions import MyWait, MyInfo, MySubplot
 from functions.thread_functions import DrawGriddedMap, ProvideWidthHeight
 from functions.material_functions import setup_plot_material, plot_information_buttons_text
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -18,7 +18,7 @@ from cartopy.util import add_cyclic_point
 
         
 class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
-    def __init__(self, variables, dimensions, x_axis_variable, font_list, default_font):
+    def __init__(self, variables, dimensions, x_axis_variable, font_list, default_font, config_dict):
         logging.debug('gui - plot_window_functions.py - PlotWindow - __init__')
         QtWidgets.QDialog.__init__(self, parent=None)
         self.setupUi(self)
@@ -30,6 +30,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.x_axis_variable = x_axis_variable
         self.font_list = font_list
         self.default_font = default_font
+        self.config_dict = config_dict
         setup_plot_material(self)
         plot_information_buttons_text(self)
         self.setup_toolbar()
@@ -125,13 +126,38 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 if dim_num[0] == 1:
                     if dim_name.count(dim_name[0]) == len(dim_name):
                         if units.count(units[0]) == len(units):
-                            self.plottypeWindow = PlotTypeWindow()
-                            self.plottypeWindow.exec_()
-                            self.plot_timeseries(self.plottypeWindow.result)
+                            result = ''
+                            pos_dict = None
+                            if int(self.config_dict.get('PLOTS', 'same_unit_plot')) == 2:
+                                plot_type_window = PlotTypeWindow()
+                                plot_type_window.exec_()
+                                result = plot_type_window.result
+                            elif int(self.config_dict.get('PLOTS', 'same_unit_plot')) == 0:
+                                result = 'plot'
+                            elif int(self.config_dict.get('PLOTS', 'same_unit_plot')) == 1:
+                                result = 'subplot'
+
+                            if result == 'subplot':
+                                if int(self.config_dict.get('PLOTS', 'subplot_disposition')) == 1:
+                                    subplot_window = MySubplot(sorted(self.variables.keys()))
+                                    subplot_window.exec_()
+                                    if subplot_window.subplot_layout:
+                                        pos_dict = subplot_window.subplot_layout
+                            self.plot_timeseries(result, pos_dict)
                         else:
-                            self.plot_timeseries('subplot')                  
+                            if int(self.config_dict.get('PLOTS', 'subplot_disposition')) == 1:
+                                subplot_window = MySubplot(sorted(self.variables.keys()))
+                                subplot_window.exec_()
+                                if subplot_window.subplot_layout:
+                                    pos_dict = subplot_window.subplot_layout
+                            self.plot_timeseries('subplot', pos_dict)
                     else:
-                        self.plot_timeseries('subplot')    
+                        if int(self.config_dict.get('PLOTS', 'subplot_disposition')) == 1:
+                            subplot_window = MySubplot(sorted(self.variables.keys()))
+                            subplot_window.exec_()
+                            if subplot_window.subplot_layout:
+                                pos_dict = subplot_window.subplot_layout
+                        self.plot_timeseries('subplot', pos_dict)
                 else:
                     print('EGADS GUI can\'t plot more than 1 variable with more than 1 dimensions')
                     logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - EGADS GUI can\'t '
@@ -141,7 +167,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 logging.info('gui - plot_window_functions.py - PlotWindow - select_plot_type - Each variable has a '
                              'different number of dimensions, this is not yet supported')
             
-    def plot_timeseries(self, plot_type):
+    def plot_timeseries(self, plot_type, pos_dict=None):
         logging.debug('gui - plot_window_functions.py - PlotWindow - plot_timeseries')
         if plot_type == 'plot':
             subplot_plot = [self.figure.add_subplot(1, 1, 1)]
@@ -166,13 +192,23 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         elif plot_type == 'subplot':
             subplot_plot = []
             i = 0
+            if pos_dict:
+                nrow = pos_dict['mpl_nrow']
+                ncol = pos_dict['mpl_ncol']
+            else:
+                nrow = len(self.variables)
+                ncol = 1
             for yname in self.variables:
                 yvalues = self.variables[yname]['values']
                 yunits = self.variables[yname]['units']
                 xname = self.variables[yname]['dimensions'][0]
                 xvalues = self.dimensions[xname]['values']
                 xunits = self.dimensions[xname]['units']
-                subplot_plot.append(self.figure.add_subplot(len(self.variables), 1, i + 1))
+                if pos_dict:
+                    idx = pos_dict[yname]
+                else:
+                    idx = i + 1
+                subplot_plot.append(self.figure.add_subplot(nrow, ncol, idx))
                 subplot_plot[i].plot(xvalues, yvalues, label=yname)
                 subplot_plot[i].set_ylabel(yunits)
                 subplot_plot[i].set_xlabel(xunits)
@@ -184,7 +220,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 leg.draggable()
                 i += 1
             # self.figure.tight_layout()
-            plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.90, wspace=0.4, hspace=0.4)
+            # plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.90, wspace=0.4, hspace=0.4)
             self.set_figure_options('subplot', subplot_plot)
             self.set_plot_options('subplot', subplot_plot)
         self.canvas.draw()
@@ -1375,29 +1411,21 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                                                                  "    border: 1px solid #acacac;\n"
                                                                                  "    border-radius: 1px;\n"
                                                                                  "    padding-left: 5px;\n"
-                                                                                 "    background-color: "
-                                                                                 "qlineargradient(x1: 0, y1: 0, "
-                                                                                 "x2: 0, y2: 1, \n"
-                                                                                 "                                "
-                                                                                 "stop: 0 #f0f0f0, "
-                                                                                 "stop: 1 #e5e5e5);\n"
+                                                                                 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+                                                                                 "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
                                                                                  "    color: rgb(45,45,45);\n"
                                                                                  "}\n"
                                                                                  "\n"
                                                                                  "QComboBox:disabled {\n"
-                                                                                 "    background-color: "
-                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    background-color:  rgb(200,200,200);\n"
+                                                                                 "    color: rgb(145,145,145);\n"
                                                                                  "}\n"
                                                                                  "\n"
                                                                                  "QComboBox:hover {\n"
                                                                                  "    border: 1px solid #7eb4ea;\n"
                                                                                  "    border-radius: 1px;\n"
-                                                                                 "    background-color: "
-                                                                                 "qlineargradient(x1: 0, y1: 0, "
-                                                                                 "x2: 0, y2: 1, \n"
-                                                                                 "                                "
-                                                                                 "stop: 0 #ecf4fc, "
-                                                                                 "stop: 1 #dcecfc);\n"
+                                                                                 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+                                                                                 "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
                                                                                  "}\n"
                                                                                  "\n"
                                                                                  "QComboBox::drop-down {\n"
@@ -1408,20 +1436,23 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                                                                  "    border-left-color: darkgray;\n"
                                                                                  "    border-left-style: solid;\n"
                                                                                  "    border-top-right-radius: 3px;\n"
-                                                                                 "    border-bottom-right-radius: "
-                                                                                 "3px;\n"
+                                                                                 "    border-bottom-right-radius: 3px;\n"
                                                                                  "}\n"
                                                                                  "\n"
                                                                                  "QComboBox::down-arrow {\n"
-                                                                                 "    image: "
-                                                                                 "url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    image: url(icons/down_arrow_icon.svg); \n"
+                                                                                 "    width: 16px;\n"
+                                                                                 "    height: 16px\n"
+                                                                                 "}\n"
+                                                                                 "\n"
+                                                                                 "QComboBox::down-arrow:disabled {\n"
+                                                                                 "    image: url(icons/down_arrow_icon_deactivated.svg); \n"
                                                                                  "    width: 16px;\n"
                                                                                  "    height: 16px\n"
                                                                                  "}\n"
                                                                                  "\n"
                                                                                  "QComboBox QAbstractItemView {\n"
-                                                                                 "    selection-background-color: "
-                                                                                 "rgb(200,200,200);\n"
+                                                                                 "    selection-background-color: rgb(200,200,200);\n"
                                                                                  "    selection-color: black;\n"
                                                                                  "    background: #f0f0f0;\n"
                                                                                  "    border: 0px solid #f0f0f0;\n"
@@ -1496,61 +1527,54 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                                                                   "    border: 1px solid #acacac;\n"
                                                                                   "    border-radius: 1px;\n"
                                                                                   "    padding-left: 5px;\n"
-                                                                                  "    background-color: "
-                                                                                  "qlineargradient(x1: 0, y1: 0, "
-                                                                                  "x2: 0, y2: 1, \n"
-                                                                                  "                                "
-                                                                                  "stop: 0 #f0f0f0, "
-                                                                                  "stop: 1 #e5e5e5);\n"
+                                                                                  "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+                                                                                  "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
                                                                                   "    color: rgb(45,45,45);\n"
                                                                                   "}\n"
                                                                                   "\n"
                                                                                   "QComboBox:disabled {\n"
-                                                                                  "    background-color: "
-                                                                                  "rgb(200,200,200);\n"
+                                                                                  "    background-color:  rgb(200,200,200);\n"
+                                                                                  "    color: rgb(145,145,145);\n"
                                                                                   "}\n"
                                                                                   "\n"
                                                                                   "QComboBox:hover {\n"
                                                                                   "    border: 1px solid #7eb4ea;\n"
                                                                                   "    border-radius: 1px;\n"
-                                                                                  "    background-color: "
-                                                                                  "qlineargradient(x1: 0, y1: 0, "
-                                                                                  "x2: 0, y2: 1, \n"
-                                                                                  "                                "
-                                                                                  "stop: 0 #ecf4fc, "
-                                                                                  "stop: 1 #dcecfc);\n"
+                                                                                  "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+                                                                                  "                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
                                                                                   "}\n"
                                                                                   "\n"
                                                                                   "QComboBox::drop-down {\n"
                                                                                   "    subcontrol-origin: padding;\n"
-                                                                                  "    subcontrol-position: "
-                                                                                  "top right;\n"
+                                                                                  "    subcontrol-position: top right;\n"
                                                                                   "    width: 27px;\n"
                                                                                   "    border-left-width: 1px;\n"
                                                                                   "    border-left-color: darkgray;\n"
                                                                                   "    border-left-style: solid;\n"
                                                                                   "    border-top-right-radius: 3px;\n"
-                                                                                  "    border-bottom-right-radius: "
-                                                                                  "3px;\n"
+                                                                                  "    border-bottom-right-radius: 3px;\n"
                                                                                   "}\n"
                                                                                   "\n"
                                                                                   "QComboBox::down-arrow {\n"
-                                                                                  "    image: "
-                                                                                  "url(icons/down_arrow_icon.svg); \n"
+                                                                                  "    image: url(icons/down_arrow_icon.svg); \n"
+                                                                                  "    width: 16px;\n"
+                                                                                  "    height: 16px\n"
+                                                                                  "}\n"
+                                                                                  "\n"
+                                                                                  "QComboBox::down-arrow:disabled {\n"
+                                                                                  "    image: url(icons/down_arrow_icon_deactivated.svg); \n"
                                                                                   "    width: 16px;\n"
                                                                                   "    height: 16px\n"
                                                                                   "}\n"
                                                                                   "\n"
                                                                                   "QComboBox QAbstractItemView {\n"
-                                                                                  "    selection-background-color: "
-                                                                                  "rgb(200,200,200);\n"
+                                                                                  "    selection-background-color: rgb(200,200,200);\n"
                                                                                   "    selection-color: black;\n"
                                                                                   "    background: #f0f0f0;\n"
                                                                                   "    border: 0px solid #f0f0f0;\n"
                                                                                   "}\n"
                                                                                   "\n"
-                                                                                  "QComboBox QAbstractItemView::item "
-                                                                                  "{\n"
+                                                                                  "QComboBox QAbstractItemView::item {\n"
                                                                                   "    margin: 5px 5px 5px 5px;\n"
                                                                                   "}")
                 self.pw_figureOptions_cb_10[self.figure_option_num].setFrame(False)
@@ -3955,8 +3979,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                                                              "}\n"
                                                                              "\n"
                                                                              "QLineEdit:disabled {\n"
-                                                                             "    background-color:  rgb(180, 180, "
-                                                                             "180);\n"
+                                                                             "    background-color:  rgb(200, 200, "
+                                                                             "200);\n"
                                                                              "}")
                 self.pw_plotOptions_ln_2[self.plot_option_num].setObjectName("pw_plotOptions_ln_2_"
                                                                              + str(self.plot_option_num))
@@ -4193,10 +4217,10 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 figure_options['display_legend'].append(self.pw_figureOptions_ck_2[i].isChecked())
             figure_options['margin_left'].append(float(self.pw_commonOptions_lb_5.text()))
             figure_options['margin_right'].append(1 - float(self.pw_commonOptions_lb_9.text()))
-            figure_options['margin_bottom'].append(float(self.pw_commonOptions_lb_10.text()))
-            figure_options['margin_top'].append(1 - float(self.pw_commonOptions_lb_6.text()))
+            figure_options['margin_bottom'].append(float(self.pw_commonOptions_lb_6.text()))
+            figure_options['margin_top'].append(1 - float(self.pw_commonOptions_lb_10.text()))
             if 'figure_instance' in self.figure_options:
-                figure_options['horizontal_space'].append(None)
+                figure_options['horizontal_space'].append(float(self.pw_commonOptions_lb_12.text()))
                 figure_options['vertical_space'].append(float(self.pw_commonOptions_lb_15.text()))
             else:
                 figure_options['horizontal_space'].append(None)
@@ -4296,8 +4320,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         if 'figure_instance' in self.figure_options:
                             self.figure_options['figure_instance'][i].legend(prop={'family': self.default_font,
                                                                                    'size': '10'})
-                            self.figure_options['figure_instance'][i].set_visible(True)
-                            self.figure_options['figure_instance'][i].draggable()
+                            self.figure_options['figure_instance'][i].legend().set_visible(True)
+                            self.figure_options['figure_instance'][i].legend().draggable()
                         else:
                             plt.gca().legend(prop={'family': self.default_font, 'size': '10'})
                             plt.gca().legend().set_visible(True)
@@ -4307,7 +4331,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         self.figure_options['display_legend'][i] = figure_options['display_legend'][i]
                         
                         if 'figure_instance' in self.figure_options:
-                            self.figure_options['figure_instance'][i].set_visible(True)
+                            self.figure_options['figure_instance'][i].legend().set_visible(False)
                         else:
                             plt.gca().legend().set_visible(False)
             margin_left, margin_right, margin_bottom, margin_top, wspace, hspace = None, None, None, None, None, None

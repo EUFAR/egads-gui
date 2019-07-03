@@ -14,7 +14,9 @@ matplotlib.use('Qt5Agg')
 from ui._version import _gui_version, _python_version, _qt_version
 from PyQt5 import QtWidgets, QtCore, QtGui
 from ui.Ui_mainwindow import Ui_MainWindow
-from functions.other_windows_functions import MyAbout, MyOptions, MyDisplay, MyInfo, MyUpdate, MyAsk
+from functions.other_windows_functions import MyAbout, MyDisplay, MyInfo, MyUpdate, MyAsk, MySubplot
+from functions.variable_functions import MyVariable
+from functions.option_window_functions import MyOptions
 from functions.plot_window_functions import PlotWindow
 from functions.metadata_windows_functions import MyGlobalAttributes, MyVariableAttributes, MyNAVariableAttributes
 from functions.algorithm_windows_functions import MyProcessing, MyAlgorithm
@@ -25,8 +27,7 @@ from functions.reading_functions import add_new_variable_gui, var_reading, new_v
 from functions.material_functions import objects_initialization, setup_fonts
 from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSVersion
 from functions.utils import prepare_algorithm_categories, prepare_output_categories, create_algorithm_dict
-# from functions.saving_functions import save_as_netcdf_for_nc, save_as_netcdf_for_na, save_as_nasaames_for_nc
-from functions.saving_functions import saving_file  # save_as_nasaames_for_na, saving_file
+from functions.saving_functions import saving_file
 from functions.batch_processing_window_functions import MyBatchProcessing
 from functions.export_window_functions import MyExport
 
@@ -51,6 +52,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.variable_list.customContextMenuRequested.connect(self.right_click_menu)
         self.check_egads_version()
         self.check_egads_gui_update()
+        self.actionCreateVariableBar.setVisible(False)
         logging.info('gui - mainwindow.py - MainWindow ready')
 
     @QtCore.pyqtSlot()
@@ -178,15 +180,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if self.file_ext == 'NetCDF Files (*.nc)' or self.file_ext == 'NASA Ames Files (*.na)':
                 reading_file(self)
             else:
-                self.infoWindow = MyInfo('This format ' + self.file_ext + ' is not supported actually.')
-                self.infoWindow.exec_()
+                info_window = MyInfo('This format ' + self.file_ext + ' is not supported actually.')
+                info_window.exec_()
             if self.list_of_unread_variables:
                 info_text = 'The following variable(s) couldn\'t be loaded:<ul>'
                 for var, reason in self.list_of_unread_variables.items():
                     info_text += '<li><b>' + var + '</b> &rarr; ' + reason + '</li>'
                 info_text += '</ul><p>Please read the GUI log file to have more details on previous issues.'
-                self.infoWindow = MyInfo(info_text)
-                self.infoWindow.exec_()
+                info_window = MyInfo(info_text)
+                info_window.exec_()
 
     def save_file(self):
         logging.debug('gui - mainwindow.py - MainWindow - save_file')
@@ -195,28 +197,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if save_file_ext == 'NetCDF Files (*.nc)' or save_file_ext == 'NASA Ames Files (*.na)':
                 saving_file(self, save_file_name, save_file_ext, self.file_ext)
             elif save_file_ext == "CSV Files (*.csv *.dat *.txt)":
-                self.infoWindow = MyInfo('This format ' + save_file_ext + ' is not supported actually.')
-                self.infoWindow.exec_()
+                info_window = MyInfo('This format ' + save_file_ext + ' is not supported actually.')
+                info_window.exec_()
 
     def export_variables(self):
         logging.debug('gui - mainwindow.py - MainWindow - export_variables')
-        self.export_window = MyExport(self.list_of_variables_and_attributes)
-        self.export_window.exec_()
+        export_window = MyExport(self.list_of_variables_and_attributes)
+        export_window.exec_()
 
     def global_attributes(self):
         logging.debug('gui - mainwindow.py - MainWindow - global_attributes')
-        self.globalAttributesWindow = MyGlobalAttributes(copy.deepcopy(self.list_of_global_attributes), self.file_ext)
-        self.globalAttributesWindow.exec_()
-        try:
-            self.list_of_global_attributes = self.globalAttributesWindow.global_attributes
+        glob_attr_window = MyGlobalAttributes(copy.deepcopy(self.list_of_global_attributes), self.file_ext)
+        glob_attr_window.exec_()
+        if glob_attr_window.global_attributes is not None:
+            self.list_of_global_attributes = glob_attr_window.global_attributes
             if self.file_ext == 'NetCDF Files (*.nc)':
                 update_global_attribute_gui(self, 'NetCDF')
             elif self.file_ext == 'NASA Ames Files (*.na)':
                 update_global_attribute_gui(self, 'NASA Ames')
             self.modified = True
             self.make_window_title()
-        except AttributeError:
-            pass
 
     def variable_attributes(self):
         logging.debug('gui - mainwindow.py - MainWindow - variable_attributes')
@@ -227,21 +227,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             variable = str(self.new_variable_list.currentItem().text())
             variable_attributes = copy.deepcopy(self.list_of_new_variables_and_attributes[variable][0].metadata)
         if self.file_ext == 'NASA Ames Files (*.na)':
-            self.variableAttributesWindow = MyNAVariableAttributes(variable, variable_attributes)
+            var_attr_window = MyNAVariableAttributes(variable, variable_attributes)
         else:
-            self.variableAttributesWindow = MyVariableAttributes(variable, variable_attributes, self.file_ext)
-        self.variableAttributesWindow.exec_()
-        try:
-            new_attributes = self.variableAttributesWindow.attributes
+            var_attr_window = MyVariableAttributes(variable, variable_attributes, self.file_ext)
+        var_attr_window.exec_()
+        if var_attr_window.attributes is not None:
             if self.tab_view.currentIndex() == 1:
-                self.list_of_variables_and_attributes[variable][0].metadata = new_attributes
+                self.list_of_variables_and_attributes[variable][0].metadata = var_attr_window.attributes
             elif self.tab_view.currentIndex() == 2:
-                self.list_of_new_variables_and_attributes[variable][0].metadata = new_attributes
+                self.list_of_new_variables_and_attributes[variable][0].metadata = var_attr_window.attributes
             update_variable_attribute_gui(self)
             self.modified = True
             self.make_window_title()
-        except AttributeError:
-            pass
     
     def display_variable(self):
         logging.debug('gui - mainwindow.py - MainWindow - display_variable')
@@ -273,8 +270,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             i += 1
         logging.debug('gui - mainwindow.py - MainWindow - display_variable : tab index '
                       + str(self.tab_view.currentIndex()) + ', variable ' + var_name)
-        self.displayWindow = MyDisplay(var_name, var_units, fill_value, var_values, dimensions)
-        self.displayWindow.exec_()
+        display_window = MyDisplay(var_name, var_units, fill_value, var_values, dimensions)
+        display_window.exec_()
 
     def plot_variable(self):
         logging.debug('gui - mainwindow.py - MainWindow - plot_variable')
@@ -327,48 +324,44 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 try:
                     dimensions[self.x_axis_variable_name]
                 except KeyError:
-                    dimensions[self.x_axis_variable_name] = {'units': self.list_of_variables_and_attributes[
-                        self.x_axis_variable_name][0].metadata['units'],
-                                       'values': self.list_of_variables_and_attributes[self.x_axis_variable_name][
-                                           0].value,
-                                       'axis': i}
+                    dimensions[self.x_axis_variable_name] = {
+                        'units': self.list_of_variables_and_attributes[self.x_axis_variable_name][0].metadata['units'],
+                        'values': self.list_of_variables_and_attributes[self.x_axis_variable_name][0].value,
+                        'axis': i}
                 i += 1
             variables[var_name] = {'units': var_units,
                                    'values': var,
                                    'dimensions': var_dimensions}
-        self.plotWindow = PlotWindow(variables, dimensions, self.x_axis_variable_name, self.font_list,
-                                     self.default_font)
-        self.plotWindow.setModal(True)
-        self.plotWindow.exec_()
+        plot_window = PlotWindow(variables, dimensions, self.x_axis_variable_name, self.font_list, self.default_font,
+                                 self.config_dict)
+        plot_window.setModal(True)
+        plot_window.exec_()
 
     def process_variable(self):
         logging.debug('gui - mainwindow.py - MainWindow - process_variable')
-        self.processingWindow = MyProcessing(self.list_of_algorithms,
-                                             self.list_of_variables_and_attributes,
-                                             self.list_of_new_variables_and_attributes)
-        self.processingWindow.exec_()
-        try:
-            self.list_of_new_variables_and_attributes = self.processingWindow.list_of_new_variables_and_attributes
+        processing_window = MyProcessing(self.list_of_algorithms, self.list_of_variables_and_attributes,
+                                         self.list_of_new_variables_and_attributes)
+        processing_window.exec_()
+        if processing_window.new_var_list is not None:
+            self.list_of_new_variables_and_attributes.update(processing_window.new_var_list)
             if not self.new_variables:
                 self.new_variables = True
                 add_new_variable_gui(self)
             update_new_variable_list_gui(self)
             self.modified = True
             self.make_window_title()
-        except AttributeError:
-            pass
 
     def create_algorithm(self):
         logging.debug('gui - mainwindow.py - MainWindow - create_algorithm')
-        self.myAlgorithm = MyAlgorithm(prepare_algorithm_categories(self.list_of_algorithms),
-                                       prepare_output_categories(self.list_of_algorithms))
-        self.myAlgorithm.exec_()
-        if not self.myAlgorithm.cancel:
+        new_algorithm_window = MyAlgorithm(prepare_algorithm_categories(self.list_of_algorithms),
+                                           prepare_output_categories(self.list_of_algorithms))
+        new_algorithm_window.exec_()
+        if not new_algorithm_window.cancel:
             try:
-                algorithm_filename = self.myAlgorithm.algorithm_filename
-                algorithm_category = self.myAlgorithm.algorithm_category
-                algorithm_name = self.myAlgorithm.algorithm_name
-                success = self.myAlgorithm.success
+                algorithm_filename = new_algorithm_window.algorithm_filename
+                algorithm_category = new_algorithm_window.algorithm_category
+                algorithm_name = new_algorithm_window.algorithm_name
+                success = new_algorithm_window.success
                 if success is True:
                     info_text = ('<p>The algorithm has been successfully created with the following details:'
                                  + '<ul><li>File name: ' + algorithm_filename + '.py</li>'
@@ -377,8 +370,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 else:
                     info_text = ('A critical exception occured during algorithm creation and the \'.py\' file'
                                  + ' couldn\'t be written.')
-                self.infoWindow = MyInfo(info_text)
-                self.infoWindow.exec_()
+                info_window = MyInfo(info_text)
+                info_window.exec_()
                 importlib.reload(egads.algorithms.user)
                 self.list_of_algorithms = create_algorithm_dict()
                 algorithm_menu_initialization(self)
@@ -396,13 +389,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.new_variable_list.takeItem(self.new_variable_list.currentRow())
         self.modified = True
         self.make_window_title()
-        try:
-            if not self.new_variable_list:
-                self.tab_view.removeTab(2)
-                self.new_variables = False
-        except AttributeError:
-            logging.exception('gui - mainwindow.py - MainWindow - migrate_variable: an exception occurred during the '
-                              'removal of the tab 2.')
+        if not self.new_variable_list:
+            self.tab_view.removeTab(2)
+            self.new_variables = False
 
     def delete_variable(self):
         logging.debug('gui - mainwindow.py - MainWindow - delete_variable')
@@ -445,15 +434,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             info_text = ('The variable <b>' + variable + '</b> is a dimension/independant variable in the currently '
                          'opened file. Thus it is not possible to delete it through the GUI.')
-            self.infoWindow = MyInfo(info_text)
-            self.infoWindow.exec_()
+            info_window = MyInfo(info_text)
+            info_window.exec_()
 
     def create_variable(self):
         logging.debug('gui - mainwindow.py - MainWindow - create_variable')
-        info_text = 'The GUI is still in an early stage of development. Thus it is not possible to create a new ' \
-                    'variable. It will be available in the next version.'
-        self.infoWindow = MyInfo(info_text)
-        self.infoWindow.exec_()
+        create_variable_window = MyVariable()
+        create_variable_window.exec_()
 
     def about_egads(self):
         logging.debug('gui - mainwindow.py - MainWindow - about_egads')
@@ -471,8 +458,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 + 'ds for use within the EUFAR community. A compilation of these standards and other Standards & Protoc'
                 + 'ols products is available on the EUFAR website: <a http://www.eufar.net/tools><span style=\" text-de'
                 + 'coration: underline; color:#0000ff;\">http://www.eufar.net/tools/</a></p>')
-        self.aboutWindow = MyAbout(text)
-        self.aboutWindow.exec_()
+        about_window = MyAbout(text)
+        about_window.exec_()
     
     def show_options(self):
         logging.debug('gui - mainwindow.py - MainWindow - show_options')
@@ -486,11 +473,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         config_string.seek(0)
         egads_config_dict_copy = configparser.ConfigParser()
         egads_config_dict_copy.read_file(config_string)
-        self.optionWindow = MyOptions(config_dict_copy, egads_config_dict_copy)
-        self.optionWindow.exec_()
-        if not self.optionWindow.cancel:
-            self.config_dict = self.optionWindow.config_dict
-            self.egads_config_dict = self.optionWindow.egads_config_dict
+        option_window = MyOptions(config_dict_copy, egads_config_dict_copy)
+        option_window.exec_()
+        if not option_window.cancel:
+            self.config_dict = option_window.config_dict
+            self.egads_config_dict = option_window.egads_config_dict
             ini_file = open(os.path.join(self.gui_path, 'egads_gui.ini'), 'w')
             self.config_dict.write(ini_file)
             ini_file.close()
@@ -529,8 +516,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     info_text = ('<p>The GUI has detected a a non Lineage EGADS branch (master) . Please consider '
                                  + 'updating EGADS Lineage before using the GUI. Malfunctions can occur with a wrong'
                                  + ' branch of the toolbox.</p>')
-            self.infoWindow = MyInfo(info_text)
-            self.infoWindow.exec_()
+            info_window = MyInfo(info_text)
+            info_window.exec_()
 
     def check_egads_gui_update(self):
         logging.debug('gui - mainwindow.py - MainWindow - check_egads_gui_updates')
@@ -550,13 +537,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def gui_update_info(self):
         logging.debug('gui - mainwindow.py - MainWindow - gui_update_info')
-        self.updade_window = MyUpdate(self.gui_update_url)
-        self.updade_window.exec_()
+        updade_window = MyUpdate(self.gui_update_url)
+        updade_window.exec_()
 
     def batch_processing(self):
         logging.debug('gui - mainwindow.py - Mainwindow - batch_processing')
-        self.batch_processing_window = MyBatchProcessing(self.list_of_algorithms, self.config_dict)
-        self.batch_processing_window.exec_()
+        batch_processing_window = MyBatchProcessing(self.list_of_algorithms, self.config_dict)
+        batch_processing_window.exec_()
 
     def get_file_name(self, action):
         logging.debug('gui - mainwindow.py - MainWindow - get_file_name : action ' + str(action))
@@ -612,8 +599,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 info_text = ('You have replaced the default dimension by another variable for the first time. Please '
                              + 'note that this option only works for time series (one dimension) and not for gridded '
                              + 'data (two or more dimensions).')
-                self.infoWindow = MyInfo(info_text)
-                self.infoWindow.exec_()
+                info_window = MyInfo(info_text)
+                info_window.exec_()
 
     def make_window_title(self):
         logging.debug('gui - mainwindow.py - MainWindow - make_window_title : modified ' + str(self.modified))
@@ -630,14 +617,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         logging.debug('gui - mainwindow.py - MainWindow - closeEvent')
         if self.modified:
-            self.ask_save_window = MyAsk('Quit')
-            self.ask_save_window.exec_()
-            if self.ask_save_window.choice == 'save':
+            ask_save_window = MyAsk('Quit')
+            ask_save_window.exec_()
+            if ask_save_window.choice == 'save':
                 self.save_file()
                 event.accept()
-            elif self.ask_save_window.choice == 'cancel':
+            elif ask_save_window.choice == 'cancel':
                 event.ignore()
-            elif self.ask_save_window.choice == 'close':
+            elif ask_save_window.choice == 'close':
                 event.accept()
         if self.file_is_opened:
             self.opened_file.close()

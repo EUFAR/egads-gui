@@ -5,13 +5,36 @@ CHANGELOG | LINEAGE BRANCH
 To do list:
 -----------
 
-  - add map export possibility for GE. (v 0.14)
-  - add the possibility for the user to change subplot positions. (v 0.14)
-  - check feasability of a standalone program. (v 0.14)
-  - add a window to create variable. (v 0.14)
+  - add map export possibility for GE. (v 1.1)
+  - add slider to plot window for 3D data. (v 1.1)
+  - check feasability of a standalone program. (v 1.0)
   
 To fix list:
 ------------
+
+
+July 03 2019, Release version 0.14.0
+====================================
+  EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly.
+  New options have been introduced, the gui_options.ini file should be deleted manually if it already exists.
+  Finally, the function to create a variable has been canceled. The use of such a function compared to its complexity is not really well balanced.
+  
+  ADDED:
+    - new options have been introduced to control how to plot variables with same units and subplots layout.
+	- now, according to the options selected by the user, the user has the possibility to manage the layout of multiple subplots.
+	- it is now possible to display data with 3 dimensions, a slider, two navigation buttons and a combobox are here to navigate in the 3rd dimension.
+  
+  MODIFIED:
+    - the option window code has been moved to a new file (it's getting big) and heavily modified to make use of the widget QStackWidget.
+	- the export window has been redone to make use of the widget QStackWidget.
+  
+  FIXED:
+    - when processing a variable, the new variable replace entirely the dictionary containing all new variables.
+	- the info text in the option widow was not correct.
+	- in the common options of the plot window, the value of the slider controling the horizontal distance between subplots wasn't set correctly.
+	- in the common options of the plot window, the value of the sliders controling the bottom and top margins were mixed up.
+	- in the plot window, the legend couldn't be hidden or set draggable with multiple subplots.
+	- few corrections in different widget stylesheets.
 
 
 June 28 2019, Release version 0.13.0

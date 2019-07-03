@@ -67,13 +67,12 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
 
     def close_window(self):
         logging.debug('gui - metadata_windows_functions.py - MyGlobalAttributes - close_window')
-        del self.global_attributes
+        self.global_attributes = None
         self.close()
         
     def close_window_save(self):
         logging.debug('gui - metadata_windows_functions.py - MyGlobalAttributes - close_window_save')
         try:
-
             if self.open_file_ext == 'NetCDF Files (*.nc)':
                 self.global_attributes["Conventions"] = str(self.gw_conventions_ln.text())
                 self.global_attributes["title"] = str(self.gw_title_ln.text())
@@ -660,7 +659,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
 
     def close_window(self):
         logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - close_window')
-        del self.attributes
+        self.attributes = None
         self.close()
 
     def close_window_save(self):
