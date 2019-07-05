@@ -21,7 +21,7 @@ class MyTableWidget(QtWidgets.QTableWidget):
             e.ignore()
 
 
-class DropFrame (QtWidgets.QFrame):
+class DropFrame(QtWidgets.QFrame):
     leftClick = QtCore.pyqtSignal()
     dropFile = QtCore.pyqtSignal(str)
     manyFiles = QtCore.pyqtSignal()
@@ -49,7 +49,7 @@ class DropFrame (QtWidgets.QFrame):
             self.leftClick.emit()
 
 
-class PushButtonRight (QtWidgets.QToolButton):
+class PushButtonRight(QtWidgets.QToolButton):
     rightClick = QtCore.pyqtSignal()
 
     def __init__(self, string):
@@ -61,7 +61,7 @@ class PushButtonRight (QtWidgets.QToolButton):
             self.rightClick.emit()
 
 
-class ListWidgetRight (QtWidgets.QListWidget):
+class ListWidgetRight(QtWidgets.QListWidget):
     rightClick = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):

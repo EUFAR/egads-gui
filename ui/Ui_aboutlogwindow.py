@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'aboutlogwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -30,14 +30,14 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar:vertical {\n"
-"  border: 1px solid white;\n"
+"  border-left: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  margin: 21px 0px 21px 0px;\n"
 "}\n"
 "\n"
 "QScrollBar:horizontal {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  margin: 0px 21px 0px 21px;\n"
@@ -49,7 +49,11 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
+"}\n"
+"\n"
+"QScrollBar:handle:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::handle:horizontal {\n"
@@ -58,37 +62,51 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
+"}\n"
+"\n"
+"QScrollBar:handle:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical {\n"
-"  border-top: 1px solid rgb(240,240,240);\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid rgb(240,240,240);\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
+"  border-bottom-right-radius: 3px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid rgb(240,240,240);\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
+"  border-top-right-radius: 3px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::up-arrow:vertical {\n"
@@ -114,33 +132,43 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid rgb(240,240,240);\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid rgb(240,240,240);\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
+"  border-bottom-right-radius: 3px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid rgb(240,240,240);\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid rgb(240,240,240);\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
+"border-bottom-left-radius: 3px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::left-arrow:horizontal {\n"
@@ -181,17 +209,21 @@ class Ui_aboutlogWindow(object):
 "\n"
 "QSplitter::handle:pressed {\n"
 "    background: rgb(190,190,190);\n"
+"}\n"
+"\n"
+"QSplitter::handle:hover {\n"
+"    background-color: rgb(205,205,205);\n"
 "}")
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName("splitter")
-        self.widget = QtWidgets.QWidget(self.splitter)
-        self.widget.setObjectName("widget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.widget)
+        self.layoutWidget = QtWidgets.QWidget(self.splitter)
+        self.layoutWidget.setObjectName("layoutWidget")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.label = QtWidgets.QLabel(self.widget)
+        self.label = QtWidgets.QLabel(self.layoutWidget)
         self.label.setMinimumSize(QtCore.QSize(0, 27))
         self.label.setMaximumSize(QtCore.QSize(16777215, 27))
         font = QtGui.QFont()
@@ -210,7 +242,7 @@ class Ui_aboutlogWindow(object):
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
-        self.browser_1 = QtWidgets.QTextBrowser(self.widget)
+        self.browser_1 = QtWidgets.QTextBrowser(self.layoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -229,8 +261,15 @@ class Ui_aboutlogWindow(object):
 "    color: rgb(45,45,45);\n"
 "}\n"
 "\n"
+"QScrollBar:vertical {\n"
+"  border-left: 0px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  margin: 21px 0px 21px 0px;\n"
+"}\n"
+"\n"
 "QScrollBar:horizontal {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  margin: 0px 21px 0px 21px;\n"
@@ -263,10 +302,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical {\n"
-"  border-top: 1px solid rgb(240,240,240);\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid rgb(240,240,240);\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
@@ -283,10 +322,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid rgb(240,240,240);\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
@@ -325,10 +364,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid rgb(240,240,240);\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid rgb(240,240,240);\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
@@ -345,10 +384,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid rgb(240,240,240);\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid rgb(240,240,240);\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
@@ -388,14 +427,14 @@ class Ui_aboutlogWindow(object):
         self.browser_1.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.browser_1.setObjectName("browser_1")
         self.verticalLayout.addWidget(self.browser_1)
-        self.widget1 = QtWidgets.QWidget(self.splitter)
-        self.widget1.setObjectName("widget1")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget1)
+        self.layoutWidget1 = QtWidgets.QWidget(self.splitter)
+        self.layoutWidget1.setObjectName("layoutWidget1")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.layoutWidget1)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.label_2 = QtWidgets.QLabel(self.widget1)
+        self.label_2 = QtWidgets.QLabel(self.layoutWidget1)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -419,7 +458,7 @@ class Ui_aboutlogWindow(object):
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem1)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-        self.browser_2 = QtWidgets.QTextBrowser(self.widget1)
+        self.browser_2 = QtWidgets.QTextBrowser(self.layoutWidget1)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -438,8 +477,15 @@ class Ui_aboutlogWindow(object):
 "    color: rgb(45,45,45);\n"
 "}\n"
 "\n"
+"QScrollBar:vertical {\n"
+"  border-left: 0px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  margin: 21px 0px 21px 0px;\n"
+"}\n"
+"\n"
 "QScrollBar:horizontal {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  margin: 0px 21px 0px 21px;\n"
@@ -472,10 +518,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical {\n"
-"  border-top: 1px solid rgb(240,240,240);\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid rgb(240,240,240);\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
@@ -492,10 +538,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid rgb(240,240,240);\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
@@ -534,10 +580,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid rgb(240,240,240);\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid rgb(240,240,240);\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
@@ -554,10 +600,10 @@ class Ui_aboutlogWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid rgb(240,240,240);\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid rgb(240,240,240);\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
@@ -657,6 +703,10 @@ class Ui_aboutlogWindow(object):
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">EGADS and its GUI are under development by EUFAR (European Facility for Airborne Research), an Integrating Activity funded by the European Commission. Specifically, the networking activity Standards &amp; Protocols within EUFAR is responsible for development of toolbox, in addition to developing standards for use within the EUFAR community. A compilation of these standards and other Standards &amp; Protocols products is available on the EUFAR website: <a href=\"http://www.eufar.net/tools/\"><span style=\" text-decoration: underline; color:#0000ff;\">http://www.eufar.net/tools/</span></a></p></body></html>"))
         self.label_2.setText(_translate("aboutlogWindow", "Changelog"))
         self.browser_2.setDocumentTitle(_translate("aboutlogWindow", "Changelog"))
-        self.browser_2.setHtml(_translate("aboutlogWindow", ""))
+        self.browser_2.setHtml(_translate("aboutlogWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><title>Changelog</title><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'FreeSans\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.button.setText(_translate("aboutlogWindow", "Ok"))
 

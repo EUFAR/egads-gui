@@ -155,18 +155,16 @@ class DrawGriddedMap(QtCore.QThread):
 
 
 class ProvideWidthHeight(QtCore.QThread):
+    finished = QtCore.pyqtSignal(list)
     
-    def __init__(self, height_widget, width_widget):
+    def __init__(self):
         QtCore.QThread.__init__(self)
         logging.debug('gui - thread_functions.py - ProvideWidthHeight - __init__')
-        self.height_widget = height_widget
-        self.width_widget = width_widget
         
     def run(self):
         logging.debug('gui - thread_functions.py - ProvideWidthHeight - run')
         time.sleep(1)
-        self.height_widget.setText(str(6.2))
-        self.width_widget.setText(str(11.52))
+        self.finished.emit([str(6.2), str(12.02)])
     
     def stop(self):
         logging.debug('gui - thread_functions.py - ProvideWidthHeight - stop')

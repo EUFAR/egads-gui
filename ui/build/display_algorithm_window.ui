@@ -420,8 +420,15 @@ QPlainTextEdit:disabled {
 	background-color:  rgb(240, 240, 240);
 }
 
+QScrollBar:vertical {
+  border-left: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  margin: 21px 0px 21px 0px;
+}
+
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -454,10 +461,10 @@ QScrollBar:handle:horizontal:pressed {
 }
 
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -474,10 +481,10 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -516,10 +523,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -536,10 +543,10 @@ QScrollBar::add-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
@@ -1526,8 +1533,15 @@ QPlainTextEdit:disabled {
 	background-color:  rgb(240, 240, 240);
 }
 
+QScrollBar:vertical {
+  border-left: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  margin: 21px 0px 21px 0px;
+}
+
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -1560,10 +1574,10 @@ QScrollBar:handle:horizontal:pressed {
 }
 
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -1580,10 +1594,10 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -1622,10 +1636,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -1642,10 +1656,10 @@ QScrollBar::add-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
@@ -1968,8 +1982,15 @@ QPlainTextEdit:disabled {
 	background-color:  rgb(240, 240, 240);
 }
 
+QScrollBar:vertical {
+  border-left: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  margin: 21px 0px 21px 0px;
+}
+
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -2002,10 +2023,10 @@ QScrollBar:handle:horizontal:pressed {
 }
 
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -2022,10 +2043,10 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -2064,10 +2085,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -2084,10 +2105,10 @@ QScrollBar::add-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
@@ -2129,7 +2150,7 @@ QScrollBar::right-arrow:horizontal:pressed {
               <enum>QFrame::NoFrame</enum>
              </property>
              <property name="readOnly">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="plainText">
               <string/>
@@ -2662,8 +2683,15 @@ QPlainTextEdit:disabled {
 	background-color:  rgb(240, 240, 240);
 }
 
+QScrollBar:vertical {
+  border-left: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  margin: 21px 0px 21px 0px;
+}
+
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -2696,10 +2724,10 @@ QScrollBar:handle:horizontal:pressed {
 }
 
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -2716,10 +2744,10 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -2758,10 +2786,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -2778,10 +2806,10 @@ QScrollBar::add-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
@@ -2911,14 +2939,14 @@ QScrollBar::right-arrow:horizontal:pressed {
 QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
 
 QScrollBar:vertical {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   margin: 21px 0px 21px 0px;
 }
 
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -2933,6 +2961,10 @@ QScrollBar:handle:vertical:hover {
   background-color: rgb(167, 167, 167);
 }
 
+QScrollBar:handle:vertical:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
 QScrollBar::handle:horizontal {
   background-color: rgb(205, 205, 205);
   min-width: 25px;
@@ -2942,11 +2974,15 @@ QScrollBar:handle:horizontal:hover {
   background-color: rgb(167, 167, 167);
 }
 
+QScrollBar:handle:horizontal:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -2958,10 +2994,10 @@ QScrollBar::add-line:vertical:hover {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -2970,6 +3006,10 @@ QScrollBar::sub-line:vertical {
 
 QScrollBar::sub-line:vertical:hover {
   background-color: rgb(219, 219, 219);
+}
+
+QScrollBar::add-line:vertical:pressed {
+  background-color: rgb(96, 96, 96);
 }
 
 QScrollBar::up-arrow:vertical {
@@ -2995,10 +3035,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -3009,11 +3049,15 @@ QScrollBar::add-line:horizontal:hover {
   background-color: rgb(219, 219, 219);
 }
 
+QScrollBar::add-line:horizontal:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
@@ -3062,21 +3106,20 @@ QScrollBar::right-arrow:horizontal:pressed {
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_5">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item row="0" column="0">
               <layout class="QVBoxLayout" name="input_layout"/>
-             </item>
-             <item row="1" column="0">
-              <spacer name="verticalSpacer_10">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>356</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </widget>
@@ -3161,14 +3204,14 @@ QScrollBar::right-arrow:horizontal:pressed {
 QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
 
 QScrollBar:vertical {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   margin: 21px 0px 21px 0px;
 }
 
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -3183,6 +3226,10 @@ QScrollBar:handle:vertical:hover {
   background-color: rgb(167, 167, 167);
 }
 
+QScrollBar:handle:vertical:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
 QScrollBar::handle:horizontal {
   background-color: rgb(205, 205, 205);
   min-width: 25px;
@@ -3192,11 +3239,15 @@ QScrollBar:handle:horizontal:hover {
   background-color: rgb(167, 167, 167);
 }
 
+QScrollBar:handle:horizontal:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -3208,10 +3259,10 @@ QScrollBar::add-line:vertical:hover {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -3220,6 +3271,10 @@ QScrollBar::sub-line:vertical {
 
 QScrollBar::sub-line:vertical:hover {
   background-color: rgb(219, 219, 219);
+}
+
+QScrollBar::add-line:vertical:pressed {
+  background-color: rgb(96, 96, 96);
 }
 
 QScrollBar::up-arrow:vertical {
@@ -3245,10 +3300,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -3259,11 +3314,15 @@ QScrollBar::add-line:horizontal:hover {
   background-color: rgb(219, 219, 219);
 }
 
+QScrollBar::add-line:horizontal:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
@@ -3312,21 +3371,20 @@ QScrollBar::right-arrow:horizontal:pressed {
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_6">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item row="0" column="0">
               <layout class="QVBoxLayout" name="output_layout"/>
-             </item>
-             <item row="1" column="0">
-              <spacer name="verticalSpacer_11">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>354</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </widget>
@@ -3633,7 +3691,7 @@ QScrollBar::right-arrow:horizontal:pressed {
            <property name="styleSheet">
             <string notr="true">QPlainTextEdit {
 	border-radius: 3px;
-	padding: 1px 0px 1px 0px;
+	padding: 1px 0px 1px 1px;
 	background-color:  rgb(240, 240, 240);
     color: rgb(45,45,45);
 }
@@ -3642,8 +3700,15 @@ QPlainTextEdit:disabled {
 	background-color:  rgb(240, 240, 240);
 }
 
+QScrollBar:vertical {
+  border-left: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  margin: 21px 0px 21px 0px;
+}
+
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -3676,10 +3741,10 @@ QScrollBar:handle:horizontal:pressed {
 }
 
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -3696,10 +3761,10 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -3738,10 +3803,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -3758,15 +3823,15 @@ QScrollBar::add-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
   subcontrol-origin: margin;
-border-bottom-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
 QScrollBar::sub-line:horizontal:hover {
@@ -3806,7 +3871,7 @@ QScrollBar::right-arrow:horizontal:pressed {
             <enum>QPlainTextEdit::NoWrap</enum>
            </property>
            <property name="readOnly">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="plainText">
             <string/>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'variable_attribute_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -34,14 +34,14 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar:vertical {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  margin: 21px 0px 21px 0px;\n"
 "}\n"
 "\n"
 "QScrollBar:horizontal {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  margin: 0px 21px 0px 21px;\n"
@@ -56,6 +56,10 @@ class Ui_variableAttributeWindow(object):
 "  background-color: rgb(167, 167, 167);\n"
 "}\n"
 "\n"
+"QScrollBar:handle:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
 "QScrollBar::handle:horizontal {\n"
 "  background-color: rgb(205, 205, 205);\n"
 "  min-width: 25px;\n"
@@ -65,11 +69,15 @@ class Ui_variableAttributeWindow(object):
 "  background-color: rgb(167, 167, 167);\n"
 "}\n"
 "\n"
+"QScrollBar:handle:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
 "QScrollBar::add-line:vertical {\n"
-"  border-top: 1px solid rgb(240,240,240);\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid rgb(240,240,240);\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
@@ -81,10 +89,10 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid rgb(240,240,240);\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
@@ -93,6 +101,10 @@ class Ui_variableAttributeWindow(object):
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
 "  background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::up-arrow:vertical {\n"
@@ -118,10 +130,10 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid rgb(240,240,240);\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid rgb(240,240,240);\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
@@ -132,11 +144,15 @@ class Ui_variableAttributeWindow(object):
 "  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
+"QScrollBar::add-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
 "QScrollBar::sub-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid rgb(240,240,240);\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid rgb(240,240,240);\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
@@ -175,6 +191,7 @@ class Ui_variableAttributeWindow(object):
 "    padding-left: 5px;\n"
 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
 "                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
+"    color: rgb(45,45,45);\n"
 "}\n"
 "\n"
 "QComboBox:disabled {\n"
@@ -311,6 +328,9 @@ class Ui_variableAttributeWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(240, 240, 240))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(45, 45, 45, 128))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        #palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.PlaceholderText, brush)
         brush = QtGui.QBrush(QtGui.QColor(45, 45, 45))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.WindowText, brush)
@@ -329,6 +349,9 @@ class Ui_variableAttributeWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(240, 240, 240))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(45, 45, 45, 128))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        #palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.PlaceholderText, brush)
         brush = QtGui.QBrush(QtGui.QColor(45, 45, 45))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.WindowText, brush)
@@ -347,6 +370,9 @@ class Ui_variableAttributeWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(200, 200, 200))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(45, 45, 45, 128))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        #palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.PlaceholderText, brush)
         self.vw_units_ln.setPalette(palette)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
@@ -410,6 +436,9 @@ class Ui_variableAttributeWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(240, 240, 240))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(45, 45, 45, 128))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        #palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.PlaceholderText, brush)
         brush = QtGui.QBrush(QtGui.QColor(45, 45, 45))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.WindowText, brush)
@@ -428,6 +457,9 @@ class Ui_variableAttributeWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(240, 240, 240))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(45, 45, 45, 128))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        #palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.PlaceholderText, brush)
         brush = QtGui.QBrush(QtGui.QColor(45, 45, 45))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.WindowText, brush)
@@ -446,6 +478,9 @@ class Ui_variableAttributeWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(200, 200, 200))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(45, 45, 45, 128))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        #palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.PlaceholderText, brush)
         self.vw_fillValue_ln.setPalette(palette)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
@@ -531,14 +566,14 @@ class Ui_variableAttributeWindow(object):
 "QScrollArea > QWidget > QWidget { background: transparent; }\n"
 "\n"
 "QScrollBar:vertical {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  margin: 21px 0px 21px 0px;\n"
 "}\n"
 "\n"
 "QScrollBar:horizontal {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  margin: 0px 21px 0px 21px;\n"
@@ -550,7 +585,7 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
+"  background-color: rgb(167, 167, 167);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:pressed {\n"
@@ -563,7 +598,7 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
+"  background-color: rgb(167, 167, 167);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:pressed {\n"
@@ -571,42 +606,36 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical {\n"
-"  border-top: 1px solid rgb(240,240,240);\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid rgb(240,240,240);\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid rgb(240,240,240);\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
-"QScrollBar::sub-line:vertical:pressed {\n"
+"QScrollBar::add-line:vertical:pressed {\n"
 "  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
@@ -633,19 +662,18 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid rgb(240,240,240);\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid rgb(240,240,240);\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:pressed {\n"
@@ -653,23 +681,18 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid rgb(240,240,240);\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid rgb(240,240,240);\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
 "QScrollBar::left-arrow:horizontal {\n"
@@ -698,10 +721,9 @@ class Ui_variableAttributeWindow(object):
         self.other_attribute_scroll.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.other_attribute_scroll.setObjectName("other_attribute_scroll")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 646, 89))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 646, 85))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
-        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_4.setObjectName("gridLayout_4")
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
@@ -828,14 +850,14 @@ class Ui_variableAttributeWindow(object):
 "QScrollArea > QWidget > QWidget { background: transparent; }\n"
 "\n"
 "QScrollBar:vertical {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  margin: 21px 0px 21px 0px;\n"
 "}\n"
 "\n"
 "QScrollBar:horizontal {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  margin: 0px 21px 0px 21px;\n"
@@ -847,7 +869,7 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
+"  background-color: rgb(167, 167, 167);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:pressed {\n"
@@ -860,7 +882,7 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
+"  background-color: rgb(167, 167, 167);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:pressed {\n"
@@ -868,42 +890,36 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical {\n"
-"  border-top: 1px solid rgb(240,240,240);\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid rgb(240,240,240);\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid rgb(240,240,240);\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
-"QScrollBar::sub-line:vertical:pressed {\n"
+"QScrollBar::add-line:vertical:pressed {\n"
 "  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
@@ -930,19 +946,18 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid rgb(240,240,240);\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid rgb(240,240,240);\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:pressed {\n"
@@ -950,23 +965,18 @@ class Ui_variableAttributeWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid rgb(240,240,240);\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid rgb(240,240,240);\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
+"  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
 "QScrollBar::left-arrow:horizontal {\n"
@@ -995,10 +1005,9 @@ class Ui_variableAttributeWindow(object):
         self.add_attribute_scroll.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.add_attribute_scroll.setObjectName("add_attribute_scroll")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 646, 89))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 646, 85))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_2)
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
@@ -1015,7 +1024,7 @@ class Ui_variableAttributeWindow(object):
         self.add_attribute_scroll.setWidget(self.scrollAreaWidgetContents_2)
         self.verticalLayout_3.addWidget(self.add_attribute_scroll)
         self.gridLayout_2.addWidget(self.splitter, 0, 0, 1, 1)
-        spacerItem15 = QtWidgets.QSpacerItem(20, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        spacerItem15 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_2.addItem(spacerItem15, 1, 0, 1, 1)
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")

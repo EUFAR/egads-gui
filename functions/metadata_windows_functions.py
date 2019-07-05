@@ -11,6 +11,7 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
         logging.debug('gui - metadata_windows_functions.py - MyGlobalAttributes - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
+        self.splitter.setSizes([170, 200, 125])
         self.gw_addAttribute_rl.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.global_attributes = global_attributes
         self.open_file_ext = open_file_ext
@@ -338,8 +339,15 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                                                                          "    background-color:  rgb(240, 240, 240);\n"
                                                                          "}\n"
                                                                          "\n"
+                                                                         "QScrollBar:vertical {\n"
+                                                                         "  border-left: 0px solid white;\n"
+                                                                         "  background-color: rgb(240, 240, 240);\n"
+                                                                         "  width: 20px;\n"
+                                                                         "  margin: 21px 0px 21px 0px;\n"
+                                                                         "}\n"
+                                                                         "\n"
                                                                          "QScrollBar:horizontal {\n"
-                                                                         "  border: 1px solid white;\n"
+                                                                         "  border: 0px solid white;\n"
                                                                          "  background-color: rgb(240, 240, 240);\n"
                                                                          "  height: 20px;\n"
                                                                          "  margin: 0px 21px 0px 21px;\n"
@@ -372,10 +380,10 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                                                                          "}\n"
                                                                          "\n"
                                                                          "QScrollBar::add-line:vertical {\n"
-                                                                         "  border-top: 1px solid rgb(240,240,240);\n"
-                                                                         "  border-left: 1px solid white;\n"
-                                                                         "  border-right: 1px solid white;\n"
-                                                                         "  border-bottom: 1px solid white;\n"
+                                                                         "  border-top: 0px solid rgb(240,240,240);\n"
+                                                                         "  border-left: 0px solid white;\n"
+                                                                         "  border-right: 0px solid white;\n"
+                                                                         "  border-bottom: 0px solid white;\n"
                                                                          "  background-color: rgb(240, 240, 240);\n"
                                                                          "  height: 20px;\n"
                                                                          "  subcontrol-position: bottom;\n"
@@ -392,10 +400,10 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                                                                          "}\n"
                                                                          "\n"
                                                                          "QScrollBar::sub-line:vertical {\n"
-                                                                         "  border-top: 1px solid white;\n"
-                                                                         "  border-left: 1px solid white;\n"
-                                                                         "  border-right: 1px solid white;\n"
-                                                                         "  border-bottom: 1px solid rgb(240,240,"
+                                                                         "  border-top: 0px solid white;\n"
+                                                                         "  border-left: 0px solid white;\n"
+                                                                         "  border-right: 0px solid white;\n"
+                                                                         "  border-bottom: 0px solid rgb(240,240,"
                                                                          "240);\n"
                                                                          "  background-color: rgb(240, 240, 240);\n"
                                                                          "  height: 20px;\n"
@@ -435,10 +443,10 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                                                                          "}\n"
                                                                          "\n"
                                                                          "QScrollBar::add-line:horizontal {\n"
-                                                                         "  border-top: 1px solid white;\n"
-                                                                         "  border-left: 1px solid rgb(240,240,240);\n"
-                                                                         "  border-right: 1px solid white;\n"
-                                                                         "  border-bottom: 1px solid white;\n"
+                                                                         "  border-top: 0px solid white;\n"
+                                                                         "  border-left: 0px solid rgb(240,240,240);\n"
+                                                                         "  border-right: 0px solid white;\n"
+                                                                         "  border-bottom: 0px solid white;\n"
                                                                          "  background-color: rgb(240, 240, 240);\n"
                                                                          "  width: 20px;\n"
                                                                          "  subcontrol-position: right;\n"
@@ -455,10 +463,10 @@ class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
                                                                          "}\n"
                                                                          "\n"
                                                                          "QScrollBar::sub-line:horizontal {\n"
-                                                                         "  border-top: 1px solid white;\n"
-                                                                         "  border-left: 1px solid white;\n"
-                                                                         "  border-right: 1px solid rgb(240,240,240);\n"
-                                                                         "  border-bottom: 1px solid white;\n"
+                                                                         "  border-top: 0px solid white;\n"
+                                                                         "  border-left: 0px solid white;\n"
+                                                                         "  border-right: 0px solid rgb(240,240,240);\n"
+                                                                         "  border-bottom: 0px solid white;\n"
                                                                          "  background-color: rgb(240, 240, 240);\n"
                                                                          "  width: 20px;\n"
                                                                          "  subcontrol-position: left;\n"
@@ -615,6 +623,7 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
         logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - __init__ : var ' + str(var))
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
+        self.splitter.setSizes([110, 190, 124])
         self.vw_addAttribute_rl.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.variable = var
         self.open_file_ext = open_file_ext

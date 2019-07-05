@@ -1,8 +1,11 @@
 import logging
+import egads
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_optionwindow import Ui_optionWindow
 from functions.help_functions import option_information_text
 from functions.other_windows_functions import MyInfo
+from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSUpdateOnline
+from ui._version import _gui_version
 
 
 class MyOptions(QtWidgets.QDialog, Ui_optionWindow):

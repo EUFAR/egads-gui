@@ -91,14 +91,14 @@ QComboBox QAbstractItemView::item {
 }
 
 QScrollBar:vertical {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   margin: 21px 0px 21px 0px;
 }
 
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -110,7 +110,7 @@ QScrollBar::handle:vertical {
 }
 
 QScrollBar:handle:vertical:hover {
-  background-color: rgb(166, 166, 166);
+  background-color: rgb(167, 167, 167);
 }
 
 QScrollBar:handle:vertical:pressed {
@@ -123,7 +123,7 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar:handle:horizontal:hover {
-  background-color: rgb(166, 166, 166);
+  background-color: rgb(167, 167, 167);
 }
 
 QScrollBar:handle:horizontal:pressed {
@@ -131,19 +131,18 @@ QScrollBar:handle:horizontal:pressed {
 }
 
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 0px;
 }
 
 QScrollBar::add-line:vertical:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::add-line:vertical:pressed {
@@ -151,19 +150,18 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
   subcontrol-origin: margin;
-  border-top-right-radius: 0px;
 }
 
 QScrollBar::sub-line:vertical:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::sub-line:vertical:pressed {
@@ -193,19 +191,18 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 0px;
 }
 
 QScrollBar::add-line:horizontal:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::add-line:horizontal:pressed {
@@ -213,19 +210,18 @@ QScrollBar::add-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
   subcontrol-origin: margin;
-border-bottom-left-radius: 0px;
 }
 
 QScrollBar::sub-line:horizontal:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::sub-line:horizontal:pressed {
@@ -605,14 +601,14 @@ QLineEdit:disabled {
 }
 
 QScrollBar:vertical {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   margin: 21px 0px 21px 0px;
 }
 
 QScrollBar:horizontal {
-  border: 1px solid white;
+  border: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   margin: 0px 21px 0px 21px;
@@ -624,7 +620,7 @@ QScrollBar::handle:vertical {
 }
 
 QScrollBar:handle:vertical:hover {
-  background-color: rgb(166, 166, 166);
+  background-color: rgb(167, 167, 167);
 }
 
 QScrollBar:handle:vertical:pressed {
@@ -637,7 +633,7 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar:handle:horizontal:hover {
-  background-color: rgb(166, 166, 166);
+  background-color: rgb(167, 167, 167);
 }
 
 QScrollBar:handle:horizontal:pressed {
@@ -645,10 +641,10 @@ QScrollBar:handle:horizontal:pressed {
 }
 
 QScrollBar::add-line:vertical {
-  border-top: 1px solid rgb(240,240,240);
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: bottom;
@@ -656,7 +652,7 @@ QScrollBar::add-line:vertical {
 }
 
 QScrollBar::add-line:vertical:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::add-line:vertical:pressed {
@@ -664,10 +660,10 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QScrollBar::sub-line:vertical {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid rgb(240,240,240);
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
   background-color: rgb(240, 240, 240);
   height: 20px;
   subcontrol-position: top;
@@ -675,7 +671,7 @@ QScrollBar::sub-line:vertical {
 }
 
 QScrollBar::sub-line:vertical:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::sub-line:vertical:pressed {
@@ -705,10 +701,10 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar::add-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid rgb(240,240,240);
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: right;
@@ -716,7 +712,7 @@ QScrollBar::add-line:horizontal {
 }
 
 QScrollBar::add-line:horizontal:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::add-line:horizontal:pressed {
@@ -724,10 +720,10 @@ QScrollBar::add-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:horizontal {
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
   background-color: rgb(240, 240, 240);
   width: 20px;
   subcontrol-position: left;
@@ -735,7 +731,7 @@ QScrollBar::sub-line:horizontal {
 }
 
 QScrollBar::sub-line:horizontal:hover {
-  background-color: rgb(218, 218, 218);
+  background-color: rgb(219, 219, 219);
 }
 
 QScrollBar::sub-line:horizontal:pressed {
@@ -1014,7 +1010,7 @@ QLabel:disabled {
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>10</height>
+       <height>20</height>
       </size>
      </property>
     </spacer>

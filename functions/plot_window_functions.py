@@ -10,7 +10,8 @@ from ui.Ui_tickslabelswindow import Ui_tickslabelsWindow
 from functions.utils import populate_combobox
 from functions.other_windows_functions import MyWait, MyInfo, MySubplot
 from functions.thread_functions import DrawGriddedMap, ProvideWidthHeight
-from functions.material_functions import setup_plot_material, plot_information_buttons_text
+from functions.material_functions import setup_plot_material
+from functions.help_functions import plot_information_text
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -32,7 +33,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.default_font = default_font
         self.config_dict = config_dict
         setup_plot_material(self)
-        plot_information_buttons_text(self)
+        self.information_text = plot_information_text()
         self.setup_toolbar()
         self.setup_plot_area()
         self.actionClose.triggered.connect(self.close_window)
@@ -51,8 +52,9 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_info_bt_3.clicked.connect(self.save_button_information)
         self.pw_info_bt_4.clicked.connect(self.save_button_information)
         self.select_plot_type()
-        self.thread_set_width_height = ProvideWidthHeight(self.pw_saveOptions_ln_1, self.pw_saveOptions_ln_2)
-        self.thread_set_width_height.start()
+        # self.thread_set_width_height = ProvideWidthHeight(self.pw_saveOptions_ln_1, self.pw_saveOptions_ln_2)
+        # self.thread_set_width_height.start()
+        self.set_window_size_thread()
         logging.info('gui - plot_window_functions.py - PlotWindow - ready')
 
     def select_plot_type(self):
@@ -468,7 +470,9 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.figure_options['grid_style'].append('-')
             self.figure_options['grid_size'].append(1)
             self.figure_options['grid_color'].append('Black')
-            
+
+            xlim_max, xlim_min, ylim_max, ylim_min = None, None, None, None
+
             for key, subplot in subplot_list.items():
                 xlim_min, xlim_max = subplot['ax'].axes.get_xlim()
                 ylim_min, ylim_max = subplot['ax'].axes.get_ylim()
@@ -4838,8 +4842,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
 
     def save_button_information(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - save_button_information')
-        self.infoWindow = MyInfo(self.save_buttons_text[self.sender().objectName()])
-        self.infoWindow.exec_()
+        info_window = MyInfo(self.information_text[self.sender().objectName()])
+        info_window.exec_()
 
     def figure_button_information(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - figure_button_information')
@@ -4847,8 +4851,17 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             name = self.sender().objectName()[:-1 * (int(''.join(reversed(self.sender().objectName())).find('_')) + 1)]
         else:
             name = self.sender().objectName()
-        self.infoWindow = MyInfo(self.figure_buttons_text[name])
-        self.infoWindow.exec_()
+        info_window = MyInfo(self.information_text[name])
+        info_window.exec_()
+
+    def set_window_size_thread(self):
+        self.thread_set_width_height = ProvideWidthHeight()
+        self.thread_set_width_height.finished.connect(self.set_window_size)
+        self.thread_set_width_height.start()
+
+    def set_window_size(self, val):
+        self.pw_saveOptions_ln_1.setText(val[0])
+        self.pw_saveOptions_ln_2.setText(val[1])
 
     def close_window(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - close_window')

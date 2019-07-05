@@ -10,7 +10,7 @@ from functions.utils import write_algorithm, clear_layout
 from functions.other_windows_functions import MyInfo, MyFill, MyUnit, MyFilename, MyCategory, MyOverwriteFilename
 from functions.other_windows_functions import MyWait, MyCoeff
 from functions.thread_functions import VariableProcessingThread
-from functions.material_functions import algorithm_information_buttons_text
+from functions.help_functions import algorithm_creation_information_text
 
 
 class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
@@ -21,6 +21,8 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
         self.algorithm_dict = algorithm_dict
         self.setWindowTitle('Algorithm - ' + self.algorithm_dict['File'])
         self.daw_okButton.clicked.connect(self.closeWindow)
+        self.input_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.output_layout.setAlignment(QtCore.Qt.AlignTop)
         self.input_label_1 = []
         self.input_label_2 = []
         self.input_label_3 = []
@@ -171,14 +173,14 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.input_ver_lay_2[self.input_nbr].setObjectName('input_ver_lay_2_' + str(self.input_nbr))
             self.input_label_3.append(QtWidgets.QLabel())
             self.input_label_3[self.input_nbr].setMinimumSize(QtCore.QSize(100, 27))
-            self.input_label_3[self.input_nbr].setMaximumSize(QtCore.QSize(100, 27))
+            self.input_label_3[self.input_nbr].setMaximumSize(QtCore.QSize(100, 16777215))
             self.input_label_3[self.input_nbr].setFont(font)
             self.input_label_3[self.input_nbr].setStyleSheet("QLabel {\n"
                                                              "   color: rgb(45,45,45);\n"
                                                              "}")
             self.input_label_3[self.input_nbr].setAlignment(QtCore.Qt.AlignRight |
                                                             QtCore.Qt.AlignTrailing |
-                                                            QtCore.Qt.AlignVCenter)
+                                                            QtCore.Qt.AlignTop)
             self.input_label_3[self.input_nbr].setObjectName('input_label_3_' + str(self.input_nbr))
             self.input_label_3[self.input_nbr].setText('Description:')
             self.input_ver_lay_2[self.input_nbr].addWidget(self.input_label_3[self.input_nbr])
@@ -199,14 +201,22 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                             "    padding: 1px 0px 1px 4px;\n"
                                                             "    background-color:  rgb(240, 240, 240);\n"
                                                             "    color: rgb(45,45,45);\n"
+                                                            "    margin-right: 5px;\n"
                                                             "}\n"
                                                             "    \n"
                                                             "QPlainTextEdit:disabled {\n"
                                                             "    background-color:  rgb(240, 240, 240);\n"
                                                             "}\n"
                                                             "\n"
+                                                            "QScrollBar:vertical {\n"
+                                                            "  border-left: 0px solid white;\n"
+                                                            "  background-color: rgb(240, 240, 240);\n"
+                                                            "  width: 20px;\n"
+                                                            "  margin: 21px 0px 21px 0px;\n"
+                                                            "}\n"
+                                                            "\n"
                                                             "QScrollBar:horizontal {\n"
-                                                            "  border: 1px solid white;\n"
+                                                            "  border: 0px solid white;\n"
                                                             "  background-color: rgb(240, 240, 240);\n"
                                                             "  height: 20px;\n"
                                                             "  margin: 0px 21px 0px 21px;\n"
@@ -239,10 +249,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                             "}\n"
                                                             "\n"
                                                             "QScrollBar::add-line:vertical {\n"
-                                                            "  border-top: 1px solid rgb(240,240,240);\n"
-                                                            "  border-left: 1px solid white;\n"
-                                                            "  border-right: 1px solid white;\n"
-                                                            "  border-bottom: 1px solid white;\n"
+                                                            "  border-top: 0px solid rgb(240,240,240);\n"
+                                                            "  border-left: 0px solid white;\n"
+                                                            "  border-right: 0px solid white;\n"
+                                                            "  border-bottom: 0px solid white;\n"
                                                             "  background-color: rgb(240, 240, 240);\n"
                                                             "  height: 20px;\n"
                                                             "  subcontrol-position: bottom;\n"
@@ -259,10 +269,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                             "}\n"
                                                             "\n"
                                                             "QScrollBar::sub-line:vertical {\n"
-                                                            "  border-top: 1px solid white;\n"
-                                                            "  border-left: 1px solid white;\n"
-                                                            "  border-right: 1px solid white;\n"
-                                                            "  border-bottom: 1px solid rgb(240,240,240);\n"
+                                                            "  border-top: 0px solid white;\n"
+                                                            "  border-left: 0px solid white;\n"
+                                                            "  border-right: 0px solid white;\n"
+                                                            "  border-bottom: 0px solid rgb(240,240,240);\n"
                                                             "  background-color: rgb(240, 240, 240);\n"
                                                             "  height: 20px;\n"
                                                             "  subcontrol-position: top;\n"
@@ -301,10 +311,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                             "}\n"
                                                             "\n"
                                                             "QScrollBar::add-line:horizontal {\n"
-                                                            "  border-top: 1px solid white;\n"
-                                                            "  border-left: 1px solid rgb(240,240,240);\n"
-                                                            "  border-right: 1px solid white;\n"
-                                                            "  border-bottom: 1px solid white;\n"
+                                                            "  border-top: 0px solid white;\n"
+                                                            "  border-left: 0px solid rgb(240,240,240);\n"
+                                                            "  border-right: 0px solid white;\n"
+                                                            "  border-bottom: 0px solid white;\n"
                                                             "  background-color: rgb(240, 240, 240);\n"
                                                             "  width: 20px;\n"
                                                             "  subcontrol-position: right;\n"
@@ -321,10 +331,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                             "}\n"
                                                             "\n"
                                                             "QScrollBar::sub-line:horizontal {\n"
-                                                            "  border-top: 1px solid white;\n"
-                                                            "  border-left: 1px solid white;\n"
-                                                            "  border-right: 1px solid rgb(240,240,240);\n"
-                                                            "  border-bottom: 1px solid white;\n"
+                                                            "  border-top: 0px solid white;\n"
+                                                            "  border-left: 0px solid white;\n"
+                                                            "  border-right: 0px solid rgb(240,240,240);\n"
+                                                            "  border-bottom: 0px solid white;\n"
                                                             "  background-color: rgb(240, 240, 240);\n"
                                                             "  width: 20px;\n"
                                                             "  subcontrol-position: left;\n"
@@ -376,6 +386,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                           "    background: rgb(190,190,190);\n"
                                                           "    height: 5px;\n"
                                                           "    border: 0px solid black;\n"
+                                                          "    margin-right: 5px;\n"
                                                           "}")
             self.input_layout.addWidget(self.input_line[self.input_nbr])
             self.input_edit_1[self.input_nbr].setText(input_dict['Symbol'])
@@ -464,6 +475,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "  padding: 1px 4px 1px 4px;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  color: rgb(45,45,45);\n"
+                                                              "    margin-right: 5px;\n"
                                                               "}\n"
                                                               "\n"
                                                               "QLineEdit:disabled {\n"
@@ -533,6 +545,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "  padding: 1px 4px 1px 4px;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  color: rgb(45,45,45);\n"
+                                                              "    margin-right: 5px;\n"
                                                               "}\n"
                                                               "\n"
                                                               "QLineEdit:disabled {\n"
@@ -546,14 +559,14 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.output_layout.addLayout(self.output_hor_lay_2[self.output_nbr])
             self.output_label_5.append(QtWidgets.QLabel())
             self.output_label_5[self.output_nbr].setMinimumSize(QtCore.QSize(100, 27))
-            self.output_label_5[self.output_nbr].setMaximumSize(QtCore.QSize(100, 27))
+            self.output_label_5[self.output_nbr].setMaximumSize(QtCore.QSize(100, 16777215))
             self.output_label_5[self.output_nbr].setFont(font)
             self.output_label_5[self.output_nbr].setStyleSheet("QLabel {\n"
                                                                "   color: rgb(45,45,45);\n"
                                                                "}")
             self.output_label_5[self.output_nbr].setAlignment(QtCore.Qt.AlignRight |
                                                               QtCore.Qt.AlignTrailing |
-                                                              QtCore.Qt.AlignVCenter)
+                                                              QtCore.Qt.AlignTop)
             self.output_label_5[self.output_nbr].setObjectName('output_label_5_' + str(self.output_nbr))
             self.output_label_5[self.output_nbr].setText('Description:')
             self.output_hor_lay_3[self.output_nbr].addWidget(self.output_label_5[self.output_nbr])
@@ -573,14 +586,22 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "    padding: 1px 0px 1px 4px;\n"
                                                               "    background-color:  rgb(240, 240, 240);\n"
                                                               "    color: rgb(45,45,45);\n"
+                                                              "    margin-right: 5px;\n"
                                                               "}\n"
                                                               "    \n"
                                                               "QPlainTextEdit:disabled {\n"
                                                               "    background-color:  rgb(240, 240, 240);\n"
                                                               "}\n"
                                                               "\n"
+                                                              "QScrollBar:vertical {\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  background-color: rgb(240, 240, 240);\n"
+                                                              "  width: 20px;\n"
+                                                              "  margin: 21px 0px 21px 0px;\n"
+                                                              "}\n"
+                                                              "\n"
                                                               "QScrollBar:horizontal {\n"
-                                                              "  border: 1px solid white;\n"
+                                                              "  border: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  height: 20px;\n"
                                                               "  margin: 0px 21px 0px 21px;\n"
@@ -613,10 +634,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::add-line:vertical {\n"
-                                                              "  border-top: 1px solid rgb(240,240,240);\n"
-                                                              "  border-left: 1px solid white;\n"
-                                                              "  border-right: 1px solid white;\n"
-                                                              "  border-bottom: 1px solid white;\n"
+                                                              "  border-top: 0px solid rgb(240,240,240);\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  border-right: 0px solid white;\n"
+                                                              "  border-bottom: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  height: 20px;\n"
                                                               "  subcontrol-position: bottom;\n"
@@ -633,10 +654,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::sub-line:vertical {\n"
-                                                              "  border-top: 1px solid white;\n"
-                                                              "  border-left: 1px solid white;\n"
-                                                              "  border-right: 1px solid white;\n"
-                                                              "  border-bottom: 1px solid rgb(240,240,240);\n"
+                                                              "  border-top: 0px solid white;\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  border-right: 0px solid white;\n"
+                                                              "  border-bottom: 0px solid rgb(240,240,240);\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  height: 20px;\n"
                                                               "  subcontrol-position: top;\n"
@@ -675,10 +696,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::add-line:horizontal {\n"
-                                                              "  border-top: 1px solid white;\n"
-                                                              "  border-left: 1px solid rgb(240,240,240);\n"
-                                                              "  border-right: 1px solid white;\n"
-                                                              "  border-bottom: 1px solid white;\n"
+                                                              "  border-top: 0px solid white;\n"
+                                                              "  border-left: 0px solid rgb(240,240,240);\n"
+                                                              "  border-right: 0px solid white;\n"
+                                                              "  border-bottom: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  width: 20px;\n"
                                                               "  subcontrol-position: right;\n"
@@ -695,10 +716,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::sub-line:horizontal {\n"
-                                                              "  border-top: 1px solid white;\n"
-                                                              "  border-left: 1px solid white;\n"
-                                                              "  border-right: 1px solid rgb(240,240,240);\n"
-                                                              "  border-bottom: 1px solid white;\n"
+                                                              "  border-top: 0px solid white;\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  border-right: 0px solid rgb(240,240,240);\n"
+                                                              "  border-bottom: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  width: 20px;\n"
                                                               "  subcontrol-position: left;\n"
@@ -743,14 +764,14 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
             self.output_layout.addLayout(self.output_hor_lay_3[self.output_nbr])
             self.output_label_6.append(QtWidgets.QLabel())
             self.output_label_6[self.output_nbr].setMinimumSize(QtCore.QSize(100, 27))
-            self.output_label_6[self.output_nbr].setMaximumSize(QtCore.QSize(100, 27))
+            self.output_label_6[self.output_nbr].setMaximumSize(QtCore.QSize(100, 16777215))
             self.output_label_6[self.output_nbr].setFont(font)
             self.output_label_6[self.output_nbr].setStyleSheet("QLabel {\n"
                                                                "   color: rgb(45,45,45);\n"
                                                                "}")
             self.output_label_6[self.output_nbr].setAlignment(QtCore.Qt.AlignRight |
                                                               QtCore.Qt.AlignTrailing |
-                                                              QtCore.Qt.AlignVCenter)
+                                                              QtCore.Qt.AlignTop)
             self.output_label_6[self.output_nbr].setObjectName('output_label_6_' + str(self.output_nbr))
             self.output_label_6[self.output_nbr].setText('Category:')
             self.output_hor_lay_4[self.output_nbr].addWidget(self.output_label_6[self.output_nbr])
@@ -770,14 +791,22 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "    padding: 1px 0px 1px 4px;\n"
                                                               "    background-color:  rgb(240, 240, 240);\n"
                                                               "    color: rgb(45,45,45);\n"
+                                                              "    margin-right: 5px;\n"
                                                               "}\n"
                                                               "    \n"
                                                               "QPlainTextEdit:disabled {\n"
                                                               "    background-color:  rgb(240, 240, 240);\n"
                                                               "}\n"
                                                               "\n"
+                                                              "QScrollBar:vertical {\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  background-color: rgb(240, 240, 240);\n"
+                                                              "  width: 20px;\n"
+                                                              "  margin: 21px 0px 21px 0px;\n"
+                                                              "}\n"
+                                                              "\n"
                                                               "QScrollBar:horizontal {\n"
-                                                              "  border: 1px solid white;\n"
+                                                              "  border: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  height: 20px;\n"
                                                               "  margin: 0px 21px 0px 21px;\n"
@@ -810,10 +839,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::add-line:vertical {\n"
-                                                              "  border-top: 1px solid rgb(240,240,240);\n"
-                                                              "  border-left: 1px solid white;\n"
-                                                              "  border-right: 1px solid white;\n"
-                                                              "  border-bottom: 1px solid white;\n"
+                                                              "  border-top: 0px solid rgb(240,240,240);\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  border-right: 0px solid white;\n"
+                                                              "  border-bottom: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  height: 20px;\n"
                                                               "  subcontrol-position: bottom;\n"
@@ -830,10 +859,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::sub-line:vertical {\n"
-                                                              "  border-top: 1px solid white;\n"
-                                                              "  border-left: 1px solid white;\n"
-                                                              "  border-right: 1px solid white;\n"
-                                                              "  border-bottom: 1px solid rgb(240,240,240);\n"
+                                                              "  border-top: 0px solid white;\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  border-right: 0px solid white;\n"
+                                                              "  border-bottom: 0px solid rgb(240,240,240);\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  height: 20px;\n"
                                                               "  subcontrol-position: top;\n"
@@ -872,10 +901,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::add-line:horizontal {\n"
-                                                              "  border-top: 1px solid white;\n"
-                                                              "  border-left: 1px solid rgb(240,240,240);\n"
-                                                              "  border-right: 1px solid white;\n"
-                                                              "  border-bottom: 1px solid white;\n"
+                                                              "  border-top: 0px solid white;\n"
+                                                              "  border-left: 0px solid rgb(240,240,240);\n"
+                                                              "  border-right: 0px solid white;\n"
+                                                              "  border-bottom: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  width: 20px;\n"
                                                               "  subcontrol-position: right;\n"
@@ -892,10 +921,10 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                               "}\n"
                                                               "\n"
                                                               "QScrollBar::sub-line:horizontal {\n"
-                                                              "  border-top: 1px solid white;\n"
-                                                              "  border-left: 1px solid white;\n"
-                                                              "  border-right: 1px solid rgb(240,240,240);\n"
-                                                              "  border-bottom: 1px solid white;\n"
+                                                              "  border-top: 0px solid white;\n"
+                                                              "  border-left: 0px solid white;\n"
+                                                              "  border-right: 0px solid rgb(240,240,240);\n"
+                                                              "  border-bottom: 0px solid white;\n"
                                                               "  background-color: rgb(240, 240, 240);\n"
                                                               "  width: 20px;\n"
                                                               "  subcontrol-position: left;\n"
@@ -946,6 +975,7 @@ class MyAlgorithmDisplay(QtWidgets.QDialog, Ui_displayAlgorithmWindow):
                                                             "    background: rgb(190,190,190);\n"
                                                             "    height: 5px;\n"
                                                             "    border: 0px solid black;\n"
+                                                            "    margin-right: 5px;\n"
                                                             "}")
             self.output_layout.addWidget(self.output_line[self.output_nbr])
             self.output_edit_1[self.output_nbr].setText(output_dict['Symbol'])
@@ -986,7 +1016,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                                                      **list_of_new_variables_and_attributes)
         self.algorithm = None
         self.types_for_combobox = ['vector', 'array', 'vector_optional', 'array_optional']
-        self.infoWindow = None
+        self.wait_window = None
         self.thread = None
         self.aw_okButton.clicked.connect(self.execute_processing)
         self.aw_cancelButton.clicked.connect(self.close_window)
@@ -1003,26 +1033,26 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.thread = VariableProcessingThread(self.algorithm, self.list_combobox_input,
                                                self.coefficient_matrix_values, self.list_edit_output,
                                                self.list_of_variables_and_attributes)
-        self.thread.started.connect(self.wait_window)
+        self.thread.started.connect(self.launch_wait_window)
         self.thread.finished.connect(self.close_wait_window)
         self.thread.error.connect(self.processing_error)
         self.thread.start()
 
-    def wait_window(self):
+    def launch_wait_window(self):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - wait_window')
         info_text = 'Processing data, please wait...'
-        self.waitWindow = MyWait(info_text)
-        self.waitWindow.exec_()
+        self.wait_window = MyWait(info_text)
+        self.wait_window.exec_()
 
     def close_wait_window(self, val):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - close_wait_window')
         self.new_var_list = val
-        self.waitWindow.close()
+        self.wait_window.close()
         self.close()
 
     def processing_error(self):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - processing_error')
-        self.waitWindow.close()
+        self.wait_window.close()
         info_text = ('Something went wrong during the processing. Please try to launch it again. If the process is'
                      + ' still not working, please check the algorithm and/or contact the developer.')
         info_window = MyInfo(info_text)
@@ -1120,8 +1150,6 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                 self.list_label_input[self.input_num].setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing |
                                                                    QtCore.Qt.AlignVCenter)
                 self.input_layout.addWidget(self.list_label_input[self.input_num], self.input_num, 0, 1, 1)
-                self.input_layout.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                                QtWidgets.QSizePolicy.Minimum), self.input_num, 1, 1, 1)
                 input_type = self.algorithm().metadata["InputTypes"][index]
                 combobox_widget = False
                 for var_type in self.types_for_combobox:
@@ -1284,7 +1312,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
                         self.input_num))
                 else:
                     self.list_button_input[self.input_num].setObjectName("list_button_input_" + str(self.input_num))
-                self.input_layout.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
+                self.input_layout.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
                                                                 QtWidgets.QSizePolicy.Minimum), self.input_num, 3, 1, 1)
                 self.list_button_input[self.input_num].setStyleSheet("QToolButton {\n"
                                                                      "    border: 1px solid transparent;\n"
@@ -1398,10 +1426,10 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
             coefficient_data = self.coefficient_matrix_values[self.sender().objectName()]
         except KeyError:
             coefficient_data = None
-        self.coefWindow = MyCoeff(matrix_nbr_str, coefficient_data, self.list_of_variables_and_attributes)
-        self.coefWindow.exec_()
-        if self.coefWindow.coef_array is not None:
-            self.coefficient_matrix_values[self.sender().objectName()] = self.coefWindow.coef_array
+        coef_window = MyCoeff(matrix_nbr_str, coefficient_data, self.list_of_variables_and_attributes)
+        coef_window.exec_()
+        if coef_window.coef_array is not None:
+            self.coefficient_matrix_values[self.sender().objectName()] = coef_window.coef_array
         self.activate_save_button()
 
     def prepare_variable_list(self):
@@ -1481,13 +1509,15 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
-        algorithm_information_buttons_text(self)
+        self.information_text = algorithm_creation_information_text()
         self.algorithm_categories = algorithm_categories
         self.output_categories = output_categories
         self.highlighter = Highlighter(self.cw_plain_4.document())
         self.cw_combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.reset_tab_title_color()
         self.cancel = True
+        self.cw_input_vl.setAlignment(QtCore.Qt.AlignTop)
+        self.cw_output_vl.setAlignment(QtCore.Qt.AlignTop)
         self.cw_okButton.clicked.connect(self.prepare_algorithm_creation)
         self.cw_cancelButton.clicked.connect(self.closeWindow)
         self.cw_add_1.clicked.connect(self.add_input)
@@ -1661,6 +1691,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_input_ln_1[self.input_num].setFrame(False)
         self.cw_input_ln_1[self.input_num].setObjectName('cw_input_ln_1_' + str(self.input_num))
         self.cw_input_gd_1[self.input_num].addWidget(self.cw_input_ln_1[self.input_num], 0, 1, 1, 1)
+
+        in_hor_lay = QtWidgets.QHBoxLayout()
+        in_hor_lay.setObjectName('in_hor_lay_1_' + str(self.input_num))
+        in_hor_lay.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                 QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_1.append(QtWidgets.QToolButton())
         self.cw_info_bt_1[self.input_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_1[self.input_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -1677,7 +1713,11 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_1[self.input_num].setIcon(icon2)
         self.cw_info_bt_1[self.input_num].setIconSize(QtCore.QSize(23, 23))
         self.cw_info_bt_1[self.input_num].setObjectName('cw_info_bt_1_' + str(self.input_num))
-        self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_1[self.input_num], 0, 2, 1, 1)
+
+        in_hor_lay.addWidget(self.cw_info_bt_1[self.input_num])
+        self.cw_input_gd_1[self.input_num].addLayout(in_hor_lay, 0, 2, 1, 1)
+
+        # self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_1[self.input_num], 0, 2, 1, 1)
         self.cw_input_gd_1[self.input_num].addItem(
             QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum), 0, 3, 1, 1)
         self.cw_input_lb_2.append(QtWidgets.QLabel())
@@ -1711,6 +1751,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_input_ln_2[self.input_num].setFrame(False)
         self.cw_input_ln_2[self.input_num].setObjectName('cw_input_ln_2_' + str(self.input_num))
         self.cw_input_gd_1[self.input_num].addWidget(self.cw_input_ln_2[self.input_num], 1, 1, 1, 1)
+
+        in_hor_lay = QtWidgets.QHBoxLayout()
+        in_hor_lay.setObjectName('in_hor_lay_2_' + str(self.input_num))
+        in_hor_lay.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                 QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_2.append(QtWidgets.QToolButton())
         self.cw_info_bt_2[self.input_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_2[self.input_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -1727,7 +1773,11 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_2[self.input_num].setIcon(icon2)
         self.cw_info_bt_2[self.input_num].setIconSize(QtCore.QSize(23, 23))
         self.cw_info_bt_2[self.input_num].setObjectName('cw_info_bt_2_' + str(self.input_num))
-        self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_2[self.input_num], 1, 2, 1, 1)
+
+        in_hor_lay.addWidget(self.cw_info_bt_2[self.input_num])
+        self.cw_input_gd_1[self.input_num].addLayout(in_hor_lay, 1, 2, 1, 1)
+
+        # self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_2[self.input_num], 1, 2, 1, 1)
         self.cw_input_gd_1[self.input_num].addItem(
             QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum), 1, 3, 1, 1)
         self.cw_input_lb_3.append(QtWidgets.QLabel())
@@ -1761,6 +1811,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_input_ln_3[self.input_num].setFrame(False)
         self.cw_input_ln_3[self.input_num].setObjectName('cw_input_ln_3_' + str(self.input_num))
         self.cw_input_gd_1[self.input_num].addWidget(self.cw_input_ln_3[self.input_num], 2, 1, 1, 1)
+
+        in_hor_lay = QtWidgets.QHBoxLayout()
+        in_hor_lay.setObjectName('in_hor_lay_3_' + str(self.input_num))
+        in_hor_lay.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                 QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_3.append(QtWidgets.QToolButton())
         self.cw_info_bt_3[self.input_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_3[self.input_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -1777,7 +1833,11 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_3[self.input_num].setIcon(icon2)
         self.cw_info_bt_3[self.input_num].setIconSize(QtCore.QSize(23, 23))
         self.cw_info_bt_3[self.input_num].setObjectName('cw_info_bt_3_' + str(self.input_num))
-        self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_3[self.input_num], 2, 2, 1, 1)
+
+        in_hor_lay.addWidget(self.cw_info_bt_3[self.input_num])
+        self.cw_input_gd_1[self.input_num].addLayout(in_hor_lay, 2, 2, 1, 1)
+
+        # self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_3[self.input_num], 2, 2, 1, 1)
         self.cw_input_gd_1[self.input_num].addItem(
             QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum), 2, 3, 1, 1)
         self.cw_input_lb_4.append(QtWidgets.QLabel())
@@ -1811,6 +1871,12 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_input_ln_4[self.input_num].setFrame(False)
         self.cw_input_ln_4[self.input_num].setObjectName('cw_input_ln_4_' + str(self.input_num))
         self.cw_input_gd_1[self.input_num].addWidget(self.cw_input_ln_4[self.input_num], 3, 1, 1, 3)
+
+        in_hor_lay = QtWidgets.QHBoxLayout()
+        in_hor_lay.setObjectName('in_hor_lay_4_' + str(self.input_num))
+        in_hor_lay.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                 QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_4.append(QtWidgets.QToolButton())
         self.cw_info_bt_4[self.input_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_4[self.input_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -1827,7 +1893,11 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_4[self.input_num].setIcon(icon2)
         self.cw_info_bt_4[self.input_num].setIconSize(QtCore.QSize(23, 23))
         self.cw_info_bt_4[self.input_num].setObjectName('cw_info_bt_4_' + str(self.input_num))
-        self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_4[self.input_num], 3, 4, 1, 1)
+
+        in_hor_lay.addWidget(self.cw_info_bt_4[self.input_num])
+        self.cw_input_gd_1[self.input_num].addLayout(in_hor_lay, 3, 42, 1, 1)
+
+        # self.cw_input_gd_1[self.input_num].addWidget(self.cw_info_bt_4[self.input_num], 3, 4, 1, 1)
         self.cw_input_hl_1[self.input_num].addItem(
             QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
         self.cw_input_vl.addLayout(self.cw_input_vl_1[self.input_num])
@@ -1841,6 +1911,7 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                                                          "    background: rgb(190,190,190);\n"
                                                          "    height: 5px;\n"
                                                          "    border: 0px solid black;\n"
+                                                         "    margin-right: 5px;\n"
                                                          "}")
         self.cw_input_vl_1[self.input_num].addWidget(self.cw_input_li_1[self.input_num])
         self.cw_input_vl_1[self.input_num].addItem(
@@ -1991,6 +2062,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_ln_1[self.output_num].setFrame(False)
         self.cw_output_ln_1[self.output_num].setObjectName("cw_output_ln_1_" + str(self.output_num))
         self.cw_output_hl_1[self.output_num].addWidget(self.cw_output_ln_1[self.output_num])
+
+        self.cw_output_hl_1[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_5.append(QtWidgets.QToolButton())
         self.cw_info_bt_5[self.output_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_5[self.output_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -2048,6 +2123,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_ln_5[self.output_num].setFrame(False)
         self.cw_output_ln_5[self.output_num].setObjectName("cw_output_ln_5_" + str(self.output_num))
         self.cw_output_hl_5[self.output_num].addWidget(self.cw_output_ln_5[self.output_num])
+
+        self.cw_output_hl_5[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_9.append(QtWidgets.QToolButton())
         self.cw_info_bt_9[self.output_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_9[self.output_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -2065,6 +2144,8 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_9[self.output_num].setIconSize(QtCore.QSize(23, 23))
         self.cw_info_bt_9[self.output_num].setObjectName("cw_info_bt_9_" + str(self.output_num))
         self.cw_output_hl_5[self.output_num].addWidget(self.cw_info_bt_9[self.output_num])
+        self.cw_output_hl_5[self.output_num].addItem(QtWidgets.QSpacerItem(5, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
         self.cw_output_gd_1[self.output_num].addLayout(self.cw_output_hl_5[self.output_num], 0, 3, 1, 1)
         self.cw_output_lb_2.append(QtWidgets.QLabel())
         self.cw_output_lb_2[self.output_num].setMinimumSize(QtCore.QSize(0, 27))
@@ -2098,6 +2179,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_ln_2[self.output_num].setFrame(False)
         self.cw_output_ln_2[self.output_num].setObjectName("cw_output_ln_2_" + str(self.output_num))
         self.cw_output_hl_2[self.output_num].addWidget(self.cw_output_ln_2[self.output_num])
+
+        self.cw_output_hl_2[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_6.append(QtWidgets.QToolButton())
         self.cw_info_bt_6[self.output_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_6[self.output_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -2155,6 +2240,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_ln_6[self.output_num].setFrame(False)
         self.cw_output_ln_6[self.output_num].setObjectName("cw_output_ln_6_" + str(self.output_num))
         self.cw_output_hl_6[self.output_num].addWidget(self.cw_output_ln_6[self.output_num])
+
+        self.cw_output_hl_6[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_10.append(QtWidgets.QToolButton())
         self.cw_info_bt_10[self.output_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_10[self.output_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -2172,6 +2261,8 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_10[self.output_num].setIconSize(QtCore.QSize(23, 23))
         self.cw_info_bt_10[self.output_num].setObjectName("cw_info_bt_10_" + str(self.output_num))
         self.cw_output_hl_6[self.output_num].addWidget(self.cw_info_bt_10[self.output_num])
+        self.cw_output_hl_6[self.output_num].addItem(QtWidgets.QSpacerItem(5, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
         self.cw_output_gd_1[self.output_num].addLayout(self.cw_output_hl_6[self.output_num], 1, 3, 1, 1)
         self.cw_output_lb_3.append(QtWidgets.QLabel())
         self.cw_output_lb_3[self.output_num].setMinimumSize(QtCore.QSize(0, 27))
@@ -2205,6 +2296,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_ln_3[self.output_num].setFrame(False)
         self.cw_output_ln_3[self.output_num].setObjectName("cw_output_ln_3_" + str(self.output_num))
         self.cw_output_hl_3[self.output_num].addWidget(self.cw_output_ln_3[self.output_num])
+
+        self.cw_output_hl_3[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_7.append(QtWidgets.QToolButton())
         self.cw_info_bt_7[self.output_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_7[self.output_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -2257,6 +2352,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_ln_4[self.output_num].setFrame(False)
         self.cw_output_ln_4[self.output_num].setObjectName("cw_output_ln_4_" + str(self.output_num))
         self.cw_output_hl_4[self.output_num].addWidget(self.cw_output_ln_4[self.output_num])
+
+        self.cw_output_hl_4[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_info_bt_8.append(QtWidgets.QToolButton())
         self.cw_info_bt_8[self.output_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_info_bt_8[self.output_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -2274,6 +2373,8 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_info_bt_8[self.output_num].setIconSize(QtCore.QSize(23, 23))
         self.cw_info_bt_8[self.output_num].setObjectName("cw_info_bt_8_" + str(self.output_num))
         self.cw_output_hl_4[self.output_num].addWidget(self.cw_info_bt_8[self.output_num])
+        self.cw_output_hl_4[self.output_num].addItem(QtWidgets.QSpacerItem(5, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
         self.cw_output_gd_1[self.output_num].addLayout(self.cw_output_hl_4[self.output_num], 3, 1, 1, 3)
         self.cw_output_lb_7.append(QtWidgets.QLabel())
         self.cw_output_lb_7[self.output_num].setMinimumSize(QtCore.QSize(0, 27))
@@ -2352,6 +2453,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_cb_1[self.output_num].addItems(['Make a choice...', 'Other...'] + self.output_categories)
         self.cw_output_cb_1[self.output_num].setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.cw_output_hl_7[self.output_num].addWidget(self.cw_output_cb_1[self.output_num])
+
+        self.cw_output_hl_7[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_output_add_1.append(QtWidgets.QToolButton())
         self.cw_output_add_1[self.output_num].setMinimumSize(QtCore.QSize(27, 27))
         self.cw_output_add_1[self.output_num].setMaximumSize(QtCore.QSize(27, 27))
@@ -2373,12 +2478,11 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         self.cw_output_vl_1[self.output_num].addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
                                                                            QtWidgets.QSizePolicy.Expanding))
         self.cw_output_hl_8[self.output_num].addLayout(self.cw_output_vl_1[self.output_num])
+
+        self.cw_output_hl_8[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_output_lw_1.append(QtWidgets.QListWidget())
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.cw_output_lw_1[self.output_num].sizePolicy().hasHeightForWidth())
-        self.cw_output_lw_1[self.output_num].setSizePolicy(sizePolicy)
         self.cw_output_lw_1[self.output_num].setMinimumSize(QtCore.QSize(250, 100))
         self.cw_output_lw_1[self.output_num].setMaximumSize(QtCore.QSize(250, 100))
         self.cw_output_lw_1[self.output_num].setFont(font2)
@@ -2584,6 +2688,10 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                                                            "}")
         self.cw_output_lw_1[self.output_num].setObjectName("cw_output_lw_1_" + str(self.output_num))
         self.cw_output_hl_8[self.output_num].addWidget(self.cw_output_lw_1[self.output_num])
+
+        self.cw_output_hl_8[self.output_num].addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
+                                                                           QtWidgets.QSizePolicy.Minimum))
+
         self.cw_output_vl_2.append(QtWidgets.QVBoxLayout())
         self.cw_output_vl_2[self.output_num].setObjectName("cw_output_vl_2_" + str(self.output_num))
         self.cw_info_bt_11.append(QtWidgets.QToolButton())
@@ -2620,6 +2728,7 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                                                            "    background: rgb(190,190,190);\n"
                                                            "    height: 5px;\n"
                                                            "    border: 0px solid black;\n"
+                                                           "    margin-right: 5px;\n"
                                                            "}")
         self.cw_output_li_1[self.output_num].setObjectName("cw_output_li_1_" + str(self.output_num))
         self.cw_output_vl_3[self.output_num].addWidget(self.cw_output_li_1[self.output_num])
@@ -2826,13 +2935,13 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
             info_text = ('An algorithm with the same name and in the same folder already exists in EGADS. Although it '
                          + 'is still possible to create it manually, they will be seen as one and only algorithm '
                          + 'once loaded into EGADS. Please change the name of the new algorithm before saving it.')
-            self.infoWindow = MyInfo(info_text)
-            self.infoWindow.exec_()
+            info_window = MyInfo(info_text)
+            info_window.exec_()
         except AttributeError:
             units_list = self.units_validation()
             if units_list:
-                self.unitWindow = MyUnit(units_list)
-                if self.unitWindow.exec_():
+                unit_window = MyUnit(units_list)
+                if unit_window.exec_():
                     self.choose_filename()
             else:
                 self.choose_filename()
@@ -2844,16 +2953,16 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
             category = str(self.cw_line_5.text())
         elif self.cw_combobox_1.currentText() != 'Make a choice...':
             category = str(self.cw_combobox_1.currentText())
-        self.filenameWindow = MyFilename()
-        if self.filenameWindow.exec_():
-            filename = str(self.filenameWindow.ac_line.text())
+        filename_window = MyFilename()
+        if filename_window.exec_():
+            filename = str(filename_window.ac_line.text())
             if '.py' in filename:
                 filename = filename[:-3]
             if filename:
                 if os.path.isfile(egads.__path__[0] + '/algorithms/user/' + category + '/' + filename + '.py'):
-                    self.overwriteWindow = MyOverwriteFilename(filename, category)
-                    if self.overwriteWindow.exec_():
-                        filename = str(self.overwriteWindow.ac_line.text())
+                    overwrite_window = MyOverwriteFilename(filename, category)
+                    if overwrite_window.exec_():
+                        filename = str(overwrite_window.ac_line.text())
                         if '.py' in filename:
                             filename = filename[:-3]
                         if filename:
@@ -3213,9 +3322,9 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
             output_section = False
             self.tabWidget.tabBar().setTabTextColor(2, QtGui.QColor(200, 0, 0))
         if not output_section or not input_section or not algorithm_section:
-            self.fillWindow = MyFill()
-            self.fillWindow.exec_()
-            result = self.fillWindow.cancel
+            fill_window = MyFill()
+            fill_window.exec_()
+            result = fill_window.cancel
         else:
             result = False
         logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - check_all_fields : result ' + str(result))
@@ -3235,14 +3344,14 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
 
     def algorithm_button_info(self):
         logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - algorithm_button_info')
-        self.infoWindow = MyInfo(self.information_buttons_text[self.sender().objectName()])
-        self.infoWindow.exec_()
+        info_window = MyInfo(self.information_text[self.sender().objectName()])
+        info_window.exec_()
 
     def input_output_button_info(self):
         logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - input_output_button_info')
         index = -1 * (int(''.join(reversed(self.sender().objectName())).find('_')) + 1)
-        self.infoWindow = MyInfo(self.input_output_button_text[self.sender().objectName()[:index]])
-        self.infoWindow.exec_()
+        info_window = MyInfo(self.information_text[self.sender().objectName()[:index]])
+        info_window.exec_()
 
     def closeWindow(self):
         logging.debug('gui - algorithm_window_functions.py - MyAlgorithmDisplay - closeWindow')

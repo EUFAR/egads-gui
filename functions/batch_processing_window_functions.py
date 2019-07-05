@@ -24,6 +24,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.list_of_algorithms = list_of_algorithms
         self.config_dict = config_dict
         self.bw_label_10.setText('')
+        self.options_layout.setAlignment(QtCore.Qt.AlignTop)
         self.bw_combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.bw_combobox_2.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.bw_combobox_3.setItemDelegate(QtWidgets.QStyledItemDelegate())
@@ -118,7 +119,6 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         self.options_button_1 = None
         self.grid_layout_input_1 = None
         self.grid_layout_input_2 = None
-        self.infoWindow = None
         self.options_line_1 = None
         self.input_activate = 0
         self.list_of_inputs = []
@@ -506,8 +506,8 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
 
     def info_item(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - info_item')
-        self.batchInfoWindow = MyBatchInfo(self.listWidget.currentItem().toolTip())
-        self.batchInfoWindow.exec_()
+        batch_info_window = MyBatchInfo(self.listWidget.currentItem().toolTip())
+        batch_info_window.exec_()
 
     def set_algorithm_options(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_algorithm_options')
@@ -588,9 +588,9 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                 self.list_label_input[self.input_num].setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing |
                                                                    QtCore.Qt.AlignVCenter)
                 self.grid_layout_input_1.addWidget(self.list_label_input[self.input_num], self.input_num, 0, 1, 1)
-                self.grid_layout_input_1.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                                       QtWidgets.QSizePolicy.Minimum),
-                                                 self.input_num, 1, 1, 1)
+                # self.grid_layout_input_1.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
+                #                                                        QtWidgets.QSizePolicy.Minimum),
+                #                                  self.input_num, 1, 1, 1)
                 input_type = self.algorithm().metadata["InputTypes"][index]
                 combobox_widget = False
                 for var_type in self.types_for_combobox:
@@ -754,7 +754,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                         self.input_num))
                 else:
                     self.list_button_input[self.input_num].setObjectName("list_button_input_" + str(self.input_num))
-                self.grid_layout_input_1.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
+                self.grid_layout_input_1.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
                                                                        QtWidgets.QSizePolicy.Minimum),
                                                  self.input_num, 3, 1, 1)
                 self.list_button_input[self.input_num].setStyleSheet("QToolButton {\n"
@@ -783,6 +783,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                                           "    background: rgb(190,190,190);\n"
                                           "    height: 5px;\n"
                                           "    border: 0px solid black;\n"
+                                          "    margin-right: 5px;\n"
                                           "}")
         self.options_layout.addWidget(self.options_line_1)
         self.options_layout.addItem(QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum,
@@ -820,9 +821,6 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.list_label_output[self.output_num].setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing |
                                                                  QtCore.Qt.AlignVCenter)
             self.grid_layout_input_2.addWidget(self.list_label_output[self.output_num], self.output_num, 0, 1, 1)
-            self.grid_layout_input_2.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
-                                                                   QtWidgets.QSizePolicy.Minimum),
-                                             self.output_num, 1, 1, 1)
             self.list_edit_output.append(QtWidgets.QLineEdit())
             self.list_edit_output[self.output_num].setEnabled(True)
             self.list_edit_output[self.output_num].setFont(font3)
@@ -850,7 +848,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             self.list_button_output[self.output_num].setIconSize(QtCore.QSize(23, 23))
             self.list_button_output[self.output_num].setPopupMode(QtWidgets.QToolButton.InstantPopup)
             self.list_button_output[self.output_num].setObjectName("list_button_output_" + str(self.output_num))
-            self.grid_layout_input_2.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed,
+            self.grid_layout_input_2.addItem(QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed,
                                                                    QtWidgets.QSizePolicy.Minimum),
                                              self.output_num, 3, 1, 1)
             self.list_button_output[self.output_num].setStyleSheet("QToolButton {\n"
@@ -873,19 +871,20 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
 
     def launch_coeff_window(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - launch_coeff_window')
-        index = int(self.sender().objectName()[17:])
-        matrix_nbr_idx = self.algorithm().metadata["InputTypes"][index].index('[')
-        matrix_nbr_str = self.algorithm().metadata["InputTypes"][index][matrix_nbr_idx + 1:-1]
-        matrix_nbr_str = matrix_nbr_str.split(',')
-        try:
-            coefficient_data = self.coefficient_matrix_values[self.sender().objectName()]
-        except KeyError:
-            coefficient_data = None
-        self.coefWindow = MyCoeff(matrix_nbr_str, coefficient_data, self.listWidget.item(0).toolTip())
-        self.coefWindow.exec_()
-        if self.coefWindow.coef_array is not None:
-            self.coefficient_matrix_values[self.sender().objectName()] = self.coefWindow.coef_array
-        self.activate_launch_processing_button()
+        if self.listWidget.item(0) is not None:
+            index = int(self.sender().objectName()[17:])
+            matrix_nbr_idx = self.algorithm().metadata["InputTypes"][index].index('[')
+            matrix_nbr_str = self.algorithm().metadata["InputTypes"][index][matrix_nbr_idx + 1:-1]
+            matrix_nbr_str = matrix_nbr_str.split(',')
+            try:
+                coefficient_data = self.coefficient_matrix_values[self.sender().objectName()]
+            except KeyError:
+                coefficient_data = None
+            coef_window = MyCoeff(matrix_nbr_str, coefficient_data, self.listWidget.item(0).toolTip())
+            coef_window.exec_()
+            if coef_window.coef_array is not None:
+                self.coefficient_matrix_values[self.sender().objectName()] = coef_window.coef_array
+            self.activate_launch_processing_button()
 
     def set_delete_metadata_options(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - set_delete_metadata_options')
@@ -2011,12 +2010,12 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             information_str = '<u>Description:</u> ' + optional_str + description + '<br><br><u>Units:</u> ' + units \
                               + '<br><br><u>Standard name:</u> ' + standard_name + '<br><br><u>Long name:</u> ' + \
                               long_name + '<br><br><u>Category:</u> ' + category_str
-        self.infoWindow = MyInfo(information_str)
-        self.infoWindow.exec_()
+        info_window = MyInfo(information_str)
+        info_window.exec_()
 
     def activate_launch_processing_button(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - '
-                   'activate_launch_processing_button')
+                      'activate_launch_processing_button')
         processing = True
         algorithm = True
         category = True
@@ -2125,31 +2124,30 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
                       'processing_options': processing_options,
                       'out_format': str(self.buttonGroup.checkedButton().text())
                       }
-        self.processing_window = MyWaitProcessing(batch_dict, self.config_dict)
-        self.processing_window.exec_()
-        error_occurred = self.processing_window.error_occurred
-        success = self.processing_window.success
+        processing_window = MyWaitProcessing(batch_dict, self.config_dict)
+        processing_window.exec_()
+        error_occurred = processing_window.error_occurred
+        success = processing_window.success
         if error_occurred:
             info_str = ('An important error occurred during the batch processing. The GUI decided to stop the '
                         'processing based on the choice of the user (cf. first tab and error option). Please read the '
                         'log file to check which kind or error occurred.')
-            self.infoWindow = MyInfo(info_str)
-            self.infoWindow.exec_()
+            info_indow = MyInfo(info_str)
+            info_indow.exec_()
         if success:
-            info_str = 'The batch processing has been well executed.'
-            self.infoWindow = MyInfo(info_str)
-            self.infoWindow.exec_()
+            info_indow = MyInfo('The batch processing has been well executed.')
+            info_indow.exec_()
 
     def batch_button_info(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - batch_button_info')
-        self.infoWindow = MyInfo(self.information_text[self.sender().objectName()])
-        self.infoWindow.exec_()
+        info_window = MyInfo(self.information_text[self.sender().objectName()])
+        info_window.exec_()
 
     def filename_button_info(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - filename_button_info')
         widget = self.information_text[self.sender().objectName()]
-        self.infoWindow = MyInfo(self.information_text[getattr(self, widget).currentText()])
-        self.infoWindow.exec_()
+        info_window = MyInfo(self.information_text[getattr(self, widget).currentText()])
+        info_window.exec_()
 
     def closeWindow(self):
         logging.debug('gui - batch_processing_window_functions.py - MyBatchProcessing - closeWindow')

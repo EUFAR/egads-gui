@@ -19,9 +19,7 @@ from ui.Ui_downloadwindow import Ui_downloadWindow
 from ui.Ui_coefwindow import Ui_coefWindow
 from ui.Ui_asksavewindow import Ui_asksaveWindow
 from ui.Ui_subplotwindow import Ui_subplotWindow
-from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSUpdateOnline
 from functions.gui_elements import QtWaitingSpinner
-from ui._version import _gui_version
 from functions.utils import clear_layout
 
 
@@ -450,12 +448,14 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
         self.dw_slider_1.setStyleSheet("QSlider::groove:horizontal {\n"
                                        "    border: 1px solid #999999;\n"
                                        "    height: 1px;\n"
-                                       "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);\n"
+                                       "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, "
+                                       "stop:1 #c4c4c4);\n"
                                        "    margin: 2px 0;\n"
                                        "}\n"
                                        "\n"
                                        "QSlider::handle:horizontal {\n"
-                                       "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);\n"
+                                       "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, "
+                                       "stop:1 #8f8f8f);\n"
                                        "    border: 1px solid #5c5c5c;\n"
                                        "    width: 10px;\n"
                                        "    margin: -5px 0;\n"
@@ -463,7 +463,8 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                                        "}\n"
                                        "\n"
                                        "QSlider::handle:horizontal:hover {\n"
-                                       "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, stop:1 #a7a7a7);\n"
+                                       "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #c7c7c7, "
+                                       "stop:1 #a7a7a7);\n"
                                        "}\n"
                                        "\n"
                                        "QSlider::add-page:horizontal {\n"
@@ -862,6 +863,7 @@ class MyCoeff(QtWidgets.QDialog, Ui_coefWindow):
         self.coefficient_data = coefficient_data
         self.matrix_nbr_str = matrix_nbr_str
         self.variable_list = variable_list
+        self.ok_button.setEnabled(False)
         self.ok_button.clicked.connect(self.set_coef)
         self.cancel_button.clicked.connect(self.closeWindow)
         self.combobox.currentTextChanged.connect(self.populate_table)
@@ -870,6 +872,7 @@ class MyCoeff(QtWidgets.QDialog, Ui_coefWindow):
         self.coef_array = None
         self.populate_variable_combobox()
         self.set_table()
+        self.table.cellChanged.connect(self.activate_ok_button)
         logging.info('gui - other_windows_functions.py - MyCoeff - ready')
 
     def populate_table(self):
@@ -910,9 +913,7 @@ class MyCoeff(QtWidgets.QDialog, Ui_coefWindow):
             variable_list = f.get_variable_list()
             f.close()
         elif isinstance(self.variable_list, dict):
-            for _, sublist in self.variable_list.items():
-                if sublist[2] != 'deleted':
-                    variable_list.append(sublist[1]["var_name"])
+            variable_list = sorted(self.variable_list.keys())
         self.combobox.addItem('Make a choice...')
         self.combobox.addItems(sorted(variable_list))
 
@@ -936,6 +937,21 @@ class MyCoeff(QtWidgets.QDialog, Ui_coefWindow):
         self.resize(w, h)
         if self.coefficient_data is not None:
             self.parse_data(self.coefficient_data)
+            self.activate_ok_button()
+
+    def activate_ok_button(self):
+        table_filled = True
+        for i in range(0, self.table.rowCount()):
+            for j in range(0, self.table.columnCount()):
+                if self.table.item(i, j) is not None:
+                    if not self.table.item(i, j).text():
+                        table_filled = False
+                else:
+                    table_filled = False
+        if table_filled:
+            self.ok_button.setEnabled(True)
+        else:
+            self.ok_button.setEnabled(False)
 
     def set_coef(self):
         logging.debug('gui - other_windows_functions.py - MyCoeff - set_coef')

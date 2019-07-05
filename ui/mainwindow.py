@@ -53,7 +53,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.check_egads_version()
         self.check_egads_gui_update()
         self.actionCreateVariableBar.setVisible(False)
+
+        self.test_file_nc()
+
         logging.info('gui - mainwindow.py - MainWindow ready')
+
+    def test_file_nc(self):
+        file_in = 'D:\\Travail\Developement\\files\\test_files' \
+                  '\\MSL_Serie_MERGED_Global_AVISO_GIA_Adjust_Filter2m.nc'
+        self.file_ext = 'NetCDF Files (*.nc)'
+        self.file_name = file_in
+        reading_file(self)
+
+        if self.list_of_unread_variables:
+            info_text = 'The following variable(s) couldn\'t be loaded:<ul>'
+            for var, reason in self.list_of_unread_variables.items():
+                info_text += '<li><b>' + var + '</b> &rarr; ' + reason + '</li>'
+            info_text += '</ul><p>Please read the GUI log file to have more details on previous issues.'
+            info_window = MyInfo(info_text)
+            info_window.exec_()
+
 
     @QtCore.pyqtSlot()
     def on_actionExit_triggered(self):

@@ -69,9 +69,9 @@ def export_information_text():
                                   'Earth. The different colormaps are from Matplotlib. Select one of them to activate '
                                   'all colormap options.',
                  'info_button_9': 'The colormap can be displayed at four different positions in Google Earth and '
-                                   'following two orientations:<ul><li>horizontal and at the '
-                                   'bottom</li><li>horizontal and at the top</li><li>vertical and on the '
-                                   'left</li><li>vertical and on the right</li></ul>',
+                                  'following two orientations:<ul><li>horizontal and at the '
+                                  'bottom</li><li>horizontal and at the top</li><li>vertical and on the '
+                                  'left</li><li>vertical and on the right</li></ul>',
                  'info_button_11': 'This option is used to reverse the colormap. If the colormap is starting with blue '
                                   'and ending with red, the reversed colormap will start with red and and end with '
                                   'blue.',
@@ -103,7 +103,7 @@ def export_information_text():
 
 
 def batch_processing_information_text():
-    logging.debug('gui - help.py - batch_processing_information_buttons_text')
+    logging.debug('gui - help.py - batch_processing_information_text')
     info_dict = {'bw_info_1': 'At this time, the batch processing function has 6 different '
                               'processes:<ul><li>the concatenation of multiple files</li><li>the '
                               'conversion of multiple NetCDF files to NASA Ames file '
@@ -163,4 +163,124 @@ def batch_processing_information_text():
                  'bw_info_10': 'bw_combobox_8',
                  'bw_info_11': 'bw_combobox_9'}
 
+    return info_dict
+
+
+def algorithm_creation_information_text():
+    logging.debug('gui - help_functions.py - algorithm_creation_information_text')
+    info_dict = {'cw_info_3': 'The name of the algorithm as implemented in EGADS. To aid in '
+                              'algorithm usage and discovery, there is a general naming scheme '
+                              'for egads algorithms. Generally, algorithm names are composed as '
+                              'follows: {Measurement}{Context/Detail/Instrument}{'
+                              'Source}<br><br><u>Ex</u>: AltitudePressureRaf',
+                 'cw_info_4': 'The person who developed the algorithm.<br><br><u>Ex</u>: John '
+                              'Doe',
+                 'cw_info_5': 'The person, institution or entity who provided the algorithm.'
+                              '<br><br><u>Ex</u>: NCAR - Earth Observing Laboratory',
+                 'cw_info_6': 'Any references to literature, journals or documents with more '
+                              'information on the current algorithm.<br><br><u>Ex</u>: A.C. van '
+                              'der Kroonenberg et al, "Measuring the wind vector using the '
+                              'autonomous mini aerial vehicle M^2AV", J. Atmos. Oceanic Technol., '
+                              '25 (2008), pp. 1969-1982.',
+                 'cw_info_7': 'The purpose of the algorithm.<br><br><u>Ex</u>: The '
+                              'algorithm calculates static pressure',
+                 'cw_info_8': 'A short description of what the algorithm does. <br><br><u>Ex</u>: '
+                              'It calculates static pressure and dynamic pressure by correction of '
+                              'static error. Angle of attack and sideslip are calculated from the'
+                              ' horizontal and vertical differential pressures.',
+                 'cw_info_9': 'General category of algorithm. The algorithm will be saved into '
+                              'a folder with the name of the category.<br><br><u>Ex</u>: '
+                              'Thermodynamics',
+                 'cw_info_10': 'The algorithm itself. It has to be coded using Python 3. It is '
+                               'still possible to import modules like numpy. Input and output '
+                               'variables should be well defined, and the last line of the '
+                               'algorithm has to return the output variable('
+                               's).<br><br><u>Ex</u>:<br>&nbsp;&nbsp;&nbsp;&nbsp;a, b = 2, -6'
+                               '<br>&nbsp;&nbsp;&nbsp;&nbsp;output_var = a * input_var + '
+                               'b<br><br>&nbsp;&nbsp;&nbsp;&nbsp;return output_var',
+                 'cw_info_1': 'The purpose of this tab is to create input variable(s) used in the '
+                              'previous algorithm field. Each variable required by the algorithm '
+                              'should be created here.',
+                 'cw_info_2': 'The purpose of this tab is to create output variable(s) used in the '
+                              'previous algorithm field. Each variable returned by the algorithm '
+                              'should be created here.',
+                 'cw_info_bt_1': 'This is the input symbol. It has to correspond to the input '
+                                 'symbol used in the previous algorithm field.<br><br><u>Ex</u>: '
+                                 's_p',
+                 'cw_info_bt_2': 'This is the unit of the input. There are 3 different ways to '
+                                 'write the unit:<ol><li>by using text, ex: <b>m.s-1</b>, '
+                                 'to inform EGADS that the unit of the input has to be '
+                                 '<b>m.s-1</b></li><li>by using <b>None</b>, to inform EGADS that '
+                                 'the input doesn\'t need a particular unit</li><li>by using a '
+                                 'space, " ", to inform EGADS that the input has to be '
+                                 'dimensionless.',
+                 'cw_info_bt_3': 'This is the type of the input. The type can be an array ('
+                                 'written <b>array</b>), a vector (written <b>vector</b>), '
+                                 'or a coefficient (written <b>coeff</b>). If the input is '
+                                 'optional, <b>_optional</b> should be added to the type.'
+                                 '<br><br><u>Ex</u>: array or coeff_optional',
+                 'cw_info_bt_4': 'A short description of the input.<br><br><u>Ex</u>: Particle '
+                                 'counts in each bin over time',
+                 'cw_info_bt_5': 'This is the output symbol. It has to correspond to the output '
+                                 'symbol used in the previous algorithm field. '
+                                 'It has to be return by the algorithm<br><br><u>Ex</u>: '
+                                 'return out_altitude',
+                 'cw_info_bt_6': 'This is the unit of the output. There are 2 different ways to '
+                                 'write the unit:<ol><li>by using text, ex: <b>m.s-1</b>, '
+                                 'to inform EGADS that the unit of the output has to be '
+                                 '<b>m.s-1</b></li><li>by using <b>input<i>n</i></b> to inform '
+                                 'EGADS that this output has to use the unit of the input <i>n</i>',
+                 'cw_info_bt_7': 'This is the type of the input. The type can be an array ('
+                                 'written <b>array</b>), a vector (written <b>vector</b>), '
+                                 'or a coefficient (written <b>coeff</b>).<br><br><u>Ex</u>: '
+                                 'array',
+                 'cw_info_bt_8': 'This is the standard name of the output. There are 2 different '
+                                 'ways to write the standard name:<ol><li>by using text, '
+                                 'ex: pressure altitude </li><li>by using <b>input<i>n</i></b> '
+                                 'with or without more text, this way egads knows that it has to '
+                                 'take the standard name of the input <i>n</i>, ex: input0 '
+                                 'corrected for something',
+                 'cw_info_bt_9': 'This is the long name of the output. There are 2 different '
+                                 'ways to write the long name:<ol><li>by using text, '
+                                 'ex: pressure altitude computed from static pressure</li><li>by '
+                                 'using <b>input<i>n</i></b> with or without more text, '
+                                 'this way egads knows that it has to take the long name of the '
+                                 'input <i>n</i>, ex: input0 corrected for something',
+                 'cw_info_bt_10': 'A short description of the output.<br><br><u>Ex</u>: Mean '
+                                  'diameter of the particles',
+                 'cw_info_bt_11': 'Each output has to be linked to one or more categories.'}
+    return info_dict
+
+
+def plot_information_text():
+    logging.debug('gui - help_functions.py - plot_information__text')
+    info_dict = {'pw_info_bt_1': 'Control the size of the figure when it is saved, if the user wants a '
+                                 'size different than the one of the window.',
+                 'pw_info_bt_2': 'The resolution of the figure in dot per inch (dpi). Numbers up to 600 '
+                                 'are accepted.',
+                 'pw_info_bt_3': 'Use this checkbox to activate or deactivate the transparency of the '
+                                 'background. 100 is the best possible quality, 1 is the worst.',
+                 'pw_info_bt_4': 'This slider controls the quality of the picture if the JPEG format is '
+                                 'selected when the picture is saved.',
+                 'pw_figureOptions_bt_1': 'It is possible to customize the figure and axis titles, '
+                                          'their fonts and the size of their fonts.',
+                 'pw_figureOptions_bt_2': 'Ticks are controled from here. Please note that the numbers '
+                                          'won\'t change if the user uses the pan and zoom functions.',
+                 'pw_figureOptions_bt_6': 'A grid can be display and customized from here.',
+                 'pw_figureOptions_bt_7': 'The legeng can move freely on the figure, this option '
+                                          'allows the user to set it visible or not.',
+                 'pw_commonOptions_bt_1': 'Figure margins are set by moving the sliders. The greater '
+                                          'the number, the greater the margins. If multiple figures '
+                                          'are displayed, the last sliders control the distance '
+                                          'between those figures.',
+                 'pw_plotOptions_bt_1': 'The line style is controled from here. The selection of the '
+                                        'style impacts the way the line is customized below.',
+                 'pw_plotOptions_bt_2': 'The color of the line can be changed to a predefined color, '
+                                        'or a color defined by an RGB/HEX code.',
+                 'pw_plotOptions_bt_3': 'This is the size of the line/marker.',
+                 'pw_plotOptions_bt_4': 'This checkbox activates or deactivates the antialiasing '
+                                        'function',
+                 'pw_plotOptions_bt_5': 'This checkbox activates or deactivates the opacity and the '
+                                        'value of opacity.',
+                 'pw_plotOptions_bt_6': 'The name of the time series can be changed here.'}
     return info_dict

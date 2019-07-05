@@ -6,21 +6,35 @@ To do list:
 -----------
 
   - add map export possibility for GE. (v 1.1)
+  - rework the plot function. (v 1.1)
   - add slider to plot window for 3D data. (v 1.1)
   - check feasability of a standalone program. (v 1.0)
+  - add changelog to the documentation. (v 1.0)
   
 To fix list:
 ------------
 
 
-July 03 2019, Release version 0.14.1
-====================================
+July 5 2019, Release version 0.14.2
+===================================
+  FIXED:
+    - an issue with the variable dictionary has been fixed in the coef window.
+	- the stylesheets of all windows have been fixed for small errors.
+	- the thread to check updates couldn't be imported; It has been fixed.
+	- a thread to write the window size in text widgets in the plot window, caused a segmentation fault on Linux. It has been fixed.
+  
+  MODIFIED:
+    - in the coef window, the OK button will be activated only if the table is full.
+
+
+July 3 2019, Release version 0.14.1
+===================================
   MODIFIED:
     - the documentation has been updated.
 
 
-July 03 2019, Release version 0.14.0
-====================================
+July 3 2019, Release version 0.14.0
+===================================
   EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly.
   New options have been introduced, the gui_options.ini file should be deleted manually if it already exists.
   Finally, the function to create a variable has been canceled. The use of such a function compared to its complexity is not really well balanced.
