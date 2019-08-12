@@ -1,7 +1,7 @@
 Version:
 -------
 
-EGADS Lineage GUI 0.14.2 (Python 3).
+EGADS Lineage GUI 1.0.0 (Python 3).
 
 
 Developments:
@@ -15,7 +15,7 @@ Project Overview:
 
 EGADS (EUFAR General Airborne Data-processing Software) is a Python-based toolbox for processing airborne atmospheric data. EGADS provides a framework for researchers to apply expert-contributed algorithms to data files, and acts as a platform for data intercomparison. Algorithms in EGADS will be contributed by members of the EUFAR Expert Working Group if they are found to be mature and well-established in the scientific community.
 
-EGADS GUI is a Python-based graphical user interface dedicated to EGADS. The project is still in early development and is not intended to be used in a production environment. But it can be tested if a user wants to have an overview of the possibilities. 
+EGADS GUI is a Python-based graphical user interface dedicated to EGADS. The project is still young, but it is stable and ready to be used in a production environment. 
 
 EGADS and EGADS GUI are under development by EUFAR (European Facility for Airborne Research), an Integrating Activity funded by the European Commission. Specifically, the networking activity Standards & Protocols within EUFAR is responsible for development of toolbox, in addition to developing standards for use within the EUFAR community. A compilation of these standards and other Standards & Protocols products is available on the different Standards & Protocols webpages: 
 * Standards & Protocols presentation: http://www.eufar.net/cms/standards-and-protocols/
@@ -54,7 +54,14 @@ Do not forget to install dependancies:
 * Matplotlib (2.2.2 or newer)
 * Cartopy (0.17 or newer)
 * Simplekml (1.3.1 or newer)
+* Markdown (3.1.1 or newer, optional, only to read the changelog in the GUI)
 * Requests (2.18.4 or newer, optional, only to check updates if the user activates the option)
+
+
+Stand-alone package:
+--------------------
+
+A stand-alone package is available for those who wants to use the GUI without a Python installation. In that case, look for ``EGADS Lineage GUI STA`` in the release part of the repository.
 
 
 Documentation:

@@ -1,4 +1,5 @@
 import logging
+import pathlib
 from PyQt5 import QtCore, QtWidgets, QtGui
 from ui.Ui_waitbatchwindow import Ui_waitBatchWindow
 from functions.gui_functions import modify_attribute_gui, update_icons_state, clear_gui
@@ -37,14 +38,19 @@ def reading_file(self):
         self.variable_list.addItems(list_of_variables)
         self.variable_list.itemClicked.connect(lambda: var_reading(self))
         self.tab_view.currentChanged.connect(lambda: update_icons_state(self))
-        all_buttons = self.tab_view.findChildren(QtWidgets.QToolButton)
-        for widget in all_buttons:
-            if widget.objectName() != '':
-                widget.clicked.connect(lambda: modify_attribute_gui(self, 'left'))
-                widget.rightClick.connect(lambda: modify_attribute_gui(self, 'right'))
         self.file_is_opened = True
         update_icons_state(self, 'open_file')
         status_bar_update(self)
+        self.buttons_lines_dict["va_button_1"] = ["va_varName_ln", self.variable_list,
+                                                  self.list_of_variables_and_attributes]
+        self.buttons_lines_dict["va_button_2"] = ["va_longName_ln", self.variable_list,
+                                                  self.list_of_variables_and_attributes]
+        self.buttons_lines_dict["va_button_3"] = ["va_category_ln", self.variable_list,
+                                                  self.list_of_variables_and_attributes]
+        self.buttons_lines_dict["va_button_4"] = ["va_units_ln", self.variable_list,
+                                                  self.list_of_variables_and_attributes]
+        self.opened_file.close()
+        self.start_status_bar_msg_thread('The file ' + pathlib.PurePath(self.file_name).name + ' has been opened...')
         logging.info('gui - reading_functions.py - reading_file: file loaded, file_ext ' + self.file_ext)
 
 

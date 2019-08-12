@@ -1,10 +1,12 @@
 import os
 import logging
+import pathlib
 from PyQt5 import QtWidgets, QtCore, QtGui
 from functions.algorithm_windows_functions import MyAlgorithmDisplay
 from functions.other_windows_functions import MyInfo
 from functions.utils import humansize, clear_layout
 from functions.gui_elements import DropFrame
+from functions.help_functions import frozen_algorithm_formula_text
     
 
 def gui_initialization(self):
@@ -21,22 +23,6 @@ def gui_initialization(self):
     self.tab_view.setVisible(False)
     self.gridLayout.removeWidget(self.tab_view)
     file_drop_layout(self)
-    self.sb_filename_lb = QtWidgets.QLabel()
-    self.sb_filename_lb.setMinimumSize(QtCore.QSize(0, 20))
-    self.sb_filename_lb.setMaximumSize(QtCore.QSize(16777215, 20))
-    font = QtGui.QFont()
-    font.setFamily("font/SourceSansPro-Regular.ttf")
-    font.setPointSize(9)
-    font.setItalic(True)
-    font.setKerning(True)
-    font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-    self.sb_filename_lb.setFont(font)
-    self.sb_filename_lb.setObjectName("sb_filename_lb")
-    self.sb_filename_lb.setText("")
-    self.sb_filename_lb.setStyleSheet("QLabel {\n"
-                                      "    color: rgb(45,45,45);\n"
-                                      "}")
-    self.statusBar.addWidget(self.sb_filename_lb)
     self.actionOpenBar.setEnabled(True)
     self.actionSaveAsBar.setEnabled(False)
     self.actionCloseBar.setEnabled(False)
@@ -49,6 +35,11 @@ def gui_initialization(self):
     self.actionVariableAttributesBar.setEnabled(False)
     self.actionDisplayBar.setEnabled(False)
     self.actionPlotBar.setEnabled(False)
+    all_buttons = self.tab_view.findChildren(QtWidgets.QToolButton)
+    for widget in all_buttons:
+        if 'none_button' not in widget.objectName() and widget.objectName():
+            widget.clicked.connect(lambda: modify_attribute_gui(self, 'left'))
+            widget.rightClick.connect(lambda: modify_attribute_gui(self, 'right'))
 
 
 def algorithm_menu_initialization(self):
@@ -201,17 +192,33 @@ def display_algorithm_information(self):
         algorithm_outputs.append(output_dict)
     algorithm_dict['Input'] = algorithm_inputs
     algorithm_dict['Output'] = algorithm_outputs
-    lines = []
-    read = False
-    f = open(file_path, 'r')
-    for line in f:
-        if 'def _algorithm' in line:
-            read = True
-            continue
-        if read:
-            lines.append(line)
-    f.close()
-    algorithm_dict['Algorithm'] = ''.join(lines)
+    if self.frozen_app:
+        try:
+            algorithm_dict['Algorithm'] = frozen_algorithm_formula_text()[rep_algo]
+        except KeyError:
+            lines = []
+            read = False
+            f = open(file_path, 'r')
+            for line in f:
+                if 'def _algorithm' in line:
+                    read = True
+                    continue
+                if read:
+                    lines.append(line)
+            f.close()
+            algorithm_dict['Algorithm'] = ''.join(lines)
+    else:
+        lines = []
+        read = False
+        f = open(file_path, 'r')
+        for line in f:
+            if 'def _algorithm' in line:
+                read = True
+                continue
+            if read:
+                lines.append(line)
+        f.close()
+        algorithm_dict['Algorithm'] = ''.join(lines)
     self.displayAlgorithmWindow = MyAlgorithmDisplay(algorithm_dict)
     self.displayAlgorithmWindow.exec_()
 
@@ -256,11 +263,13 @@ def modify_attribute_gui(self, string):
                             var_attr_list[var][0].metadata[value] = str(widget[0].text())
                         except AttributeError:
                             var_attr_list[var][0].metadata[value] = str(widget[0].toPlainText())
+                    self.start_status_bar_msg_thread('Variable attributes have been modified...')
                 else:
                     try:
                         var_attr_list[value] = str(widget[0].text())
                     except AttributeError:
                         var_attr_list[value] = str(widget[0].toPlainText())
+                    self.start_status_bar_msg_thread('Global attributes have been modified...')
             elif string == 'right':
                 widget[0].setEnabled(False)
                 icon = QtGui.QIcon()
@@ -301,6 +310,7 @@ def modify_attribute_gui(self, string):
                         widget[0].setCursorPosition(0)
                     except AttributeError:
                         widget[0].setPlainText(text)
+                self.start_status_bar_msg_thread('The modification has been canceled...')
             
 
 def update_global_attribute_gui(self, source):
@@ -375,24 +385,24 @@ def update_new_variable_list_gui(self):
 def status_bar_update(self):
     logging.debug('gui - gui_functions.py - status_bar_update')
     if self.file_is_opened:
-        out_file_base, out_file_ext = os.path.splitext(os.path.basename(self.file_name))
-        open_file_size = humansize(os.path.getsize(self.file_name))
-        filename = out_file_base + out_file_ext
+        filename = pathlib.PurePath(self.file_name).name
+        filesize = humansize(pathlib.Path(self.file_name).stat().st_size)
         filetype = ''
-        try:
-            conventions = self.list_of_global_attributes['Conventions']
-        except KeyError:
-            logging.exception('gui - gui_functions.py - statusBar_updating : an exception occured')
-            conventions = 'no conventions'
+        conventions = ''
         if self.file_ext == 'NetCDF Files (*.nc)':
             filetype = 'NetCDF'
+            try:
+                conventions = self.list_of_global_attributes['Conventions']
+            except KeyError:
+                logging.debug('gui - gui_functions.py - status_bar_update : no conventions')
+                conventions = 'no conventions'
         elif self.file_ext == 'NASA Ames Files (*.na)':
             filetype = 'NASA Ames'
             conventions = 'NASA Ames file conventions'
-        string = filename + '   |   ' + open_file_size + '   |   ' + filetype + '   |   ' + conventions
+        self.default_message = filename + '   |   ' + filesize + '   |   ' + filetype + '   |   ' + conventions
     else:
-        string = ''
-    self.sb_filename_lb.setText(string)
+        self.default_message = ''
+    self.statusBar.showMessage(self.default_message)
 
 
 def update_icons_state(self, string=None):

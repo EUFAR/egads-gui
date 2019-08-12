@@ -8,7 +8,7 @@ from ui.Ui_creationwindow import Ui_creationWindow
 from functions.utils import Highlighter, create_datestring, prepare_long_string, check_string_max_length
 from functions.utils import write_algorithm, clear_layout
 from functions.other_windows_functions import MyInfo, MyFill, MyUnit, MyFilename, MyCategory, MyOverwriteFilename
-from functions.other_windows_functions import MyWait, MyCoeff
+from functions.other_windows_functions import MyWait, MyCoeff, MyExistingVariable
 from functions.thread_functions import VariableProcessingThread
 from functions.help_functions import algorithm_creation_information_text
 
@@ -1014,6 +1014,7 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
         self.new_var_list = None
         self.list_of_variables_and_attributes = dict(list_of_variables_and_attributes,
                                                      **list_of_new_variables_and_attributes)
+        self.list_of_new_variables_and_attributes = list_of_new_variables_and_attributes
         self.algorithm = None
         self.types_for_combobox = ['vector', 'array', 'vector_optional', 'array_optional']
         self.wait_window = None
@@ -1030,6 +1031,24 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
     def execute_processing(self):
         logging.debug('gui - algorithm_window_functions.py - MyProcessing - close_window_save : algorithm '
                       + self.algorithm().metadata["Processor"])
+        new_var_list = list(self.list_of_new_variables_and_attributes.keys())
+        output_names = [str(widget.text()) for widget in self.list_edit_output]
+        filtered_list = [string for string in output_names if string in new_var_list]
+        if filtered_list:
+            if len(filtered_list) > 1:
+                text = 'The following variable already exist in the New variables workspace:<ul>'
+                for var in filtered_list:
+                    text += '<li>' + var + '</li>'
+                text += ('</ul>Please confirm the overwriting by clicking on <b>Overwrite</b>. Click on <b>Cancel</b> '
+                         'to cancel the processing.')
+            else:
+                text = ('The following variable, ' + filtered_list[0] + ', already exists in the New variables '
+                        'workspace. Please confirm the overwriting by clicking on <b>Overwrite</b>. Click on '
+                        '<b>Cancel</b> to cancel the processing.')
+            existing_window = MyExistingVariable(text)
+            existing_window.exec_()
+            if not existing_window.overwrite:
+                return
         self.thread = VariableProcessingThread(self.algorithm, self.list_combobox_input,
                                                self.coefficient_matrix_values, self.list_edit_output,
                                                self.list_of_variables_and_attributes)
@@ -1505,12 +1524,14 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
 
 
 class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
-    def __init__(self, algorithm_categories, output_categories):
+    def __init__(self, algorithm_categories, output_categories, frozen, gui_path):
         logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.information_text = algorithm_creation_information_text()
         self.algorithm_categories = algorithm_categories
+        self.frozen = frozen
+        self.gui_path = gui_path
         self.output_categories = output_categories
         self.highlighter = Highlighter(self.cw_plain_4.document())
         self.cw_combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
@@ -3014,7 +3035,7 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         complete_string = (author + date + version + alg_all + alg_imports + alg_class + alg_help
                            + alg_init + alg_out_metadata + alg_metadata + alg_run + algorithm)
         try:
-            write_algorithm(filename, complete_string, category, str(self.cw_line_2.text()))
+            write_algorithm(filename, complete_string, category, str(self.cw_line_2.text()), self.frozen, self.gui_path)
             self.success = True
         except Exception:
             logging.exception('gui - algorithm_window_functions.py - MyAlgorithm - prepare_algorithm : an '
@@ -3096,12 +3117,13 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
                 units = str(self.cw_output_ln_2[i].text())
                 long_name = str(self.cw_output_ln_6[i].text())
                 standard_name = str(self.cw_output_ln_5[i].text())
-                category = ''
                 if self.cw_output_lw_1[i].count() > 0:
-                    category += '['
+                    category = '['
                     for j in range(self.cw_output_lw_1[i].count()):
                         category += "'" + self.cw_output_lw_1[i].item(j).text() + "',"
                     category = category[:-1] + ']'
+                else:
+                    category = "['']"
 
                 ##########################
                 #
@@ -3118,12 +3140,13 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
             units = str(self.cw_output_ln_2[0].text())
             long_name = str(self.cw_output_ln_6[0].text())
             standard_name = str(self.cw_output_ln_5[0].text())
-            category = ''
             if self.cw_output_lw_1[0].count() > 0:
-                category += '['
+                category = '['
                 for j in range(self.cw_output_lw_1[0].count()):
                     category += "'" + self.cw_output_lw_1[0].item(j).text() + "',"
                 category = category[:-1] + ']'
+            else:
+                category = "['']"
 
             ##########################
             #

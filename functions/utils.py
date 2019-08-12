@@ -26,20 +26,26 @@ def create_option_file(main_path):
     config_dict.add_section('SYSTEM')
     config_dict.add_section('PLOTS')
     config_dict.add_section('OPTIONS')
-    config_dict.set('LOG', 'level', 'INFO')
+    config_dict.set('LOG', 'level', 'DEBUG')
     config_dict.set('LOG', 'path', str(main_path))
     config_dict.set('SYSTEM', 'read_as_float', 'False')
     config_dict.set('SYSTEM', 'replace_fill_value', 'False')
     config_dict.set('SYSTEM', 'switch_fill_value', 'False')
     config_dict.set('PLOTS', 'same_unit_plot', '2')
     config_dict.set('PLOTS', 'subplot_disposition', '0')
+    config_dict.set('PLOTS', 'x_info_disabled', 'False')
     config_dict.set('OPTIONS', 'check_update', 'False')
     config_dict.write(ini_file)
     ini_file.close()
 
 
-def create_logging_handlers(config_dict, filename):
-    log_filename = os.path.join(config_dict.get('LOG', 'path'), filename)
+def create_logging_handlers(config_dict, filename, default_path):
+    using_default_path = False
+    if pathlib.Path(config_dict.get('LOG', 'path')).exists():
+        log_filename = os.path.join(config_dict.get('LOG', 'path'), filename)
+    else:
+        using_default_path = True
+        log_filename = os.path.join(default_path, filename)
     logging.getLogger('').handlers = []
     logging.basicConfig(filename=log_filename,
                         level=getattr(logging, config_dict.get('LOG', 'level')),
@@ -50,6 +56,8 @@ def create_logging_handlers(config_dict, filename):
     console.setLevel(logging.DEBUG)
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
+    if using_default_path:
+        logging.error('gui - logging system - path from ini file not found, using default path')
 
 
 def str_format(color, style=''):
@@ -164,7 +172,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
             return False
 
 
-def create_algorithm_dict():
+def create_algorithm_dict(frozen):
     logging.debug('gui - utils.py - create_algorithm_dict')
     algorithm_list = {}
     rep_list = [item for item in dir(egads.algorithms) if '__' not in item]
@@ -181,19 +189,35 @@ def create_algorithm_dict():
                                                       'method': getattr(getattr(egads.algorithms, rep), algo)}
             except (TypeError, AttributeError):
                 pass
-    rep_list = [item for item in dir(egads.algorithms.user) if '__' not in item]
-    rep_list.remove('egads')
-    for rep in rep_list:
-        tmp = [item for item in dir(getattr(egads.algorithms.user, rep)) if '__' not in item]
-        for algo in tmp:
-            try:
-                _ = getattr(getattr(egads.algorithms.user, rep), algo)().run
-                item = str(inspect.getmodule(getattr(getattr(egads.algorithms.user, rep), algo)))
-                algorithm_list[rep + ' - ' + algo] = {'name': algo, 'folder': rep, 'user': True,
-                                                      'path': str(pathlib.Path(item[item.find(' from ') + 7: -2])),
-                                                      'method': getattr(getattr(egads.algorithms.user, rep), algo)}
-            except (TypeError, AttributeError):
-                pass
+    if frozen:
+        import user_algorithms
+        rep_list = [item for item in dir(user_algorithms) if '__' not in item]
+        rep_list.remove('user_algorithms')
+        for rep in rep_list:
+            tmp = [item for item in dir(getattr(user_algorithms, rep)) if '__' not in item]
+            for algo in tmp:
+                try:
+                    _ = getattr(getattr(user_algorithms, rep), algo)().run
+                    item = str(inspect.getmodule(getattr(getattr(user_algorithms, rep), algo)))
+                    algorithm_list[rep + ' - ' + algo] = {'name': algo, 'folder': rep, 'user': True,
+                                                          'path': str(pathlib.Path(item[item.find(' from ') + 7: -2])),
+                                                          'method': getattr(getattr(user_algorithms, rep), algo)}
+                except (TypeError, AttributeError):
+                    pass
+    else:
+        rep_list = [item for item in dir(egads.algorithms.user) if '__' not in item]
+        rep_list.remove('egads')
+        for rep in rep_list:
+            tmp = [item for item in dir(getattr(egads.algorithms.user, rep)) if '__' not in item]
+            for algo in tmp:
+                try:
+                    _ = getattr(getattr(egads.algorithms.user, rep), algo)().run
+                    item = str(inspect.getmodule(getattr(getattr(egads.algorithms.user, rep), algo)))
+                    algorithm_list[rep + ' - ' + algo] = {'name': algo, 'folder': rep, 'user': True,
+                                                          'path': str(pathlib.Path(item[item.find(' from ') + 7: -2])),
+                                                          'method': getattr(getattr(egads.algorithms.user, rep), algo)}
+                except (TypeError, AttributeError):
+                    pass
     return algorithm_list
 
 
@@ -269,11 +293,15 @@ def check_string_max_length(string_list):
     return max_length
 
 
-def write_algorithm(filename, string, category, author):
+def write_algorithm(filename, string, category, author, frozen, gui_path):
     logging.debug('gui - utils.py - write_algorithm : filename ' + str(filename) + ', category' + str(category)
                   + ', author ' + str(author) + ', string ' + str(string))
     category = category.lower()
-    algorithm_path = egads.__path__[0] + '/algorithms/user/' + category
+
+    if frozen:
+        algorithm_path = gui_path + '/user_algorithms/' + category
+    else:
+        algorithm_path = egads.__path__[0] + '/algorithms/user/' + category
     addendum = '    from .' + filename + ' import *'
     if os.path.isdir(algorithm_path):
         with open(algorithm_path + '/__init__.py', 'r') as in_file:
@@ -305,35 +333,54 @@ def write_algorithm(filename, string, category, author):
         algorithm_file.close()
     else:
         os.makedirs(algorithm_path)
+        if frozen:
+            frozen_egads = 'gui [user_algorithms/'
+        else:
+            frozen_egads = 'egads [user/'
         init_string = ('__author__ = "' + author + '"\n'
                        + '__date__ = "' + create_datestring() + '"\n'
                        + '__version__ = "1.0"\n\n'
                        + 'import logging\n\n'
                        + 'try:\n'
                        + '    from .' + filename + ' import *\n'
-                       + "    logging.info('egads [user/" + category + "] algorithms have been loaded')\n"
-                       + 'except Exception:\n'
-                       + "    logging.error('an error occured during the loading of a [user/" + category
-                       + "] algorithm')\n")
+                       + "    logging.info('" + frozen_egads + category + "] algorithms have been "
+                       + "loaded')\nexcept Exception as e:\n"
+                       + "    logging.error('an error occured during the loading of a " + frozen_egads + category
+                       + "] algorithm: ' + str(e))\n")
         init_file = open(algorithm_path + '/__init__.py', 'w')
         init_file.write(init_string)
         init_file.close()
 
-        init_addendum = 'import egads.algorithms.user.' + category
-        with open(egads.__path__[0] + '/algorithms/user/__init__.py', 'r') as in_file:
-            init_file = in_file.readlines()
-        import_num, add_num = 0, 0
-        for line in init_file:
-            if 'import ' in line:
-                import_num += 1
-        with open(egads.__path__[0] + '/algorithms/user/__init__.py', 'w') as out_file:
+        if frozen:
+            init_addendum = 'import user_algorithms.' + category
+            with open(gui_path + '/user_algorithms/__init__.py', 'r') as in_file:
+                init_file = in_file.readlines()
+            import_num, add_num = 0, 0
             for line in init_file:
                 if 'import ' in line:
-                    add_num += 1
-                    if add_num == import_num:
-                        line = line + '\n' + init_addendum
-                out_file.write(line)
-
+                    import_num += 1
+            with open(gui_path + '/user_algorithms/__init__.py', 'w') as out_file:
+                for line in init_file:
+                    if 'import ' in line:
+                        add_num += 1
+                        if add_num == import_num:
+                            line = line + '\n' + init_addendum
+                    out_file.write(line)
+        else:
+            init_addendum = 'import egads.algorithms.user.' + category
+            with open(egads.__path__[0] + '/algorithms/user/__init__.py', 'r') as in_file:
+                init_file = in_file.readlines()
+            import_num, add_num = 0, 0
+            for line in init_file:
+                if 'import ' in line:
+                    import_num += 1
+            with open(egads.__path__[0] + '/algorithms/user/__init__.py', 'w') as out_file:
+                for line in init_file:
+                    if 'import ' in line:
+                        add_num += 1
+                        if add_num == import_num:
+                            line = line + '\n' + init_addendum
+                    out_file.write(line)
         algorithm_file = open(algorithm_path + '/' + filename + '.py', 'w')
         algorithm_file.write(string)
         algorithm_file.close()
@@ -470,3 +517,13 @@ def transparency_hexa_dict_function():
                  1: '03',
                  0: '00'}
     return hexa_dict
+
+
+def set_size(bytes_size):
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    i = 0
+    while bytes_size >= 1024 and i < len(suffixes)-1:
+        bytes_size /= 1024.
+        i += 1
+    f = ('%.2f' % bytes_size).rstrip('0').rstrip('.')
+    return '%s %s' % (f, suffixes[i])

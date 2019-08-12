@@ -1,20 +1,24 @@
 import logging
 import egads
+import pathlib
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_optionwindow import Ui_optionWindow
 from functions.help_functions import option_information_text
-from functions.other_windows_functions import MyInfo
+from functions.other_windows_functions import MyInfo, MyUpdate
 from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSUpdateOnline
 from ui._version import _gui_version
 
 
 class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
-    def __init__(self, config_dict, egads_config_dict):
+    available_update = QtCore.pyqtSignal(str)
+
+    def __init__(self, config_dict, egads_config_dict, frozen):
         logging.debug('gui - option_window_functions.py - MyOptions - __init__ ')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.config_dict = config_dict
         self.egads_config_dict = egads_config_dict
+        self.frozen = frozen
         self.ow_splitter.setSizes([110, 590])
         self.information_text = option_information_text()
         self.cancel = True
@@ -49,7 +53,25 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         self.info_button_9.clicked.connect(self.button_info)
         self.info_button_10.clicked.connect(self.button_info)
         self.info_button_11.clicked.connect(self.button_info)
+        self.info_button_12.clicked.connect(self.button_info)
+        if self.frozen:
+            self.ow_checkbox_5.setEnabled(False)
+            self.ow_checkbox_5.setVisible(False)
+            self.info_button_11.setEnabled(False)
+            self.info_button_11.setVisible(False)
+            self.ow_check_button_2.setEnabled(False)
+            self.ow_check_button_2.setVisible(False)
         self.read_config_dict()
+        try:
+            import requests
+        except ImportError:
+            logging.info('gui - option_window_functions.py - MyOptions - requests is not installed, no update check')
+            self.ow_check_button_1.setEnabled(False)
+            self.ow_check_button_2.setEnabled(False)
+            self.ow_checkbox_4.setEnabled(False)
+            self.ow_checkbox_5.setEnabled(False)
+            self.ow_checkbox_4.setChecked(False)
+            self.ow_checkbox_5.setChecked(False)
         logging.info('gui - option_window_functions.py - MyOptions - ready ')
 
     def display_options(self, idx):
@@ -76,20 +98,28 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         self.ow_line_2.setText(self.egads_config_dict.get('LOG', 'path'))
         self.ow_combobox_3.setCurrentIndex(int(self.config_dict.get('PLOTS', 'same_unit_plot')))
         self.ow_combobox_4.setCurrentIndex(int(self.config_dict.get('PLOTS', 'subplot_disposition')))
+        self.ow_checkbox_6.setChecked(self.config_dict.getboolean('PLOTS', 'x_info_disabled'))
         self.ow_checkbox_4.setChecked(self.config_dict.getboolean('OPTIONS', 'check_update'))
         self.ow_checkbox_5.setChecked(self.egads_config_dict.getboolean('OPTIONS', 'check_update'))
 
     def check_gui_update(self):
         logging.debug('gui - option_window_functions.py - MyOptions - check_gui_update')
-        self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version)
+        self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version, self.frozen)
         self.check_gui_update_thread.start()
         self.check_gui_update_thread.finished.connect(self.parse_gui_update)
 
     def parse_gui_update(self, val):
         logging.debug('gui - option_window_functions.py - MyOptions - parse_gui_update - val ' + str(val))
         if val != 'no new version':
-            update_window = MyUpdate(val)
-            update_window.exec_()
+            self.available_update.emit(val)
+            if self.frozen:
+                text = ('A new update for EGADS Lineage is available on GitHub. Please exit the option window and '
+                        'click on the Update button to launch the update process.')
+                info_window = MyInfo(text)
+                info_window.exec_()
+            else:
+                update_window = MyUpdate(val)
+                update_window.exec_()
         else:
             info_window = MyInfo('No new update available on GitHub for the GUI.')
             info_window.exec_()
@@ -111,19 +141,40 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
 
     def save_config_dict(self):
         logging.debug('gui - option_window_functions.py - MyOptions - save_config_dict')
-        self.config_dict.set('LOG', 'level', str(self.ow_combobox_1.currentText()))
-        self.egads_config_dict.set('LOG', 'level', str(self.ow_combobox_2.currentText()))
-        self.config_dict.set('PLOTS', 'same_unit_plot', str(self.ow_combobox_3.currentIndex()))
-        self.config_dict.set('PLOTS', 'subplot_disposition', str(self.ow_combobox_4.currentIndex()))
-        self.config_dict.set('LOG', 'path', str(self.ow_line_1.text()))
-        self.egads_config_dict.set('LOG', 'path', str(self.ow_line_2.text()))
-        self.config_dict.set('OPTIONS', 'check_update', str(self.ow_checkbox_4.isChecked()))
-        self.egads_config_dict.set('OPTIONS', 'check_update', str(self.ow_checkbox_5.isChecked()))
-        self.config_dict.set('SYSTEM', 'read_as_float', str(self.ow_checkbox_1.isChecked()))
-        self.config_dict.set('SYSTEM', 'replace_fill_value', str(self.ow_checkbox_2.isChecked()))
-        self.config_dict.set('SYSTEM', 'switch_fill_value', str(self.ow_checkbox_3.isChecked()))
-        self.cancel = False
-        self.closeWindow()
+        egads_log_path, gui_log_path = False, False
+        if pathlib.Path(str(self.ow_line_1.text())).exists():
+            gui_log_path = True
+        if pathlib.Path(str(self.ow_line_2.text())).exists():
+            egads_log_path = True
+        text = ''
+        if not gui_log_path or not egads_log_path:
+            if not gui_log_path and not egads_log_path:
+                text = ('After checking, it appears that the paths for EGADS and its GUI log files are not valid. Thus '
+                        + 'it is not possible to save the new configuration. Please correct them and try again.')
+            else:
+                if not gui_log_path:
+                    text = ('After checking, it appears that the path for the GUI log file is not valid. Thus it is '
+                            'not possible to save the new configuration. Please correct it and try again.')
+                elif not egads_log_path:
+                    text = ('After checking, it appears that the path for EGADS log file is not valid. Thus it is '
+                            'not possible to save the new configuration. Please correct it and try again.')
+            info_window = MyInfo(text)
+            info_window.exec_()
+        else:
+            self.config_dict.set('LOG', 'level', str(self.ow_combobox_1.currentText()))
+            self.egads_config_dict.set('LOG', 'level', str(self.ow_combobox_2.currentText()))
+            self.config_dict.set('PLOTS', 'same_unit_plot', str(self.ow_combobox_3.currentIndex()))
+            self.config_dict.set('PLOTS', 'subplot_disposition', str(self.ow_combobox_4.currentIndex()))
+            self.config_dict.set('LOG', 'path', str(self.ow_line_1.text()))
+            self.egads_config_dict.set('LOG', 'path', str(self.ow_line_2.text()))
+            self.config_dict.set('OPTIONS', 'check_update', str(self.ow_checkbox_4.isChecked()))
+            self.egads_config_dict.set('OPTIONS', 'check_update', str(self.ow_checkbox_5.isChecked()))
+            self.config_dict.set('PLOTS', 'x_info_disabled', str(self.ow_checkbox_6.isChecked()))
+            self.config_dict.set('SYSTEM', 'read_as_float', str(self.ow_checkbox_1.isChecked()))
+            self.config_dict.set('SYSTEM', 'replace_fill_value', str(self.ow_checkbox_2.isChecked()))
+            self.config_dict.set('SYSTEM', 'switch_fill_value', str(self.ow_checkbox_3.isChecked()))
+            self.cancel = False
+            self.closeWindow()
 
     def button_info(self):
         logging.debug('gui - option_window_functions.py - MyOptions - button_info')

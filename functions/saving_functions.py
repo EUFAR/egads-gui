@@ -21,6 +21,9 @@ def saving_file(self, save_file_name, save_file_ext, open_file_ext):
         self.infoWindow = MyInfo(info_str)
         self.infoWindow.exec_()
     if self.saving_window.success:
+        self.modified = False
+        self.make_window_title()
+        self.start_status_bar_msg_thread('The file ' + pathlib.PurePath(save_file_name).name + ' has been saved...')
         logging.info('gui - saving_functions.py - saving_file - the file has been saved - save_file_name ' +
                      save_file_name)
 

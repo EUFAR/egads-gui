@@ -5,6 +5,9 @@ import webbrowser
 import egads
 import pathlib
 import textwrap
+import platform
+import time
+import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_infowindow import Ui_infoWindow
 from ui.Ui_displaywindow import Ui_displayWindow
@@ -13,14 +16,113 @@ from ui.Ui_addcategorywindow import Ui_Addcategory
 from ui.Ui_fillwindow import Ui_fillWindow
 from ui.Ui_filenamewindow import Ui_Addfilename
 from ui.Ui_unitwindow import Ui_unitWindow
-from ui.Ui_optionwindow import Ui_optionWindow
 from ui.Ui_waitwindow import Ui_waitWindow
 from ui.Ui_downloadwindow import Ui_downloadWindow
 from ui.Ui_coefwindow import Ui_coefWindow
 from ui.Ui_asksavewindow import Ui_asksaveWindow
 from ui.Ui_subplotwindow import Ui_subplotWindow
+from ui.Ui_updatewindow import Ui_updateWindow
+from ui.Ui_updateavailablewindow import Ui_updateAvailableWindow
+from ui.Ui_existingvarwindow import Ui_existingvarWindow
 from functions.gui_elements import QtWaitingSpinner
 from functions.utils import clear_layout
+from functions.thread_functions import DownloadFile
+
+
+class MyExistingVariable(QtWidgets.QDialog, Ui_existingvarWindow):
+    def __init__(self, text):
+        logging.debug('gui - other_windows_functions.py - MyExistingVariable - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.label.setText(text)
+        self.overwrite = False
+        self.overwrite_button.clicked.connect(self.set_overwrite)
+        self.cancel_button.clicked.connect(self.close_window)
+        logging.info('gui - other_windows_functions.py - MyExistingVariable - ready')
+
+    def set_overwrite(self):
+        logging.debug('gui - other_windows_functions.py - MyExistingVariable - set_overwrite')
+        self.overwrite = True
+        self.close_window()
+
+    def close_window(self):
+        logging.debug('gui - other_windows_functions.py - MyExistingVariable - close_window')
+        self.close()
+
+
+class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):
+    def __init__(self, url, folder):
+        logging.debug('gui - other_windows_functions.py - MyUpdate - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.temp_folder = folder
+        self.url = url
+        if platform.system() == 'Windows':
+            self.update_file = self.temp_folder + '\\' + self.url[self.url.rfind('/') + 1:]
+        elif platform.system() == 'Linux':
+            self.update_file = self.temp_folder + '/' + self.url[self.url.rfind('/') + 1:]
+        self.dw_button.clicked.connect(self.cancel_download)
+        self.cancel = False
+        self.thread = None
+        self.download_update()
+        logging.info('gui - other_windows_functions.py - MyUpdate - ready')
+
+    def update_progress_bar(self, val):
+        if isinstance(val, list):
+            self.dw_progress_bar.setValue(val[0])
+            self.dw_label.setText(val[1])
+        else:
+            self.dw_progress_bar.setValue(val)
+
+    def download_update(self):
+        logging.debug('gui - other_windows_functions.py - MyUpdate - download_update')
+        self.thread = DownloadFile(self.url, self.update_file)
+        self.thread.download_update.connect(self.update_progress_bar)
+        self.thread.download_done.connect(self.close)
+        self.thread.download_failed.connect(self.download_failed)
+        self.thread.start()
+
+    def cancel_download(self):
+        logging.debug('gui - other_windows_functions.py - MyUpdate - cancel_download')
+        if self.thread is not None:
+            self.thread.cancel_download()
+        self.cancel = True
+        time.sleep(0.25)
+        self.close()
+
+    def download_failed(self):
+        logging.debug('gui - other_windows_functions.py - MyUpdate - download_failed')
+        self.update_progress_bar(0)
+        self.dw_label.setText('Download failed')
+        self.cancel_download()
+
+    def closeEvent(self, event):
+        logging.info('gui - other_windows_functions.py - MyUpdate - closeEvent')
+        if self.cancel:
+            try:
+                os.remove(self.update_file)
+            except PermissionError:
+                pass
+
+
+class MyWarningUpdate(QtWidgets.QDialog, Ui_updateWindow):
+    def __init__(self):
+        logging.debug('gui - other_windows_functions.py - MyWarningUpdate - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.uw_update_button.clicked.connect(self.agree_update)
+        self.uw_cancel_button.clicked.connect(self.close_window)
+        self.update = False
+        logging.info('gui - other_windows_functions.py - MyWarningUpdate - ready')
+
+    def agree_update(self):
+        logging.debug('gui - other_windows_functions.py - MyWarningUpdate - agree_update')
+        self.update = True
+        self.close_window()
+
+    def close_window(self):
+        logging.debug('gui - other_windows_functions.py - MyWarningUpdate - close_window')
+        self.close()
 
 
 class MySubplot(QtWidgets.QDialog, Ui_subplotWindow):
@@ -651,10 +753,18 @@ class MyAbout(QtWidgets.QDialog, Ui_aboutlogWindow):
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.browser_1.setHtml(text)
-        self.browser_2.setPlainText(open("documentation/changelog.txt").read())
         self.button.clicked.connect(self.closeWindow)
         self.splitter.setSizes([170, 130])
+        self.read_markdown_file()
         logging.info('gui - other_windows_functions.py - MyAbout - ready')
+
+    def read_markdown_file(self):
+        changelog = open('documentation/changelog.txt').read()
+        try:
+            import markdown
+            self.browser_2.setHtml(markdown.markdown(changelog))
+        except ImportError:
+            self.browser_2.setPlainText(changelog)
 
     def closeWindow(self):
         logging.debug('gui - other_windows_functions.py - MyAbout - closeWindow')
@@ -801,7 +911,7 @@ class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
         self.accept()
 
 
-class MyUpdate(QtWidgets.QDialog, Ui_downloadWindow):
+class MyUpdateAvailable(QtWidgets.QDialog, Ui_updateAvailableWindow):
     def __init__(self, url):
         logging.debug('gui - other_windows_functions.py - MyUpdate - __init__ ')
         QtWidgets.QWidget.__init__(self)

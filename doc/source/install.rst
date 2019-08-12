@@ -2,18 +2,18 @@
 Installation
 =============
 
-The latest version of the EGADS GUI can be obtained from https://github.com/EUFAR/egads-gui/tree/Lineage
+The latest version of the EGADS GUI can be obtained from https://github.com/EUFAR/egads-gui/tree/Lineage and from https://github.com/EUFAR/egads-gui/releases for the Stand-alone version (look for the EGADS Lineage GUI STA vX.X.X package, STA means stand-alone).
 
 
 *************
 Prerequisites
 *************
 
-The use of the EGADS GUI requires the following packages:
+The use of the EGADS GUI as a standard Python script requires the following packages:
 
 * Python 3.5.4 or newer. Available at https://www.python.org/
 * PyQt 5.11.3 or newer. Available at https://www.riverbankcomputing.com/software/pyqt/download5
-* EGADS 0.9.3 or newer. Available at https://pypi.python.org/pypi/egads
+* EGADS 1.0.0 or newer. Available at https://pypi.python.org/pypi/egads
 * Matplotlib 2.2.2 or newer. Available at https://pypi.python.org/pypi/matplotlib
 * Cartopy 0.17.0 or newer. Available at https://pypi.org/project/Cartopy/
 * Simplekml 1.3.1 or newer. Available at https://pypi.org/project/simplekml/
@@ -33,9 +33,14 @@ Installation
 
 The EGADS GUI is actually available as a common Python script, thus it doesn't need any particular installation. To use it, the package must be downloaded and uncompressed somewhere on the hard drive, and the script executed with the usual command ``python egads_gui.py`` from a terminal launched in the EGADS GUI directory. This version can be executed on any version of Linux, Windows and MacOS as soon as prerequisites are installed and working.
 
-In the future, a stand-alone version will be available.
-
 To learn how to install EGADS, please read the EGADS documentation available at the following places: https://github.com/EUFAR/egads/tree/Lineage/Documentation & https://egads.readthedocs.io/en/lineage/
+
+
+***********
+Stand-alone
+***********
+
+Since version 1.0.0, a Stand-alone package is available for those who wants to use the GUI without a Python installation. In that case, look for ``EGADS Lineage GUI STA`` in the release part of the repository. For Windows (from Windows 7 32), donwload the .msi package and launch the installation, it should be installed outside ProgramFiles to avoid issues with admin rights, then the GUI can be run by double clicking on egads_gui.exe or from the shortcut in the Startup menu. For Linux (from kernel 3.19), donwload the .tar.gz package and uncompress it somewhere on your hard drive, preferably in your Home directory to avoid issues with admin rights, then the GUI can be launch for double clicking on egads_gui, or from the terminal.
 
 
 *******
@@ -49,7 +54,7 @@ No test system has been introduced at this time.
 Options
 *******
 
-Since version 0.10.0, an .ini file has been added to EGADS GUI to welcome few options: log level and path, automatic check for a new EGADS GUI version on GitHub, and few other options. If the file is not present in EGADS GUI directory, when importing, EGADS GUI will create it automatically with default options. The modification of the file is made through the option window of the GUI. Since version 0.13.0, the GUI can control the EGADS options.
+Since version 0.10.0, an .ini file has been added to EGADS GUI to welcome few options: log level and path, automatic check for a new EGADS GUI version on GitHub, and few other options. If the file is not present in EGADS GUI directory, when importing, EGADS GUI will create it automatically with default options. The modification of the file is made through the option window of the GUI. Since version 0.13.0, the GUI can control the EGADS options. Information about each option in the Option window of the GUI is available through info buttons.
 
 
 ***
@@ -63,9 +68,12 @@ Actual options to control the logging system are for now:
 * ``level``: the logging level ( ``DEBUG``, ``INFO``, ``WARNING``, ``CRITICAL``, ``ERROR`` ).
 * ``path``: the path of the file containing all logs.
 
-Once the logging level has been changed in the Option window (saved and confirmed by clicking on Ok), the logging file will record new messages based on the logging level. On the contrary, if the path is modified, the GUI has to be restarted to take into account the new path.
+The GUI has to be restarted to take into account the new path and new log level.
 
 
+******
 Update
 ******
 Since version 0.11.0, EGADS GUI can check for an update on GitHub. The check system is launched in a separate thread and can run automatically at each startup if the option to do so has been set accordingly. To install the update, the user has to follow the install instructions found in actual document. The module Requests is optional for EGADS GUI but is mandatory to check for an update.
+
+In the Stand-alone version, the update system can check for an update automatically at startup or manually any time, and if an update is available, it can be downloaded and installed automatically.

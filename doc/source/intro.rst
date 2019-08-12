@@ -8,6 +8,5 @@ The GUI (Graphical User Interface) developed for EGADS is a program based on Pyt
 
 As the EUFAR FP7 project ended the 31st of January 2018, the development of EGADS GUI has been stopped for now. To continue to improve EGADS GUI outside the scope of EUFAR, a new branch has been created: EGADS Lineage GUI. EGADS Lineage GUI is still EGADS GUI, but compatible with Python 3 and maintained by Olivier Henry. All issues reported in EGADS GUI and EGADS Lineage GUI will be fixed in EGADS Lineage GUI only. A merging of both project will probably happen in the next EUFAR project.
 
-
 .. NOTE::
-  EGADS Lineage GUI is still in beta state and will require a certain knowledge in Python if corrections must be made as quicly as possible. From now on, EGADS GUI will refer to EGADS Lineage GUI.
+  From now on, EGADS GUI will refer to EGADS Lineage GUI.

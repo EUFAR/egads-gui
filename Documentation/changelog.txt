@@ -1,381 +1,412 @@
-==========================
-CHANGELOG | LINEAGE BRANCH
-==========================
+#### To do list: ####
 
-To do list:
------------
-
-  - add map export possibility for GE. (v 1.1)
-  - rework the plot function. (v 1.1)
-  - add slider to plot window for 3D data. (v 1.1)
-  - check feasability of a standalone program. (v 1.0)
-  - add changelog to the documentation. (v 1.0)
+* add map export possibility for GE. (v 1.1)
+* rework the plot function. (v 1.1)
+* add slider to plot window for 3D data. (v 1.1)
+* it is possible to change units in metadata window, check the new unit if it has been changed.
+* deactivate google earth - map in the export window for now.
   
-To fix list:
-------------
+#### To fix list: ####
+
+* nothing
 
 
-July 5 2019, Release version 0.14.2
-===================================
-  FIXED:
-    - an issue with the variable dictionary has been fixed in the coef window.
-	- the stylesheets of all windows have been fixed for small errors.
-	- the thread to check updates couldn't be imported; It has been fixed.
-	- a thread to write the window size in text widgets in the plot window, caused a segmentation fault on Linux. It has been fixed.
+### August 12 2019, Release version 1.0.0 ###
+
+For this version 1.0.0, a stand alone version has also been produced. EGADS Lineage GUI needs EGADS Lineage 1.0.0 or above to work properly.
   
-  MODIFIED:
-    - in the coef window, the OK button will be activated only if the table is full.
-
-
-July 3 2019, Release version 0.14.1
-===================================
-  MODIFIED:
-    - the documentation has been updated.
-
-
-July 3 2019, Release version 0.14.0
-===================================
-  EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly.
-  New options have been introduced, the gui_options.ini file should be deleted manually if it already exists.
-  Finally, the function to create a variable has been canceled. The use of such a function compared to its complexity is not really well balanced.
+  * FIXED:
+    * with the new function to read files, the modification of variable metadata leads to a crash. It has been fixed.
+	* if the option to plot data with the same units is set on automatic, the position of subplots can't be set in the plot window.
+	* the style of the info window has been fixed.
+	* the style of all tabwidgets has been fixed.
+	* the PyQt5.Qt module was imported for nothing and leads to errors with Windows 8.1 when frozen by PyInstaller. It has been removed.
+	* pathlib wasn't correctly imported in the option window and leaded to an error when the user tried to change the path of the logging file.
+	* if the path to the log is incorrectly set, it leads to a file not found error at startup. Now if the path is not valid, the GUI will use the default path and log a message.
+	* shapefiles for coasts were missing from the stand alone version. They have been added and moved to a new dedicated folder.
+	* if a file is modified and saved, the attribute modified isn't set to False. It has been fixed.
+	* when a file is opened, it is now closed once the reading is finished. Thus it is possible to overwrite a file which has been opened and modified.
+	* when creating an algorithm, if no Category is entered for outputs, it leads to an empy value for the key Category in the output_metadata dict and a crash when egads try to load it. it has been fixed.
+	* linestyle in the plot window wasn't set correctly and leaded to an error with Matplotlib.
+	* if a variable exist in the New Variables tab, and if the user tries to save a new file, an information window will appear.
   
-  ADDED:
-    - new options have been introduced to control how to plot variables with same units and subplots layout.
-	- now, according to the options selected by the user, the user has the possibility to manage the layout of multiple subplots.
-	- it is now possible to display data with 3 dimensions, a slider, two navigation buttons and a combobox are here to navigate in the 3rd dimension.
-  
-  MODIFIED:
-    - the option window code has been moved to a new file (it's getting big) and heavily modified to make use of the widget QStackWidget.
-	- the export window has been redone to make use of the widget QStackWidget.
-  
-  FIXED:
-    - when processing a variable, the new variable replace entirely the dictionary containing all new variables.
-	- the info text in the option widow was not correct.
-	- in the common options of the plot window, the value of the slider controling the horizontal distance between subplots wasn't set correctly.
-	- in the common options of the plot window, the value of the sliders controling the bottom and top margins were mixed up.
-	- in the plot window, the legend couldn't be hidden or set draggable with multiple subplots.
-	- few corrections in different widget stylesheets.
+  * MODIFIED:
+    * until now, when the user wants to plot two or more time series, if those time series have the same units, the GUI can ask him if he wants to plot them on the same figure or on separated subplots. The appearance of this particular window was based on the units read directly in the netcdf/nasaames file. Now the appearance is based on the interpretation of the units by EGADS (for example: before m and meter weren't equal, now m and meter are considered as the same units)
+	* the update system has been modified to include the frozen status of EGADS GUI.
+	* the changelog has been converted to markdown for a better readability in the GUI and on Github.
+	* if requests is not installed, the entire update system is disabled.
+	* the way to load algorithms in the GUI has been modified:
+	    * If the app is frozen, the GUI load the embedded algorithms through EGADS, as usual. But it will load the user-defined algorithms from the user_algorithms folder itself, as a module. In that case, the formula of each embedded algorithms, as they are impossible to read when the app is frozen, are stored as string in a dictionary in the help_functions file. For the user-defined algorithms, files exist in the user_algorithms folder and the formula can be read from the file.
+	    * If the app is not frozen, all algorithms are load from EGADS, and the formula is read from the files.
+	* the way to save algorithms in the GUI has been modified:
+	    * If the app is frozen, user-defined algorithms, created manually or through the GUI, are now saved in the user_algorithms folder.
+	    * if the app is not frozen, the user-defined algorithms have to be saved in the algorithms/user folder, as before.
+	* log messages for user algorithms have been modified to display gui if the app has been frozen.
+	* if a metadata of a variable or a global metadata is deleted by the user in the metadata window, and if the metadata is a part of the officiel EGADS list of metadata, it is available in the Add metadata combobox.
+	* if a metadata is created by the user, and if it already exists in the global or variable metadata dictionary, the gui asks him if he wants to overwrite the metadat or nor.
+	* in the metadata window, the same metadata can't be added twice or more.
+	* the documentation has been updated.
+
+  * ADDED:
+    * if a file has been modified and not saved, and if the user wants to close it, now the GUI will ask him if he wants to save it or not.
+	* an option has been added to disable the information window when activating another variable for the X axis.
+	* when clicking on Ok in the option windows, the system is now checking if paths for EGADS and its GUI log files are valid. If not, an information window is displayed asking the user to correct them.
+	* information messages have been added in the status bar, displayed for 5 seconds after a confirmed action of the user.
+	* if a user choose a name for a new variable (from the processing window) which exists for another variable in the New variables workspace, the gui will ask him if he wants to override the existing variable or if he wants to cancel the processing.
+	* if a user wants to migrate a variable from the New variables workspace to the main workspace, and if a variable with the same name already exists, the gui will ask him if he wants to overwrite it or not.
+	* it is now possible to migrate multiple variables from the New variable workspace to the main workspace.
 
 
-June 28 2019, Release version 0.13.0
-====================================
-  EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly.
-  The GUI can now take care of EGADS options.
-  It is also prossible to save airborne data (time series) or data along a path to KML / KMZ file for Google Earth (File > Export).
-  
-  MODIFIED:
-    - the option window has been redone to take into account EGADS options, and future GUI options.
-	- the saving function has been moved to a QThread.
-	- the documentation has been updated.
-	- all logging messages have reviewed and corrected.
+### July 5 2019, Release version 0.14.2 ###
 
-  ADDED:
-    - a function to save kml/kmz files for Google Earth has been added.
+  * FIXED:
+    * an issue with the variable dictionary has been fixed in the coef window.
+	* the stylesheets of all windows have been fixed for small errors.
+	* the thread to check updates couldn't be imported; It has been fixed.
+	* a thread to write the window size in text widgets in the plot window, caused a segmentation fault on Linux. It has been fixed.
   
-  FIXED:
-    - few logging messages have been corrected.
+  * MODIFIED:
+    * in the coef window, the OK button will be activated only if the table is full.
 
 
-June 10 2019, Release version 0.12.0
-====================================
-  EGADS Lineage GUI needs EGADS Lineage 0.9.4 or above to work properly.
-  NASA Ames file format is now handled by the GUI.
-  Batch processing is now available in the GUI.
-  New options have been introduced, the gui_options.ini file should be deleted manually if it already exists.
+### July 3 2019, Release version 0.14.1 ###
+
+  * MODIFIED:
+    * the documentation has been updated.
+
+
+### July 3 2019, Release version 0.14.0 ###
+
+  EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly. New options have been introduced, the gui_options.ini file should be deleted manually if it already exists. Finally, the function to create a variable has been canceled. The use of such a function compared to its complexity is not really well balanced.
   
-  MODIFIED:
-    - the naming convention has been added in the filename window when a user creates an algorithm.
-	- NASA Ames file global metadata handled automatically by EGADS (NLHEAD, FFI, DX, ...) are not displayed in the metadata window.
-	- NASA Ames file global metadata linked to a variable are not displayed in the global metadat window, but in the variable metadata window.
-	- because of modification in EGADS about data and their type, if a variable contains only integers, missing values can't be replaced by Numpy.nan.
-	- until now, when a coefficient with multiple rows and columns is asked by an algorithm, multiple QLineEdit are drawn in the window. It has been replaced by a button calling a window with a table AND a list of variables in a combobox if the user wants to select the coefficient amongs the variables.
-	- for NetCdf files, as the GUI uses the EgadsNetCdf class now, metadata are not stored into a dedicated object, but are directly read from EgadsData instances.
-	- the documentation has been updated.
-	- the way to create the algorithm dictionary has been totally changed to include path of the algorithm file, class method, folder.
+  * ADDED:
+    * new options have been introduced to control how to plot variables with same units and subplots layout.
+	* now, according to the options selected by the user, the user has the possibility to manage the layout of multiple subplots.
+	* it is now possible to display data with 3 dimensions, a slider, two navigation buttons and a combobox are here to navigate in the 3rd dimension.
+  
+  * MODIFIED:
+    * the option window code has been moved to a new file (it's getting big) and heavily modified to make use of the widget QStackWidget.
+	* the export window has been redone to make use of the widget QStackWidget.
+  
+  * FIXED:
+    * when processing a variable, the new variable replace entirely the dictionary containing all new variables.
+	* the info text in the option widow was not correct.
+	* in the common options of the plot window, the value of the slider controling the horizontal distance between subplots wasn't set correctly.
+	* in the common options of the plot window, the value of the sliders controling the bottom and top margins were mixed up.
+	* in the plot window, the legend couldn't be hidden or set draggable with multiple subplots.
+	* few corrections in different widget stylesheets.
+
+
+### June 28 2019, Release version 0.13.0 ###
+
+  EGADS Lineage GUI needs EGADS Lineage 0.9.5 or above to work properly. The GUI can now take care of EGADS options. It is also prossible to save airborne data (time series) or data along a path to KML / KMZ file for Google Earth (File > Export).
+  
+  * MODIFIED:
+    * the option window has been redone to take into account EGADS options, and future GUI options.
+	* the saving function has been moved to a QThread.
+	* the documentation has been updated.
+	* all logging messages have reviewed and corrected.
+
+  * ADDED:
+    * a function to save kml/kmz files for Google Earth has been added.
+  
+  * FIXED:
+    * few logging messages have been corrected.
+
+
+### June 10 2019, Release version 0.12.0 ###
+
+  EGADS Lineage GUI needs EGADS Lineage 0.9.4 or above to work properly. NASA Ames file format is now handled by the GUI. Batch processing is now available in the GUI. New options have been introduced, the gui_options.ini file should be deleted manually if it already exists.
+  
+  * MODIFIED:
+    * the naming convention has been added in the filename window when a user creates an algorithm.
+	* NASA Ames file global metadata handled automatically by EGADS (NLHEAD, FFI, DX, ...) are not displayed in the metadata window.
+	* NASA Ames file global metadata linked to a variable are not displayed in the global metadat window, but in the variable metadata window.
+	* because of modification in EGADS about data and their type, if a variable contains only integers, missing values can't be replaced by Numpy.nan.
+	* until now, when a coefficient with multiple rows and columns is asked by an algorithm, multiple QLineEdit are drawn in the window. It has been replaced by a button calling a window with a table AND a list of variables in a combobox if the user wants to select the coefficient amongs the variables.
+	* for NetCdf files, as the GUI uses the EgadsNetCdf class now, metadata are not stored into a dedicated object, but are directly read from EgadsData instances.
+	* the documentation has been updated.
+	* the way to create the algorithm dictionary has been totally changed to include path of the algorithm file, class method, folder.
 	
-  FIXED:
-    - in the algorithm creation window, the unit validation for each input variable is performed even if the unit is equal to 'None' or ' ', and lead to a crash. It has been fixed.
-	- in the aglorithm creation window, None was saved as a string.
-	- None wasn't well displayed in the algorithm display window.
-	- once a global metadata is updated in the metadata window with a NASA Ames file, it isn't updated in the GUI. It has been fixed.
-	- fixed a wrong attribute in the metadata window with NASA Ames file.
-	- issues with the name of few widgets in the option window have been corrected.
-	- style has been fixed in the algorithm creation window.
-	- style has been fixed in the algorithm display window.
-	- focus has been fixed in the algorithm creation window.
-	- an issue with the status bar updating method has been fixed.
-	- array variables were not correctly handled by the processing window.
-	- if a new global metadata is created in the global metadata window, the name of the metadata wasn't saved correctly.
-	- if a new variable metadata is created in the variable metadata window, the name of the metadata wasn't saved correctly.
-	- if a variable can't be read, the name of the variable is now removed from the variable list.
-	- the path of the log file in the option window wasn't set properly.
-	- few icons have been cleaned.
+  * FIXED:
+    * in the algorithm creation window, the unit validation for each input variable is performed even if the unit is equal to 'None' or ' ', and lead to a crash. It has been fixed.
+	* in the aglorithm creation window, None was saved as a string.
+	* None wasn't well displayed in the algorithm display window.
+	* once a global metadata is updated in the metadata window with a NASA Ames file, it isn't updated in the GUI. It has been fixed.
+	* fixed a wrong attribute in the metadata window with NASA Ames file.
+	* issues with the name of few widgets in the option window have been corrected.
+	* style has been fixed in the algorithm creation window.
+	* style has been fixed in the algorithm display window.
+	* focus has been fixed in the algorithm creation window.
+	* an issue with the status bar updating method has been fixed.
+	* array variables were not correctly handled by the processing window.
+	* if a new global metadata is created in the global metadata window, the name of the metadata wasn't saved correctly.
+	* if a new variable metadata is created in the variable metadata window, the name of the metadata wasn't saved correctly.
+	* if a variable can't be read, the name of the variable is now removed from the variable list.
+	* the path of the log file in the option window wasn't set properly.
+	* few icons have been cleaned.
 
-  ADDED:
-    - the function to save a netcdf file has been added and modified for Python3.
-	- the function to save a nasa ames file has been added and modified for Python3.
-	- an option has been added to the GUI, available in the option window, to let EGADS read variables as floats (or not).
-	- it is not possible anymore to delete dimension variables in a file through the GUI.
-	- information text has been added to the option window and linked to all info buttons.
-	- link to the EGADS GUI documentation has been added to the Help button.
-	- a batch processing function and window have been added.
-	- drag and drop function has been added to open a file.
-	- if a file has been modified, and if the user wants to quit or close the file, the GUI will ask him if he wants to save the file or not.
-	- the loading of a file has been moved to a dedicated thread.
+  * ADDED:
+    * the function to save a netcdf file has been added and modified for Python3.
+	* the function to save a nasa ames file has been added and modified for Python3.
+	* an option has been added to the GUI, available in the option window, to let EGADS read variables as floats (or not).
+	* it is not possible anymore to delete dimension variables in a file through the GUI.
+	* information text has been added to the option window and linked to all info buttons.
+	* link to the EGADS GUI documentation has been added to the Help button.
+	* a batch processing function and window have been added.
+	* drag and drop function has been added to open a file.
+	* if a file has been modified, and if the user wants to quit or close the file, the GUI will ask him if he wants to save the file or not.
+	* the loading of a file has been moved to a dedicated thread.
 
 
-May 9 2019, Release version 0.11.0
-==================================
-  MODIFIED:
-	- the custom vertical label in the display data window has been replaced for now by an original horizontal label to avoid issues with the paintEvent.
-	- the window to process variables with EGADS algorithms have been modified for python 3.
-	- the window to create algorithms have been modified for python 3.
-	- the processing of variables has been placed into a dedicated QThread.
-	- the code has been cleaned thanks to PyCharm.
-	- the documentation has been updated.
+### May 9 2019, Release version 0.11.0 ###
+
+  * MODIFIED:
+	* the custom vertical label in the display data window has been replaced for now by an original horizontal label to avoid issues with the paintEvent.
+	* the window to process variables with EGADS algorithms have been modified for python 3.
+	* the window to create algorithms have been modified for python 3.
+	* the processing of variables has been placed into a dedicated QThread.
+	* the code has been cleaned thanks to PyCharm.
+	* the documentation has been updated.
 	
-  FIXED:
-	- fixed an issue with the plot type and the grid activation in the plot window.
-	- if a user modifies a plot with the pan or zoom button activated, both buttons weren't released when the update button was clicked. It has been fixed.
-	- few wrongly spelled variables have been corrected.
-	- when closing a file, the dictionary containing all algorithms and their folders was deleted.
+  * FIXED:
+	* fixed an issue with the plot type and the grid activation in the plot window.
+	* if a user modifies a plot with the pan or zoom button activated, both buttons weren't released when the update button was clicked. It has been fixed.
+	* few wrongly spelled variables have been corrected.
+	* when closing a file, the dictionary containing all algorithms and their folders was deleted.
 
-  ADDED:
-    - a window to display algorithms has been added.
-	- once an algorithm is created, it is automatically loaded into EGADS and in the GUI.
-	- a right-click menu has been added to the variable list. It is possible to display data, plot data, delete data, and use the selected variable as the x axis in the plot window. The last option only works for time series (1 dimension) and doesn't work for gridded data (two or more dimensions).
-	- if multiple variables are selected, all functions which don't accept more than one variable are disabled and their icons are greyed out.
-	- if multiple variables are selected, the gui doesn't display variable metadata and all edit buttons are greyed out.
-	- if a variable can't be loaded, the gui now informs the user and try to give a reason (the number of reasons will increase in the future).
-	- EGADS GUI is now working based on the version of EGADS Lineage.
-	- information has been introduced for the algorithm creation window.
-	- information has been introduced for the plot window.
+  * ADDED:
+    * a window to display algorithms has been added.
+	* once an algorithm is created, it is automatically loaded into EGADS and in the GUI.
+	* a right*click menu has been added to the variable list. It is possible to display data, plot data, delete data, and use the selected variable as the x axis in the plot window. The last option only works for time series (1 dimension) and doesn't work for gridded data (two or more dimensions).
+	* if multiple variables are selected, all functions which don't accept more than one variable are disabled and their icons are greyed out.
+	* if multiple variables are selected, the gui doesn't display variable metadata and all edit buttons are greyed out.
+	* if a variable can't be loaded, the gui now informs the user and try to give a reason (the number of reasons will increase in the future).
+	* EGADS GUI is now working based on the version of EGADS Lineage.
+	* information has been introduced for the algorithm creation window.
+	* information has been introduced for the plot window.
 
 
-October 1 2018, Release version 0.10.0
-======================================
-  First design of the new GUI dedicated to EGADS Lineage.
-  EGADS GUI is now compatible with Python 3.5 and above.
+### October 1 2018, Release version 0.10.0 ###
+
+  First design of the new GUI dedicated to EGADS Lineage. EGADS GUI is now compatible with Python 3.5 and above.
   
-  ADDED:
-    - the branch and the minimum version of EGADS accepted by the GUI has been added to the egads_gui.ini file. If an older version and/or a different branch of EGADS is/are found, a warning is displayed.
-    - the branch version has been added to the '_version.py' file.
+  * ADDED:
+    * the branch and the minimum version of EGADS accepted by the GUI has been added to the egads_gui.ini file. If an older version and/or a different branch of EGADS is/are found, a warning is displayed.
+    * the branch version has been added to the '_version.py' file.
     
-  MODIFIED:
-    - the window to display data has been totally redone. If a variable with dimension equal to time, longitude and/or latitude, the variable will be parsed accordingly (latitude as col, latitude as row, and time as col). For now only variable with 2 dimensions (or 3 if the length of a dimension is equal to 1) can be parsed in the window. Not all date are parsed during init, the scroll bars include a method to load new data during scrolling.
-    - the window to plot data has been totally rework. It is possible to plot timeseries and gridded data (maps). In the last case, for now, the function is still beta and needs to finalized. Thus options have been disabled.
-    - the global and variable attributes windows have been reworked.
+  * MODIFIED:
+    * the window to display data has been totally redone. If a variable with dimension equal to time, longitude and/or latitude, the variable will be parsed accordingly (latitude as col, latitude as row, and time as col). For now only variable with 2 dimensions (or 3 if the length of a dimension is equal to 1) can be parsed in the window. Not all date are parsed during init, the scroll bars include a method to load new data during scrolling.
+    * the window to plot data has been totally rework. It is possible to plot timeseries and gridded data (maps). In the last case, for now, the function is still beta and needs to finalized. Thus options have been disabled.
+    * the global and variable attributes windows have been reworked.
   
-  FIXED:
-    - when a user creates a new metadata (global or variable), the name of the metadata is truncated when it is saved. It has been fixed.
-    - if a user try to add a metadata (global or variable) which already exists, the metadata was added multiple times or replaced. It has been fixed.
+  * FIXED:
+    * when a user creates a new metadata (global or variable), the name of the metadata is truncated when it is saved. It has been fixed.
+    * if a user try to add a metadata (global or variable) which already exists, the metadata was added multiple times or replaced. It has been fixed.
 
 
-January 31 2018, Release version 0.9.4
-======================================
-  MODIFIED:
-    - documentation has been updated.
+### January 31 2018, Release version 0.9.4 ###
+
+  * MODIFIED:
+    * documentation has been updated.
 
 
-January 19 2018, Release version 0.9.3
-======================================
-  FIXED:
-    - when a new variable was created, the migration of the new variable to the list of variable didn't set the "modified" attribute of the GUI on True, thus it was no possible to save the file.
-    - a log message contained a mistake.
+### January 19 2018, Release version 0.9.3 ###
+
+  * FIXED:
+    * when a new variable was created, the migration of the new variable to the list of variable didn't set the "modified" attribute of the GUI on True, thus it was no possible to save the file.
+    * a log message contained a mistake.
 
   
-January 11 2018, Release version 0.9.2
-======================================
-  FIXED:
-    - if a variable in a file can't be read, the GUI crashes. It has been fixed by adding a logged exception.
-    - buttons of the toolbar were connected to the function to modify metadata when a netcdf file was read. It has been fixed.
-    - in the creation algorithm window, the directory 'file_templates' was listed with other directories for algorithm creation.
-    - the processing window can accept as input for coefficient an integer or a float, but not a string even if it is needed by the algorithm. It has been fixed.
-    - when processing time in the algorithm window, the gui tried to find the _FillValue of time, which doesn't exist.
-    - if a user click on one of the edit buttons in the main window, close the file and open another file, the edit mode is still active. It has been fixed.
-    - when a user modifies metadata through the global metadata window, few of them are not correctly saved.
-    - when a user modifies global metadata through the main window, they are not correctly saved.
-    - corrected few GUI issues when closing a NASA Ames file and opening a NetCDF file after that.
-    - typos in logging messages.
+### January 11 2018, Release version 0.9.2 ###
+
+  * FIXED:
+    * if a variable in a file can't be read, the GUI crashes. It has been fixed by adding a logged exception.
+    * buttons of the toolbar were connected to the function to modify metadata when a netcdf file was read. It has been fixed.
+    * in the creation algorithm window, the directory 'file_templates' was listed with other directories for algorithm creation.
+    * the processing window can accept as input for coefficient an integer or a float, but not a string even if it is needed by the algorithm. It has been fixed.
+    * when processing time in the algorithm window, the gui tried to find the _FillValue of time, which doesn't exist.
+    * if a user click on one of the edit buttons in the main window, close the file and open another file, the edit mode is still active. It has been fixed.
+    * when a user modifies metadata through the global metadata window, few of them are not correctly saved.
+    * when a user modifies global metadata through the main window, they are not correctly saved.
+    * corrected few GUI issues when closing a NASA Ames file and opening a NetCDF file after that.
+    * typos in logging messages.
     
-  MODIFIED:
-    - in the processing window, variables are now sorted in the different comboboxes.
-    - as the .py file containing all windows is now too large, it has been divided into smaller .py files.
-    - the logging system has been modified for a better clarity and consistency with EGADS logging system.
-    - the global and variable metadata windows have been modify for NASA Ames files.
-    - the button to launch processing in the processing window has been modified.
+  * MODIFIED:
+    * in the processing window, variables are now sorted in the different comboboxes.
+    * as the .py file containing all windows is now too large, it has been divided into smaller .py files.
+    * the logging system has been modified for a better clarity and consistency with EGADS logging system.
+    * the global and variable metadata windows have been modify for NASA Ames files.
+    * the button to launch processing in the processing window has been modified.
     
-  ADDED:
-    - if a user create a new algorithm through a gui in a new folder, the new folder with its new algorithm is now automatically reloaded by the GUI after saving.
-    - an egads_gui.ini file has been included to add few log options, with a menu for options, and to allow automatic update checking.
-    - if the egads_gui.ini file is not found, it is now automatically created.
-    - the first version of a documentation has been written.
-    - a window to handle egads gui options has been added.
-    - a function to check new version on GitHub has been added.
-    - a new window to display algorithm has been added.
-    - the GUI will now check the version of EGADS and display a warning if a deprecated version is found.
-    - a right click has been added to the buttons of the main window to cancel the modification of an attribute.
-    - it is now possible to save a nasa ames file.
+  * ADDED:
+    * if a user create a new algorithm through a gui in a new folder, the new folder with its new algorithm is now automatically reloaded by the GUI after saving.
+    * an egads_gui.ini file has been included to add few log options, with a menu for options, and to allow automatic update checking.
+    * if the egads_gui.ini file is not found, it is now automatically created.
+    * the first version of a documentation has been written.
+    * a window to handle egads gui options has been added.
+    * a function to check new version on GitHub has been added.
+    * a new window to display algorithm has been added.
+    * the GUI will now check the version of EGADS and display a warning if a deprecated version is found.
+    * a right click has been added to the buttons of the main window to cancel the modification of an attribute.
+    * it is now possible to save a nasa ames file.
   
   
-June 25 2017, Release version 0.9.1
-===================================
-  FIXED:
-    - when new variables were deleted or migrated, and if the tab for new variables disappeared, if a new variable is created, the tad for new variables wouldn't appear again. It has been fixed.
-    - when migrating a new variable to the variable list, the variable lost is EgadsData type for a Quantities type. It has been fixed.
+### June 25 2017, Release version 0.9.1 ###
+
+  * FIXED:
+    * when new variables were deleted or migrated, and if the tab for new variables disappeared, if a new variable is created, the tad for new variables wouldn't appear again. It has been fixed.
+    * when migrating a new variable to the variable list, the variable lost is EgadsData type for a Quantities type. It has been fixed.
   
-  ADDED:
-    - new algorithms saved in one of the existing folders in the user folder are now loaded once created.
-    - new algorithms are now automatically added to the Processings menu.
+  * ADDED:
+    * new algorithms saved in one of the existing folders in the user folder are now loaded once created.
+    * new algorithms are now automatically added to the Processings menu.
   
 
-June 13 2017, Release version 0.9.0
-====================================
+### June 13 2017, Release version 0.9.0 ###
+
   Following the release of EGADS 0.8.0, the GUI has been reworked to add improvements and make it compatible. Actually for deadlines reasons, the GUI function to read NASA Ames files is not fully ready: it's still possible to read NASA Ames files, and export them to a new NetCDF or NASA Ames file, but its not possible to simply save the opened NASA Ames file (the user has to "Save As ..." to save modifications brought to a NASA Ames file and with a different name). Also, the handling of metadata has not been totally converted to handle metadata in NASA Ames files. It should be ready in the next minor version.
   PyQt4 has been replaced by PyQt5 to improve compatibility with few scientific modules. It is now possible to create algorithms from the GUI.
   
-  MODIFIED:
-    - the main window has been modified to decrease memory and cpu footprints.
-    - the global attributes window has been modified to decrease memory and cpu footprints.
-    - the variable attributes window has been modified to decrease memory and cpu footprints.
-    - the object in which are stored all data and metadata has been changed from a list to a dictionnary.
-    - all functions to handle the data object has been modified to comply with the new object type.
-    - plot options are now applied to subplot(s).
-    - a new way to list all embedded algorithms has been introduced.
-    - user-created algorithms are now listed into EGADS GUI with embedded algorithms.
-    - as the "Quantities" module doesn't allow to change units of a variable, the possibility to modify units in EGADS GUI has been disabled.
+  * MODIFIED:
+    * the main window has been modified to decrease memory and cpu footprints.
+    * the global attributes window has been modified to decrease memory and cpu footprints.
+    * the variable attributes window has been modified to decrease memory and cpu footprints.
+    * the object in which are stored all data and metadata has been changed from a list to a dictionnary.
+    * all functions to handle the data object has been modified to comply with the new object type.
+    * plot options are now applied to subplot(s).
+    * a new way to list all embedded algorithms has been introduced.
+    * user*created algorithms are now listed into EGADS GUI with embedded algorithms.
+    * as the "Quantities" module doesn't allow to change units of a variable, the possibility to modify units in EGADS GUI has been disabled.
     
-  FIXED:
-    - when multiple plots are created, all the radio buttons belong to the same group.
-    - when chosen, the marker line style wasn't applied to the plot.
-    - if a time series is deleted in the 'single plot' part, and if it's the last one, the figure options are not deleted.
-    - if a time series is deleted in the 'single plot' part, and if there are still other time series left, the name of the time series is not deleted from the legend.
-    - if a subplot is deleted without being drawn, an error appears when trying to remove subplot options which don't exist.
-    - properties of the legend are not the same if the 'Update' button is pushed in the plot options section or in the figure options section.
-    - after creating two or more subplots, if the first one is deleted, unique options are deleted as well, and it's leading to a crash.
-    - after creating two or more subplots, if subplots are not drawn from the 1st one to the last one, it will leads to issues in plot options. Now the user have to draw a subplot before adding another.
-    - if multiple plots or subplots are created, deleted and created agains, all checkboxes belong to the same group.
-    - the saving of an image was leading to a crash. It has been fixed.
-    - if multiple subplots are created, and one of them is drawn, the deletion of one of the empty ones lead to a crash.
-    - if multiple subplots are created, the size of the first one legend is not well defined.
-    - an object was missing in the algorithm generator.
-    - the metadata 'standard_name' wasn't registered succesfully once a variable is created by an algorithm.
-    - output metadata during algorithm creation are now well formated.
-    - global and variable attributes are now sorted if displayed in the 'attributes' window.
-    - in the plot window, variables are now sorted in the different comboboxes.
-    - all toolbuttons weren't well disconnected when a file was closed and the GUI cleared.
-    - the text of the QLineEdin the data Display Window is now black.
-    - if multiple subplots are created and one or more are deleted, 'spines' option for all other subplots is set on fully visible.
-    - all new items in Processings menu have now the same style than other menu items.
-    - items in Processings menu weren't well sorted.
-    - variable list in the variable tab is now sorted by default.
-    - fixed an issue with the function to list all algorithms: all folders were added twice.
-    - fixed an issue during the validation of units if an algorithm is created via the gui.
+  * FIXED:
+    * when multiple plots are created, all the radio buttons belong to the same group.
+    * when chosen, the marker line style wasn't applied to the plot.
+    * if a time series is deleted in the 'single plot' part, and if it's the last one, the figure options are not deleted.
+    * if a time series is deleted in the 'single plot' part, and if there are still other time series left, the name of the time series is not deleted from the legend.
+    * if a subplot is deleted without being drawn, an error appears when trying to remove subplot options which don't exist.
+    * properties of the legend are not the same if the 'Update' button is pushed in the plot options section or in the figure options section.
+    * after creating two or more subplots, if the first one is deleted, unique options are deleted as well, and it's leading to a crash.
+    * after creating two or more subplots, if subplots are not drawn from the 1st one to the last one, it will leads to issues in plot options. Now the user have to draw a subplot before adding another.
+    * if multiple plots or subplots are created, deleted and created agains, all checkboxes belong to the same group.
+    * the saving of an image was leading to a crash. It has been fixed.
+    * if multiple subplots are created, and one of them is drawn, the deletion of one of the empty ones lead to a crash.
+    * if multiple subplots are created, the size of the first one legend is not well defined.
+    * an object was missing in the algorithm generator.
+    * the metadata 'standard_name' wasn't registered succesfully once a variable is created by an algorithm.
+    * output metadata during algorithm creation are now well formated.
+    * global and variable attributes are now sorted if displayed in the 'attributes' window.
+    * in the plot window, variables are now sorted in the different comboboxes.
+    * all toolbuttons weren't well disconnected when a file was closed and the GUI cleared.
+    * the text of the QLineEdin the data Display Window is now black.
+    * if multiple subplots are created and one or more are deleted, 'spines' option for all other subplots is set on fully visible.
+    * all new items in Processings menu have now the same style than other menu items.
+    * items in Processings menu weren't well sorted.
+    * variable list in the variable tab is now sorted by default.
+    * fixed an issue with the function to list all algorithms: all folders were added twice.
+    * fixed an issue during the validation of units if an algorithm is created via the gui.
     
-  ADDED:
-    - a new window to create algorithm is now available.
-    - a new window is now available to confirm (or not) the success of the algorithm creation.
-    - all algorithms are now listed in the menu bar under 'Processings'. If user click on one algorithm, a window with algorithm information should open.
-    - 'Variable attributes' has been added to the Variable attributes window.
-    - an icon has been added to the plot window.
-    - in the plot window, if the pan or the zoom function is activated, the user will have to release it to modify or update the plot window.
-    - a splashscreen has been added with a EUFAR logo.
-    - a function to validate units has been added in the algorithm creation window.
-    - warning messages have been added if a user try to close a file or quit EGADS GUI and a file is already opened and modified.
-    - an information message has been added to inform that a variable can't be deleted from a netcdf file.
+  * ADDED:
+    * a new window to create algorithm is now available.
+    * a new window is now available to confirm (or not) the success of the algorithm creation.
+    * all algorithms are now listed in the menu bar under 'Processings'. If user click on one algorithm, a window with algorithm information should open.
+    * 'Variable attributes' has been added to the Variable attributes window.
+    * an icon has been added to the plot window.
+    * in the plot window, if the pan or the zoom function is activated, the user will have to release it to modify or update the plot window.
+    * a splashscreen has been added with a EUFAR logo.
+    * a function to validate units has been added in the algorithm creation window.
+    * warning messages have been added if a user try to close a file or quit EGADS GUI and a file is already opened and modified.
+    * an information message has been added to inform that a variable can't be deleted from a netcdf file.
     
 
-December 1 2016, Release version 0.8.1
-======================================
+### December 1 2016, Release version 0.8.1 ###
+
   EGADS GUI has been separated from EGADS (core) and is now an independant module. Only fixes, additions and modifications for EGADS GUI will be written here. 
 
 
-September 1 2016, Release version 0.8.0
-=======================================
-  Matplotlib package is used to generate all figures. A logging system has been introduced.
-  As more bugs have been found in Nappy and to prevent future compatibility issues, a new function to read and write NASA Ames format will be coded.
+### September 1 2016, Release version 0.8.0 ###
+
+  Matplotlib package is used to generate all figures. A logging system has been introduced. As more bugs have been found in Nappy and to prevent future compatibility issues, a new function to read and write NASA Ames format will be coded.
   
-  ADDED:
-    - a simple function to plot data has been introduced.
-    - a new plot window with custom icons has been designed. It has been connected to the official Matplotlib API.
-    - figure options have been added to the plot window.
-    - the user has the possibility to generate single plot or multiple subplots.
-    - figure options have been expanded to include subplots.
-    - plot options have been introduced to the plot window.
-    - a new function has been added to EGADS core to add new units not available in Quantities.
-    - a new window has been added to display a changelog.
-    - a new window has been added to display information about EGADS.
-    - plot options have been expanded to include subplots.
+  * ADDED:
+    * a simple function to plot data has been introduced.
+    * a new plot window with custom icons has been designed. It has been connected to the official Matplotlib API.
+    * figure options have been added to the plot window.
+    * the user has the possibility to generate single plot or multiple subplots.
+    * figure options have been expanded to include subplots.
+    * plot options have been introduced to the plot window.
+    * a new function has been added to EGADS core to add new units not available in Quantities.
+    * a new window has been added to display a changelog.
+    * a new window has been added to display information about EGADS.
+    * plot options have been expanded to include subplots.
 
-  FIXED:
-    - EGADS core couldn't process correctly variable units if the unit is 'unicode' and not 'str'.
-    - EGADS core couldn't process correclty time units if the unit is composed of 'time' (seconds, minutes, hours, ...) and ' since xxxxx'.
-    - as the netcdf gui function changed, the closing function wasn't cleaning the GUI properly.
-    - fixed a bug with set_linestyle, markers weren't displayed correctly
-    - the deletion of two or more variables brings a TypeError. It has been fixed
-    - during the creation of a new variable through the process window, the dimensions of the new variable wasn't set correctly. It has been fixed
-    - once a new variable is created and selected in the new variables tab, the icon to migrate the variable is not enabled. It has been fixed
-    - if a new variable is created with a list as Category metadata, the variable couldn't be saved. It has been fixed.
-    - if multiple time series are displayed in the same plot window, clearing the window bring an error and doesn't clean all options, this has been fixed.
+  * FIXED:
+    * EGADS core couldn't process correctly variable units if the unit is 'unicode' and not 'str'.
+    * EGADS core couldn't process correclty time units if the unit is composed of 'time' (seconds, minutes, hours, ...) and ' since xxxxx'.
+    * as the netcdf gui function changed, the closing function wasn't cleaning the GUI properly.
+    * fixed a bug with set_linestyle, markers weren't displayed correctly
+    * the deletion of two or more variables brings a TypeError. It has been fixed
+    * during the creation of a new variable through the process window, the dimensions of the new variable wasn't set correctly. It has been fixed
+    * once a new variable is created and selected in the new variables tab, the icon to migrate the variable is not enabled. It has been fixed
+    * if a new variable is created with a list as Category metadata, the variable couldn't be saved. It has been fixed.
+    * if multiple time series are displayed in the same plot window, clearing the window bring an error and doesn't clean all options, this has been fixed.
 
 
-February 16 2016, Release version 0.7.0
-=======================================
+### February 16 2016, Release version 0.7.0 ###
+
   As Nappy, a module for python, called CDMS2, is incompatible with Window for now. A test with Pyinstaller for Linux is a success. A solution will be found for Windows.
   
-  FIXED:
-    - in the variable metadata window, if "show other attributes" is clicked two times (to show and to hide), once Save is clicked, the program crashes. It has been fixed.
-    - a temporary solution has been found to allow Quantities module to correctly read CF1.0 time unit format. The modification has been introduced in "egads_core.py"
+  * FIXED:
+    * in the variable metadata window, if "show other attributes" is clicked two times (to show and to hide), once Save is clicked, the program crashes. It has been fixed.
+    * a temporary solution has been found to allow Quantities module to correctly read CF1.0 time unit format. The modification has been introduced in "egads_core.py"
     
-  ADDED:
-    - a function to delete a variable has been introduced.
-    - a function to apply an algorithm (just one) has been introduced to prepare the introduction of new variables. Applying an algorithm create a new workspace to store new variables.
-    - a function to migrate new varibles to the main workspace.
-    - a new window to allow processing operations has been introduced.
-    - new metadata have been added to all algorithms : input type (vector, scalar, time, ...), input description, output description, purpose and description. Those modifications have been made to allow a user to know all caracteritics of an algorithm.
-    - info boxes have been added to the processing window.
-    - the number of input and output object in the processing window depends now on the metadata of the algorithm.
-    - information about the selected algorithm are displayed in the processing window
-    - the processing window can now handle multiple coefficients for one LineEdit.
-    - in the processing window, the "Save" button will be available only if all fields have been filled in. Optionnal fields are not taken into account to activate the "Save" button.
-    - a function and a window to display a variable has been introduced.
-    - the processing window is now linked with the "new variable" tab and functional.
-    - algorithms with multiple outputs are now managed by the processing window.
+  * ADDED:
+    * a function to delete a variable has been introduced.
+    * a function to apply an algorithm (just one) has been introduced to prepare the introduction of new variables. Applying an algorithm create a new workspace to store new variables.
+    * a function to migrate new varibles to the main workspace.
+    * a new window to allow processing operations has been introduced.
+    * new metadata have been added to all algorithms : input type (vector, scalar, time, ...), input description, output description, purpose and description. Those modifications have been made to allow a user to know all caracteritics of an algorithm.
+    * info boxes have been added to the processing window.
+    * the number of input and output object in the processing window depends now on the metadata of the algorithm.
+    * information about the selected algorithm are displayed in the processing window
+    * the processing window can now handle multiple coefficients for one LineEdit.
+    * in the processing window, the "Save" button will be available only if all fields have been filled in. Optionnal fields are not taken into account to activate the "Save" button.
+    * a function and a window to display a variable has been introduced.
+    * the processing window is now linked with the "new variable" tab and functional.
+    * algorithms with multiple outputs are now managed by the processing window.
     
-  MODIFIED:
-    - the function to save a file has been modified to allow proper operation once a variable has been deleted.
-    - the GUI has been modified to allow proper operations with new variables.
-    - the gui can handle modification/deletion/addition of metadata linked to new variables
-    - the gui can handle multiple categories for the Category metadata.
-    - a new stylesheet has been used for the processing window.
-    - in the processing window, for an algorithm, if an input is optional, a default message is added to the information window.
+  * MODIFIED:
+    * the function to save a file has been modified to allow proper operation once a variable has been deleted.
+    * the GUI has been modified to allow proper operations with new variables.
+    * the gui can handle modification/deletion/addition of metadata linked to new variables
+    * the gui can handle multiple categories for the Category metadata.
+    * a new stylesheet has been used for the processing window.
+    * in the processing window, for an algorithm, if an input is optional, a default message is added to the information window.
 
 
-January 25 2016, Release version 0.6.0
-======================================
-  Two incompatibilites with the latest version of Numpy have been found in Nappy. Until the official fix, a modified nappy is proposed with EGADS.
-  First version of the main GUI.
+### January 25 2016, Release version 0.6.0 ###
+
+  Two incompatibilites with the latest version of Numpy have been found in Nappy. Until the official fix, a modified nappy is proposed with EGADS. First version of the main GUI.
   
-  ADDED:
-    - a function to open netcdf files has been introduced, with all needed functions to feed the gui and close the file.
-    - a function to save netcdf files to netcdf, NASA Ames and csv format has been introduced.
-    - a function to read NASA Ames files has been introduced, with all needed functions to feed the gui and close the file.
-    - it is now possible to save a NASA Ames file to netcdf file using the dedicated nappy API.
-    - a list of variables is shown in the dedicated tab.
-    - metadata (global and linked to variables) are now displayed in the GUI.
-    - the status bar is fed with information (file name, file size, conventions)
-    - it is now possible to modify the global metadata directly in the GUI.
-    - it is now possible to modify the variable metadata directly in the GUI.
-    - a new window to modify global metadata (accessible via an icon in the toolbar) has been added.
-    - it is possible to add, modify and delete metadata through the new global metadata window.
+  * ADDED:
+    * a function to open netcdf files has been introduced, with all needed functions to feed the gui and close the file.
+    * a function to save netcdf files to netcdf, NASA Ames and csv format has been introduced.
+    * a function to read NASA Ames files has been introduced, with all needed functions to feed the gui and close the file.
+    * it is now possible to save a NASA Ames file to netcdf file using the dedicated nappy API.
+    * a list of variables is shown in the dedicated tab.
+    * metadata (global and linked to variables) are now displayed in the GUI.
+    * the status bar is fed with information (file name, file size, conventions)
+    * it is now possible to modify the global metadata directly in the GUI.
+    * it is now possible to modify the variable metadata directly in the GUI.
+    * a new window to modify global metadata (accessible via an icon in the toolbar) has been added.
+    * it is possible to add, modify and delete metadata through the new global metadata window.
 
-  MODIFIED:
-    - if a variable is selected, and a metadata has been modified before, it will now reflect the modification of the metadata even if another variable is selected.
-    - if a variable is selected, and a metadata is modified but not saved, selecting another variable will cancel the modication.
-    - the function to save netcdf also save the modified metadata.
+  * MODIFIED:
+    * if a variable is selected, and a metadata has been modified before, it will now reflect the modification of the metadata even if another variable is selected.
+    * if a variable is selected, and a metadata is modified but not saved, selecting another variable will cancel the modication.
+    * the function to save netcdf also save the modified metadata.
 
 
-December 1 2015 - 4 January 2016
-================================
-  First design of the new GUI dedicated to EGADS.
-  EGADS version is currently 0.5.8. It appears to have critical issues with Nappy, as this one calls old numpy functions which have been discarded from newer versions.
+### From December 1 2015 to January 6 2016 ###
+
+  First design of the new GUI dedicated to EGADS. EGADS version is currently 0.5.8. It appears to have critical issues with Nappy, as this one calls old numpy functions which have been discarded from newer versions.

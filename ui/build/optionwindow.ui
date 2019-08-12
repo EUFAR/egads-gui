@@ -2441,8 +2441,8 @@ QScrollBar::right-arrow:horizontal:pressed {
              <layout class="QVBoxLayout" name="ow_vertical_layout_3">
               <item>
                <layout class="QGridLayout" name="gridLayout_8">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="ow_label_7">
+                <item row="1" column="0">
+                 <widget class="QLabel" name="ow_label_8">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -2469,7 +2469,7 @@ QScrollBar::right-arrow:horizontal:pressed {
 }</string>
                   </property>
                   <property name="text">
-                   <string>Plot variables with the same unit:</string>
+                   <string>Disposition of subplots</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2640,8 +2640,8 @@ QToolButton:flat {
                   </item>
                  </layout>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="ow_label_8">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="ow_label_7">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -2668,7 +2668,7 @@ QToolButton:flat {
 }</string>
                   </property>
                   <property name="text">
-                   <string>Disposition of subplots</string>
+                   <string>Plot variables with the same unit:</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2830,6 +2830,109 @@ QToolButton:flat {
                    </spacer>
                   </item>
                  </layout>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_19">
+                <item>
+                 <widget class="QCheckBox" name="ow_checkbox_6">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>FreeSans</family>
+                    <pointsize>10</pointsize>
+                    <stylestrategy>PreferAntialias</stylestrategy>
+                    <kerning>true</kerning>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QCheckBox {
+   color: rgb(45,45,45);
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable permanently the popup about the X axis</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_19">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>10</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="info_button_12">
+                  <property name="maximumSize">
+                   <size>
+                    <width>27</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton {
+	border: 1px solid transparent;
+	background-color: transparent;
+	width: 27px;
+	height: 27px;
+}
+
+QToolButton:flat {
+	border: none;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>icons/info_icon.svg</normaloff>icons/info_icon.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>23</width>
+                    <height>23</height>
+                   </size>
+                  </property>
+                  <property name="autoRaise">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </item>
@@ -3041,7 +3144,7 @@ QScrollBar::right-arrow:horizontal:pressed {
              <x>0</x>
              <y>0</y>
              <width>511</width>
-             <height>139</height>
+             <height>195</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_11">

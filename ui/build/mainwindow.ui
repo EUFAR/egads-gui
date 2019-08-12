@@ -45,6 +45,8 @@
        <font>
         <family>FreeSans</family>
         <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
         <stylestrategy>PreferAntialias</stylestrategy>
         <kerning>true</kerning>
        </font>
@@ -52,25 +54,20 @@
       <property name="styleSheet">
        <string notr="true">QTabWidget::pane {
     border: 1px solid rgb(180,180,180);
-	border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px;
-	border-top-right-radius: 5px;
-    top: -1px;
     background-color: rgb(230,230,230);
 }
 
 QTabWidget::tab-bar {
-    left: 0px;
+    top: 1px;
+    bottom: 1px;
+    left: 10px;
 }
 
 QTabBar::tab {
-    background: transparent;
     border-top: 1px solid rgb(180,180,180);
 	border-left: 1px solid rgb(180,180,180);
 	border-right: 1px solid rgb(180,180,180);
-    border-top-right-radius: 5px;
-	border-top-left-radius: 5px;
-    padding: 2px 10px 2px 10px;
+    padding: 2px 15px 2px 15px;
 	margin-right: 2px;
 	color: rgb(45,45,45);
 }
@@ -84,7 +81,21 @@ QTabBar::tab:selected {
 }
 
 QTabBar::tab:!selected {
-    margin-top: 4px; 
+    margin-top: 4px;
+	color: rgb(70,70,70);
+}
+
+QTabBar::tab:!selected:hover {
+    border-bottom: 1px solid rgb(180,180,180);
+}
+
+QTabBar::tab:top, QTabBar::tab:bottom {
+    margin-right: -1px;
+}
+
+QTabBar::tab:top:last, QTabBar::tab:bottom:last,
+QTabBar::tab:top:only-one, QTabBar::tab:bottom:only-one {
+    margin-right: 0;
 }
 
 QTabBar::scroller {
@@ -208,7 +219,6 @@ QScrollBar::add-line:vertical {
   height: 20px;
   subcontrol-position: bottom;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 5px;
 }
 
 QScrollBar::add-line:vertical:hover {
@@ -228,7 +238,6 @@ QScrollBar::sub-line:vertical {
   height: 20px;
   subcontrol-position: top;
   subcontrol-origin: margin;
-  border-top-right-radius: 5px;
 }
 
 QScrollBar::sub-line:vertical:hover {
@@ -270,7 +279,6 @@ QScrollBar::add-line:horizontal {
   width: 20px;
   subcontrol-position: right;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 5px;
 }
 
 QScrollBar::add-line:horizontal:hover {
@@ -290,7 +298,6 @@ QScrollBar::sub-line:horizontal {
   width: 20px;
   subcontrol-position: left;
   subcontrol-origin: margin;
-border-bottom-left-radius: 5px;
 }
 
 QScrollBar::sub-line:horizontal:hover {
@@ -2779,7 +2786,6 @@ QScrollBar::add-line:vertical {
   height: 20px;
   subcontrol-position: bottom;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 5px;
 }
 
 QScrollBar::add-line:vertical:hover {
@@ -2799,7 +2805,6 @@ QScrollBar::sub-line:vertical {
   height: 20px;
   subcontrol-position: top;
   subcontrol-origin: margin;
-  border-top-right-radius: 5px;
 }
 
 QScrollBar::sub-line:vertical:hover {
@@ -2841,7 +2846,6 @@ QScrollBar::add-line:horizontal {
   width: 20px;
   subcontrol-position: right;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 5px;
 }
 
 QScrollBar::add-line:horizontal:hover {
@@ -2861,7 +2865,6 @@ QScrollBar::sub-line:horizontal {
   width: 20px;
   subcontrol-position: left;
   subcontrol-origin: margin;
-border-bottom-left-radius: 5px;
 }
 
 QScrollBar::sub-line:horizontal:hover {
@@ -6146,7 +6149,6 @@ QScrollBar::add-line:vertical {
   height: 20px;
   subcontrol-position: bottom;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 5px;
 }
 
 QScrollBar::add-line:vertical:hover {
@@ -6166,7 +6168,6 @@ QScrollBar::sub-line:vertical {
   height: 20px;
   subcontrol-position: top;
   subcontrol-origin: margin;
-  border-top-right-radius: 5px;
 }
 
 QScrollBar::sub-line:vertical:hover {
@@ -6208,7 +6209,6 @@ QScrollBar::add-line:horizontal {
   width: 20px;
   subcontrol-position: right;
   subcontrol-origin: margin;
-  border-bottom-right-radius: 5px;
 }
 
 QScrollBar::add-line:horizontal:hover {
@@ -6228,7 +6228,6 @@ QScrollBar::sub-line:horizontal {
   width: 20px;
   subcontrol-position: left;
   subcontrol-origin: margin;
-border-bottom-left-radius: 5px;
 }
 
 QScrollBar::sub-line:horizontal:hover {
@@ -9466,7 +9465,7 @@ QScrollBar::right-arrow:horizontal:pressed {
 
 QMenuBar::item {
     spacing: 3px;
-    padding: 5px 10px 5px 10px;
+    padding: 5px 15px 5px 15px;
     background: transparent;
 	color: rgb(45,45,45);
 }
@@ -9636,7 +9635,7 @@ QMenu::separator {
    <property name="styleSheet">
     <string notr="true">QToolBar {
    padding: 10px;
-   background-color: rgb(240,240,240);
+   background: rgb(240,240,240);
    border-bottom: 1px solid rgb(220,220,220);
 }</string>
    </property>
@@ -9678,6 +9677,15 @@ QMenu::separator {
    <addaction name="actionUpdate"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>9</pointsize>
+     <italic>true</italic>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">QStatusBar {
     background: rgb(240,240,240);
@@ -9688,7 +9696,7 @@ QStatusBar QLabel {
 }</string>
    </property>
    <property name="sizeGripEnabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <action name="actionOpenBar">

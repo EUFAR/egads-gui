@@ -368,7 +368,7 @@ How to delete a variable?
 How to create an algorithm through the GUI?
 *******************************************
 
-EGADS GUI offers the possibility to create algorithm from a window, by filling in different kind of fields. If a complex algorithm has to be written, the most suitable way is to use a text editor like Notepad++ (Windows) or Kate (Linux) and modify the template provided in the EGADS algorithm directory. For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT, p. 28.
+EGADS GUI offers the possibility to create algorithm from a window, by filling in different type of fields. If a complex algorithm has to be written, the most suitable way is to use a text editor like Notepad++ (Windows) or Kate (Linux) and modify the template provided in the EGADS algorithm directory. For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT, p. 28.
 
 * To launch the algorithm creation window, just click on |create algorithm|.
 
@@ -409,9 +409,14 @@ EGADS GUI offers the possibility to create algorithm from a window, by filling i
    :scale: 45 %
    :align: center
 
+.. NOTE::
+  It is important to remember that special characters and punctuation, apart from the following list ``. , ; : - _``, can't be used in the different fields. The system won't remove them and it can lead to an exception when the GUI tries to load the algorithm.
 
 .. NOTE::
   There is no system to check the algorithm result. Once the algorithm is saved, EGADS and its GUI expect the algorithm to be true and stable.
+
+.. NOTE::
+  If using the stand-alone version of the GUI, new algorithms are saved in the ``user_algorithms`` folder in the main directory. The user still has the possibility to create an algorithm manually with a text editor. In that case, follow the EGADS documentation about new algorithms and save the algorithm in the ``user_algorithms`` folder. Do not forget to edit or create __init__.py files.
 
 
 **********************************************

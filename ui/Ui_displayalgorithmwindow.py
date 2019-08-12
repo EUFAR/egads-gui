@@ -42,25 +42,20 @@ class Ui_displayAlgorithmWindow(object):
         self.tabWidget.setFont(font)
         self.tabWidget.setStyleSheet("QTabWidget::pane {\n"
 "    border: 1px solid rgb(180,180,180);\n"
-"    border-bottom-left-radius: 5px;\n"
-"    border-bottom-right-radius: 5px;\n"
-"    border-top-right-radius: 5px;\n"
-"    top: -1px;\n"
 "    background-color: rgb(230,230,230);\n"
 "}\n"
 "\n"
 "QTabWidget::tab-bar {\n"
-"    left: 0px; \n"
+"    top: 1px;\n"
+"    bottom: 1px;\n"
+"    left: 10px;\n"
 "}\n"
 "\n"
 "QTabBar::tab {\n"
-"    background: transparent;\n"
 "    border-top: 1px solid rgb(180,180,180);\n"
 "    border-left: 1px solid rgb(180,180,180);\n"
 "    border-right: 1px solid rgb(180,180,180);\n"
-"    border-top-right-radius: 5px;\n"
-"    border-top-left-radius: 5px;\n"
-"    padding: 2px 10px 2px 10px;\n"
+"    padding: 2px 15px 2px 15px;\n"
 "    margin-right: 2px;\n"
 "    color: rgb(45,45,45);\n"
 "}\n"
@@ -74,7 +69,21 @@ class Ui_displayAlgorithmWindow(object):
 "}\n"
 "\n"
 "QTabBar::tab:!selected {\n"
-"    margin-top: 4px; \n"
+"    margin-top: 4px;\n"
+"    color: rgb(70,70,70);\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected:hover {\n"
+"    border-bottom: 1px solid rgb(180,180,180);\n"
+"}\n"
+"\n"
+"QTabBar::tab:top, QTabBar::tab:bottom {\n"
+"    margin-right: -1px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:top:last, QTabBar::tab:bottom:last,\n"
+"QTabBar::tab:top:only-one, QTabBar::tab:bottom:only-one {\n"
+"    margin-right: 0;\n"
 "}\n"
 "\n"
 "QTabBar::scroller {\n"
@@ -118,6 +127,7 @@ class Ui_displayAlgorithmWindow(object):
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.tab_3)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
         spacerItem = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_3.addItem(spacerItem, 0, 1, 1, 1)
@@ -1543,11 +1553,8 @@ class Ui_displayAlgorithmWindow(object):
         self.tab_1 = QtWidgets.QWidget()
         self.tab_1.setObjectName("tab_1")
         self.gridLayout_7 = QtWidgets.QGridLayout(self.tab_1)
+        self.gridLayout_7.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_7.setObjectName("gridLayout_7")
-        spacerItem5 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_7.addItem(spacerItem5, 0, 1, 1, 1)
-        spacerItem6 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_7.addItem(spacerItem6, 1, 0, 1, 1)
         self.scrollArea = QtWidgets.QScrollArea(self.tab_1)
         self.scrollArea.setStyleSheet("QScrollArea { background: transparent; }\n"
 "\n"
@@ -1708,29 +1715,30 @@ class Ui_displayAlgorithmWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 618, 390))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 674, 445))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setObjectName("gridLayout_5")
+        spacerItem5 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_5.addItem(spacerItem5, 0, 2, 1, 1)
         self.input_layout = QtWidgets.QVBoxLayout()
         self.input_layout.setObjectName("input_layout")
-        self.gridLayout_5.addLayout(self.input_layout, 0, 0, 1, 1)
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.gridLayout_7.addWidget(self.scrollArea, 1, 1, 1, 1)
+        self.gridLayout_5.addLayout(self.input_layout, 1, 1, 2, 2)
+        spacerItem6 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_5.addItem(spacerItem6, 1, 3, 1, 1)
         spacerItem7 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_7.addItem(spacerItem7, 1, 2, 1, 1)
+        self.gridLayout_5.addItem(spacerItem7, 2, 0, 1, 1)
         spacerItem8 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_7.addItem(spacerItem8, 2, 1, 1, 1)
+        self.gridLayout_5.addItem(spacerItem8, 3, 1, 1, 1)
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.gridLayout_7.addWidget(self.scrollArea, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_1, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayout_8 = QtWidgets.QGridLayout(self.tab_2)
+        self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_8.setObjectName("gridLayout_8")
-        spacerItem9 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_8.addItem(spacerItem9, 0, 1, 1, 1)
-        spacerItem10 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_8.addItem(spacerItem10, 1, 0, 1, 1)
         self.scrollArea_2 = QtWidgets.QScrollArea(self.tab_2)
         self.scrollArea_2.setStyleSheet("QScrollArea { background: transparent; }\n"
 "\n"
@@ -1891,24 +1899,29 @@ class Ui_displayAlgorithmWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 618, 390))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 674, 445))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.gridLayout_6 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_6.setObjectName("gridLayout_6")
+        spacerItem9 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_6.addItem(spacerItem9, 0, 2, 1, 1)
+        spacerItem10 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_6.addItem(spacerItem10, 1, 0, 1, 1)
         self.output_layout = QtWidgets.QVBoxLayout()
         self.output_layout.setObjectName("output_layout")
-        self.gridLayout_6.addLayout(self.output_layout, 0, 0, 1, 1)
-        self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
-        self.gridLayout_8.addWidget(self.scrollArea_2, 1, 1, 2, 2)
+        self.gridLayout_6.addLayout(self.output_layout, 1, 1, 1, 2)
         spacerItem11 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_8.addItem(spacerItem11, 2, 3, 1, 1)
+        self.gridLayout_6.addItem(spacerItem11, 1, 3, 1, 1)
         spacerItem12 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_8.addItem(spacerItem12, 3, 2, 1, 1)
+        self.gridLayout_6.addItem(spacerItem12, 2, 1, 1, 1)
+        self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
+        self.gridLayout_8.addWidget(self.scrollArea_2, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.gridLayout = QtWidgets.QGridLayout(self.tab)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         spacerItem13 = QtWidgets.QSpacerItem(10, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout.addItem(spacerItem13, 0, 1, 1, 1)

@@ -6,9 +6,8 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
 from functions.gui_elements import PushButtonRight
-
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -34,30 +33,27 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.tab_view.setFont(font)
         self.tab_view.setStyleSheet("QTabWidget::pane {\n"
 "    border: 1px solid rgb(180,180,180);\n"
-"    border-bottom-left-radius: 5px;\n"
-"    border-bottom-right-radius: 5px;\n"
-"    border-top-right-radius: 5px;\n"
-"    top: -1px;\n"
 "    background-color: rgb(230,230,230);\n"
 "}\n"
 "\n"
 "QTabWidget::tab-bar {\n"
-"    left: 0px;\n"
+"    top: 1px;\n"
+"    bottom: 1px;\n"
+"    left: 10px;\n"
 "}\n"
 "\n"
 "QTabBar::tab {\n"
-"    background: transparent;\n"
 "    border-top: 1px solid rgb(180,180,180);\n"
 "    border-left: 1px solid rgb(180,180,180);\n"
 "    border-right: 1px solid rgb(180,180,180);\n"
-"    border-top-right-radius: 5px;\n"
-"    border-top-left-radius: 5px;\n"
-"    padding: 2px 10px 2px 10px;\n"
+"    padding: 2px 15px 2px 15px;\n"
 "    margin-right: 2px;\n"
 "    color: rgb(45,45,45);\n"
 "}\n"
@@ -71,7 +67,21 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QTabBar::tab:!selected {\n"
-"    margin-top: 4px; \n"
+"    margin-top: 4px;\n"
+"    color: rgb(70,70,70);\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected:hover {\n"
+"    border-bottom: 1px solid rgb(180,180,180);\n"
+"}\n"
+"\n"
+"QTabBar::tab:top, QTabBar::tab:bottom {\n"
+"    margin-right: -1px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:top:last, QTabBar::tab:bottom:last,\n"
+"QTabBar::tab:top:only-one, QTabBar::tab:bottom:only-one {\n"
+"    margin-right: 0;\n"
 "}\n"
 "\n"
 "QTabBar::scroller {\n"
@@ -172,7 +182,6 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -192,7 +201,6 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -234,7 +242,6 @@ class Ui_MainWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
@@ -254,7 +261,6 @@ class Ui_MainWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
@@ -1434,7 +1440,6 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -1454,7 +1459,6 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -1496,7 +1500,6 @@ class Ui_MainWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
@@ -1516,7 +1519,6 @@ class Ui_MainWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
@@ -1974,7 +1976,7 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 0px;\n"
+"  border-top-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -1994,7 +1996,7 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 0px;\n"
+"  border-bottom-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -3148,7 +3150,6 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -3168,7 +3169,6 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -3210,7 +3210,6 @@ class Ui_MainWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
@@ -3230,7 +3229,6 @@ class Ui_MainWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
@@ -3682,7 +3680,7 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 0px;\n"
+"  border-top-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -3702,7 +3700,7 @@ class Ui_MainWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 0px;\n"
+"  border-bottom-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -4819,7 +4817,7 @@ class Ui_MainWindow(object):
 "\n"
 "QMenuBar::item {\n"
 "    spacing: 3px;\n"
-"    padding: 5px 10px 5px 10px;\n"
+"    padding: 5px 15px 5px 15px;\n"
 "    background: transparent;\n"
 "    color: rgb(45,45,45);\n"
 "}\n"
@@ -4927,7 +4925,7 @@ class Ui_MainWindow(object):
         self.toolBar.setFont(font)
         self.toolBar.setStyleSheet("QToolBar {\n"
 "   padding: 10px;\n"
-"   background-color: rgb(240,240,240);\n"
+"   background: rgb(240,240,240);\n"
 "   border-bottom: 1px solid rgb(220,220,220);\n"
 "}")
         self.toolBar.setMovable(False)
@@ -4936,6 +4934,13 @@ class Ui_MainWindow(object):
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.statusBar = QtWidgets.QStatusBar(MainWindow)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
+        font.setItalic(True)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.statusBar.setFont(font)
         self.statusBar.setStyleSheet("QStatusBar {\n"
 "    background: rgb(240,240,240);\n"
 "}\n"
@@ -4943,7 +4948,7 @@ class Ui_MainWindow(object):
 "QStatusBar QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.statusBar.setSizeGripEnabled(True)
+        self.statusBar.setSizeGripEnabled(False)
         self.statusBar.setObjectName("statusBar")
         MainWindow.setStatusBar(self.statusBar)
         self.actionOpenBar = QtWidgets.QAction(MainWindow)
@@ -5107,8 +5112,8 @@ class Ui_MainWindow(object):
         self.actionSeparator = QtWidgets.QAction(MainWindow)
         self.actionSeparator.setEnabled(False)
         icon16 = QtGui.QIcon()
-        icon16.addPixmap(QtGui.QPixmap("icons/separator_icon.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
         icon16.addPixmap(QtGui.QPixmap("icons/separator_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon16.addPixmap(QtGui.QPixmap("icons/separator_icon.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
         self.actionSeparator.setIcon(icon16)
         self.actionSeparator.setObjectName("actionSeparator")
         self.actionSeparator2 = QtWidgets.QAction(MainWindow)

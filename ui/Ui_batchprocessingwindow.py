@@ -115,25 +115,20 @@ class Ui_batchProcessingWindow(object):
         self.tabWidget.setFont(font)
         self.tabWidget.setStyleSheet("QTabWidget::pane {\n"
 "    border: 1px solid rgb(180,180,180);\n"
-"    border-bottom-left-radius: 5px;\n"
-"    border-bottom-right-radius: 5px;\n"
-"    border-top-right-radius: 5px;\n"
-"    top: -1px;\n"
 "    background-color: rgb(230,230,230);\n"
 "}\n"
 "\n"
 "QTabWidget::tab-bar {\n"
-"    left: 0px; \n"
+"    top: 1px;\n"
+"    bottom: 1px;\n"
+"    left: 10px;\n"
 "}\n"
 "\n"
 "QTabBar::tab {\n"
-"    background: transparent;\n"
 "    border-top: 1px solid rgb(180,180,180);\n"
 "    border-left: 1px solid rgb(180,180,180);\n"
 "    border-right: 1px solid rgb(180,180,180);\n"
-"    border-top-right-radius: 5px;\n"
-"    border-top-left-radius: 5px;\n"
-"    padding: 2px 10px 2px 10px;\n"
+"    padding: 2px 15px 2px 15px;\n"
 "    margin-right: 2px;\n"
 "    color: rgb(45,45,45);\n"
 "}\n"
@@ -147,7 +142,21 @@ class Ui_batchProcessingWindow(object):
 "}\n"
 "\n"
 "QTabBar::tab:!selected {\n"
-"    margin-top: 4px; \n"
+"    margin-top: 4px;\n"
+"    color: rgb(70,70,70);\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected:hover {\n"
+"    border-bottom: 1px solid rgb(180,180,180);\n"
+"}\n"
+"\n"
+"QTabBar::tab:top, QTabBar::tab:bottom {\n"
+"    margin-right: -1px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:top:last, QTabBar::tab:bottom:last,\n"
+"QTabBar::tab:top:only-one, QTabBar::tab:bottom:only-one {\n"
+"    margin-right: 0;\n"
 "}\n"
 "\n"
 "QTabBar::scroller {\n"
@@ -191,6 +200,7 @@ class Ui_batchProcessingWindow(object):
         self.tab_1 = QtWidgets.QWidget()
         self.tab_1.setObjectName("tab_1")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.tab_1)
+        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_2.addItem(spacerItem3, 0, 1, 1, 1)
@@ -1058,6 +1068,7 @@ class Ui_batchProcessingWindow(object):
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.tab_2)
+        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_4.setObjectName("gridLayout_4")
         spacerItem17 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_4.addItem(spacerItem17, 0, 1, 1, 1)
@@ -1626,12 +1637,9 @@ class Ui_batchProcessingWindow(object):
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
-        self.gridLayout_7 = QtWidgets.QGridLayout(self.tab_3)
-        self.gridLayout_7.setObjectName("gridLayout_7")
-        spacerItem27 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_7.addItem(spacerItem27, 0, 1, 1, 1)
-        spacerItem28 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_7.addItem(spacerItem28, 1, 0, 1, 1)
+        self.gridLayout_8 = QtWidgets.QGridLayout(self.tab_3)
+        self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_8.setObjectName("gridLayout_8")
         self.scroll_area = QtWidgets.QScrollArea(self.tab_3)
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro")
@@ -1698,6 +1706,10 @@ class Ui_batchProcessingWindow(object):
 "  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
 "QScrollBar::sub-line:vertical {\n"
 "  border-top: 0px solid white;\n"
 "  border-left: 0px solid white;\n"
@@ -1713,7 +1725,7 @@ class Ui_batchProcessingWindow(object):
 "  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
-"QScrollBar::add-line:vertical:pressed {\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
 "  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
@@ -1773,6 +1785,10 @@ class Ui_batchProcessingWindow(object):
 "  background-color: rgb(219, 219, 219);\n"
 "}\n"
 "\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
 "QScrollBar::left-arrow:horizontal {\n"
 "  image: url(icons/left_arrow_icon.svg); \n"
 "  width: 16px;\n"
@@ -1798,27 +1814,34 @@ class Ui_batchProcessingWindow(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.scrollAreaWidgetContents_4 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 754, 448))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 810, 486))
         self.scrollAreaWidgetContents_4.setObjectName("scrollAreaWidgetContents_4")
-        self.gridLayout_8 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_4)
-        self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_8.setObjectName("gridLayout_8")
+        self.gridLayout_7 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_4)
+        self.gridLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_7.setObjectName("gridLayout_7")
+        spacerItem27 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_7.addItem(spacerItem27, 0, 1, 1, 1)
+        spacerItem28 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_7.addItem(spacerItem28, 1, 0, 1, 1)
         self.options_layout = QtWidgets.QVBoxLayout()
         self.options_layout.setObjectName("options_layout")
-        self.gridLayout_8.addLayout(self.options_layout, 0, 0, 1, 1)
-        self.scroll_area.setWidget(self.scrollAreaWidgetContents_4)
-        self.gridLayout_7.addWidget(self.scroll_area, 1, 1, 2, 1)
+        self.gridLayout_7.addLayout(self.options_layout, 1, 1, 1, 1)
         spacerItem29 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_7.addItem(spacerItem29, 2, 2, 1, 1)
+        self.gridLayout_7.addItem(spacerItem29, 1, 2, 1, 1)
+        spacerItem30 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_7.addItem(spacerItem30, 2, 1, 1, 1)
+        self.scroll_area.setWidget(self.scrollAreaWidgetContents_4)
+        self.gridLayout_8.addWidget(self.scroll_area, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_3, "")
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
         self.gridLayout_6 = QtWidgets.QGridLayout(self.tab_4)
+        self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_6.setObjectName("gridLayout_6")
-        spacerItem30 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_6.addItem(spacerItem30, 0, 1, 1, 1)
-        spacerItem31 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_6.addItem(spacerItem31, 1, 0, 1, 1)
+        spacerItem31 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_6.addItem(spacerItem31, 0, 1, 1, 1)
+        spacerItem32 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_6.addItem(spacerItem32, 1, 0, 1, 1)
         self.verticalLayout_5 = QtWidgets.QVBoxLayout()
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.horizontalLayout_14 = QtWidgets.QHBoxLayout()
@@ -1947,8 +1970,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_open_button_2.setAutoRaise(False)
         self.bw_open_button_2.setObjectName("bw_open_button_2")
         self.horizontalLayout_14.addWidget(self.bw_open_button_2)
-        spacerItem32 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_14.addItem(spacerItem32)
+        spacerItem33 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_14.addItem(spacerItem33)
         self.bw_info_5 = QtWidgets.QToolButton(self.tab_4)
         self.bw_info_5.setMinimumSize(QtCore.QSize(27, 27))
         self.bw_info_5.setMaximumSize(QtCore.QSize(27, 27))
@@ -1969,8 +1992,8 @@ class Ui_batchProcessingWindow(object):
         self.verticalLayout_5.addLayout(self.horizontalLayout_14)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        spacerItem33 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_3.addItem(spacerItem33)
+        spacerItem34 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout_3.addItem(spacerItem34)
         self.bw_line_2 = QtWidgets.QFrame(self.tab_4)
         self.bw_line_2.setStyleSheet("QFrame {\n"
 "   background: rgb(190,190,190);\n"
@@ -1981,8 +2004,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.bw_line_2.setObjectName("bw_line_2")
         self.verticalLayout_3.addWidget(self.bw_line_2)
-        spacerItem34 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_3.addItem(spacerItem34)
+        spacerItem35 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout_3.addItem(spacerItem35)
         self.verticalLayout_5.addLayout(self.verticalLayout_3)
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
@@ -2003,13 +2026,13 @@ class Ui_batchProcessingWindow(object):
         self.bw_label_9.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.bw_label_9.setObjectName("bw_label_9")
         self.horizontalLayout_15.addWidget(self.bw_label_9)
-        spacerItem35 = QtWidgets.QSpacerItem(588, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_15.addItem(spacerItem35)
+        spacerItem36 = QtWidgets.QSpacerItem(588, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_15.addItem(spacerItem36)
         self.verticalLayout_5.addLayout(self.horizontalLayout_15)
         self.horizontalLayout_16 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_16.setObjectName("horizontalLayout_16")
-        spacerItem36 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_16.addItem(spacerItem36)
+        spacerItem37 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_16.addItem(spacerItem37)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout()
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.horizontalLayout_13 = QtWidgets.QHBoxLayout()
@@ -2029,8 +2052,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_checkbox_1.setChecked(True)
         self.bw_checkbox_1.setObjectName("bw_checkbox_1")
         self.horizontalLayout_13.addWidget(self.bw_checkbox_1)
-        spacerItem37 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_13.addItem(spacerItem37)
+        spacerItem38 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_13.addItem(spacerItem38)
         self.bw_info_6 = QtWidgets.QToolButton(self.tab_4)
         self.bw_info_6.setMinimumSize(QtCore.QSize(27, 27))
         self.bw_info_6.setMaximumSize(QtCore.QSize(27, 27))
@@ -2048,8 +2071,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_info_6.setIconSize(QtCore.QSize(23, 23))
         self.bw_info_6.setObjectName("bw_info_6")
         self.horizontalLayout_13.addWidget(self.bw_info_6)
-        spacerItem38 = QtWidgets.QSpacerItem(178, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_13.addItem(spacerItem38)
+        spacerItem39 = QtWidgets.QSpacerItem(178, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_13.addItem(spacerItem39)
         self.verticalLayout_4.addLayout(self.horizontalLayout_13)
         self.bw_label_10 = QtWidgets.QLabel(self.tab_4)
         self.bw_label_10.setEnabled(False)
@@ -2168,8 +2191,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_5.setFrame(False)
         self.bw_edit_5.setObjectName("bw_edit_5")
         self.horizontalLayout_8.addWidget(self.bw_edit_5)
-        spacerItem39 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_8.addItem(spacerItem39)
+        spacerItem40 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_8.addItem(spacerItem40)
         self.bw_combobox_5 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_5.setEnabled(False)
         self.bw_combobox_5.setMinimumSize(QtCore.QSize(210, 27))
@@ -2354,8 +2377,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_6.setFrame(False)
         self.bw_edit_6.setObjectName("bw_edit_6")
         self.horizontalLayout_9.addWidget(self.bw_edit_6)
-        spacerItem40 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem40)
+        spacerItem41 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_9.addItem(spacerItem41)
         self.bw_combobox_6 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_6.setEnabled(False)
         self.bw_combobox_6.setMinimumSize(QtCore.QSize(210, 27))
@@ -2540,8 +2563,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_7.setFrame(False)
         self.bw_edit_7.setObjectName("bw_edit_7")
         self.horizontalLayout_10.addWidget(self.bw_edit_7)
-        spacerItem41 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_10.addItem(spacerItem41)
+        spacerItem42 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_10.addItem(spacerItem42)
         self.bw_combobox_7 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_7.setEnabled(False)
         self.bw_combobox_7.setMinimumSize(QtCore.QSize(210, 27))
@@ -2726,8 +2749,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_8.setFrame(False)
         self.bw_edit_8.setObjectName("bw_edit_8")
         self.horizontalLayout_11.addWidget(self.bw_edit_8)
-        spacerItem42 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_11.addItem(spacerItem42)
+        spacerItem43 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_11.addItem(spacerItem43)
         self.bw_combobox_8 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_8.setEnabled(False)
         self.bw_combobox_8.setMinimumSize(QtCore.QSize(210, 27))
@@ -2912,8 +2935,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_9.setFrame(False)
         self.bw_edit_9.setObjectName("bw_edit_9")
         self.horizontalLayout_12.addWidget(self.bw_edit_9)
-        spacerItem43 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_12.addItem(spacerItem43)
+        spacerItem44 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_12.addItem(spacerItem44)
         self.bw_combobox_9 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_9.setEnabled(False)
         self.bw_combobox_9.setMinimumSize(QtCore.QSize(210, 27))
@@ -3008,14 +3031,14 @@ class Ui_batchProcessingWindow(object):
         self.horizontalLayout_16.addLayout(self.verticalLayout_4)
         self.verticalLayout_5.addLayout(self.horizontalLayout_16)
         self.gridLayout_6.addLayout(self.verticalLayout_5, 1, 1, 2, 2)
-        spacerItem44 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_6.addItem(spacerItem44, 2, 3, 1, 1)
-        spacerItem45 = QtWidgets.QSpacerItem(20, 17, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_6.addItem(spacerItem45, 3, 2, 1, 1)
+        spacerItem45 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_6.addItem(spacerItem45, 2, 3, 1, 1)
+        spacerItem46 = QtWidgets.QSpacerItem(20, 17, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_6.addItem(spacerItem46, 3, 2, 1, 1)
         self.tabWidget.addTab(self.tab_4, "")
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
-        spacerItem46 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_5.addItem(spacerItem46, 1, 0, 1, 1)
+        spacerItem47 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_5.addItem(spacerItem47, 1, 0, 1, 1)
 
         self.retranslateUi(batchProcessingWindow)
         self.tabWidget.setCurrentIndex(0)

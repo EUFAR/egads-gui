@@ -18,14 +18,19 @@ def launch_egads_gui(gui_path):
     splash_pix = QtGui.QPixmap('icons/egads_gui_splashscreen.png')
     splash = QtWidgets.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.show()
+    if getattr(sys, 'frozen', False):
+        frozen = True
+    else:
+        frozen = False
     if not os.path.exists(os.path.join(gui_path, 'egads_gui.ini')):
         create_option_file(gui_path)
     config_dict = configparser.ConfigParser()
     config_dict.read(os.path.join(gui_path, 'egads_gui.ini'))
-    create_logging_handlers(config_dict, 'egads_gui.log')
+    create_logging_handlers(config_dict, 'egads_gui.log', gui_path)
     logging.info('**********************************')
     logging.info('EGADS GUI ' + _gui_version + ' is starting ...')
     logging.info('**********************************')
+    logging.debug('gui - gui frozen ? ' + str(frozen))
     system, release, version = platform.system_alias(platform.system(), platform.release(), platform.version())
     logging.debug('gui - operating system: ' + system + ' ' + release + ' (' + version + ')')
     python_version = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
@@ -34,7 +39,7 @@ def launch_egads_gui(gui_path):
     logging.debug('gui - matplotlib version: ' + mpl_version)
     logging.debug('gui - cartopy version: ' + cy_version)
     logging.debug('gui - simplekml version: ' + km_version)
-    ui = MainWindow(gui_path, config_dict)
+    ui = MainWindow(gui_path, config_dict, frozen)
     ui.show()
     splash.finish(ui)
     sys.exit(app.exec_())

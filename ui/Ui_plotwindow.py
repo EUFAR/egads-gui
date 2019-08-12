@@ -32,38 +32,84 @@ class Ui_plotWindow(object):
         self.tab_view.setFont(font)
         self.tab_view.setStyleSheet("QTabWidget::pane {\n"
 "    border: 1px solid rgb(180,180,180);\n"
-"    border-bottom-left-radius: 5px;\n"
-"    border-bottom-right-radius: 5px;\n"
-"    border-top-right-radius: 5px;\n"
-"    top: -1px;\n"
 "    background-color: rgb(230,230,230);\n"
 "}\n"
-"    \n"
+"\n"
 "QTabWidget::tab-bar {\n"
-"    left: 0px;\n"
+"    top: 1px;\n"
+"    bottom: 1px;\n"
+"    left: 10px;\n"
 "}\n"
-"    \n"
+"\n"
 "QTabBar::tab {\n"
-"    background: transparent;\n"
 "    border-top: 1px solid rgb(180,180,180);\n"
 "    border-left: 1px solid rgb(180,180,180);\n"
 "    border-right: 1px solid rgb(180,180,180);\n"
-"    border-top-right-radius: 5px;\n"
-"    border-top-left-radius: 5px;\n"
-"    padding: 2px 10px 2px 10px;\n"
+"    padding: 2px 15px 2px 15px;\n"
 "    margin-right: 2px;\n"
+"    color: rgb(45,45,45);\n"
 "}\n"
-"    \n"
+"\n"
 "QTabBar::tab:hover {\n"
 "    background-color: rgb(210,210,210);\n"
 "}\n"
-"    \n"
+"\n"
 "QTabBar::tab:selected {\n"
-"    background-color: rgb(230,230,230);\n"
+"    background: rgb(230,230,230);\n"
 "}\n"
-"    \n"
+"\n"
 "QTabBar::tab:!selected {\n"
 "    margin-top: 4px;\n"
+"    color: rgb(70,70,70);\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected:hover {\n"
+"    border-bottom: 1px solid rgb(180,180,180);\n"
+"}\n"
+"\n"
+"QTabBar::tab:top, QTabBar::tab:bottom {\n"
+"    margin-right: -1px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:top:last, QTabBar::tab:bottom:last,\n"
+"QTabBar::tab:top:only-one, QTabBar::tab:bottom:only-one {\n"
+"    margin-right: 0;\n"
+"}\n"
+"\n"
+"QTabBar::scroller {\n"
+"}\n"
+"\n"
+"QTabBar QToolButton {\n"
+"    border: 1px solid rgb(180,180,180);\n"
+"    background-color: rgb(240,240,240);\n"
+"}\n"
+"\n"
+"QTabBar QToolButton:hover {\n"
+"    background-color: rgb(219, 219, 219);\n"
+"}\n"
+"\n"
+"QTabBar QToolButton::right-arrow {\n"
+"    image: url(icons/right_arrow_icon.svg); \n"
+"    width: 16px;\n"
+"    height: 16px;\n"
+"    margin : 2px 2px 2px 2px;\n"
+"}\n"
+"\n"
+"QTabBar QToolButton::right-arrow:pressed {\n"
+"    right: -1px;\n"
+"    bottom: -1px;\n"
+"}\n"
+"\n"
+"QTabBar QToolButton::left-arrow {\n"
+"    image: url(icons/left_arrow_icon.svg); \n"
+"    width: 16px;\n"
+"    height: 16px;\n"
+"    margin : 2px 2px 2px 2px;\n"
+"}\n"
+"\n"
+"QTabBar QToolButton::left-arrow:pressed {\n"
+"    right: -1px;\n"
+"    bottom: -1px;\n"
 "}")
         self.tab_view.setObjectName("tab_view")
         self.tab = QtWidgets.QWidget()
@@ -155,7 +201,6 @@ class Ui_plotWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -254,9 +299,10 @@ class Ui_plotWindow(object):
         self.pw_figureOptions_sa.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.pw_figureOptions_sa.setObjectName("pw_figureOptions_sa")
         self.scrollAreaWidgetContents_3 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 1226, 594))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 1226, 596))
         self.scrollAreaWidgetContents_3.setObjectName("scrollAreaWidgetContents_3")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_3)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
         spacerItem = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_3.addItem(spacerItem, 0, 1, 1, 1)
@@ -396,7 +442,6 @@ class Ui_plotWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -493,9 +538,10 @@ class Ui_plotWindow(object):
         self.pw_plotOptions_sa.setWidgetResizable(True)
         self.pw_plotOptions_sa.setObjectName("pw_plotOptions_sa")
         self.scrollAreaWidgetContents_5 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 1226, 594))
+        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 1226, 596))
         self.scrollAreaWidgetContents_5.setObjectName("scrollAreaWidgetContents_5")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_5)
+        self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setObjectName("gridLayout_5")
         spacerItem7 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_5.addItem(spacerItem7, 0, 1, 1, 1)
@@ -614,7 +660,6 @@ class Ui_plotWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -634,7 +679,6 @@ class Ui_plotWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -676,7 +720,6 @@ class Ui_plotWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
@@ -696,7 +739,6 @@ class Ui_plotWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 5px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
@@ -733,9 +775,10 @@ class Ui_plotWindow(object):
         self.pw_saveOptions_sa.setWidgetResizable(True)
         self.pw_saveOptions_sa.setObjectName("pw_saveOptions_sa")
         self.scrollAreaWidgetContents_6 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_6.setGeometry(QtCore.QRect(0, 0, 1226, 687))
+        self.scrollAreaWidgetContents_6.setGeometry(QtCore.QRect(0, 0, 1226, 686))
         self.scrollAreaWidgetContents_6.setObjectName("scrollAreaWidgetContents_6")
         self.gridLayout_9 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_6)
+        self.gridLayout_9.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_9.setObjectName("gridLayout_9")
         spacerItem14 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_9.addItem(spacerItem14, 0, 1, 1, 1)

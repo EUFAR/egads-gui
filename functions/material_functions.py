@@ -9,7 +9,10 @@ def objects_initialization(self):
     self.opened_file = None
     self.file_name = ''
     self.file_ext = ''
+    self.default_message = ''
     self.file_is_opened = False
+    self.list_of_dimensions = {}
+    self.list_of_global_attributes = {}
     self.list_of_variables_and_attributes = {}
     self.list_of_new_variables_and_attributes = {}
     self.list_of_unread_variables = {}
@@ -19,7 +22,8 @@ def objects_initialization(self):
     self.x_variable = None
     self.first_time_x_variable = True
     self.gui_update_url = None
-    self.min_egads_version = '0.9.3'
+    self.statusbar_msg_thread = None
+    self.min_egads_version = '0.9.5'
     self.min_egads_branch = 'Lineage'
     self.buttons_lines_dict = {
                         "gm_button_1": ["gm_title_ln", None, None],
@@ -28,10 +32,6 @@ def objects_initialization(self):
                         "gm_button_4": ["gm_project_ln", None, None],
                         "gm_button_5": ["gm_history_ln", None, None],
                         "gm_button_6": ["gm_comments_ln", None, None],
-                        "va_button_1": ["va_varName_ln", self.variable_list, self.list_of_variables_and_attributes],
-                        "va_button_2": ["va_longName_ln", self.variable_list, self.list_of_variables_and_attributes],
-                        "va_button_3": ["va_category_ln", self.variable_list, self.list_of_variables_and_attributes],
-                        "va_button_4": ["va_units_ln", self.variable_list, self.list_of_variables_and_attributes],
                         "new_button_1": ["new_varName_ln", self.new_variable_list,
                                          self.list_of_new_variables_and_attributes],
                         "new_button_2": ["new_longName_ln", self.new_variable_list,

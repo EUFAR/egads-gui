@@ -19,7 +19,7 @@ from cartopy.util import add_cyclic_point
 
         
 class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
-    def __init__(self, variables, dimensions, x_axis_variable, font_list, default_font, config_dict):
+    def __init__(self, variables, dimensions, x_axis_variable, font_list, default_font, config_dict, gui_path):
         logging.debug('gui - plot_window_functions.py - PlotWindow - __init__')
         QtWidgets.QDialog.__init__(self, parent=None)
         self.setupUi(self)
@@ -32,6 +32,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.font_list = font_list
         self.default_font = default_font
         self.config_dict = config_dict
+        self.gui_path = gui_path
         setup_plot_material(self)
         self.information_text = plot_information_text()
         self.setup_toolbar()
@@ -52,8 +53,6 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         self.pw_info_bt_3.clicked.connect(self.save_button_information)
         self.pw_info_bt_4.clicked.connect(self.save_button_information)
         self.select_plot_type()
-        # self.thread_set_width_height = ProvideWidthHeight(self.pw_saveOptions_ln_1, self.pw_saveOptions_ln_2)
-        # self.thread_set_width_height.start()
         self.set_window_size_thread()
         logging.info('gui - plot_window_functions.py - PlotWindow - ready')
 
@@ -107,8 +106,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                             
                     info_text = ('Actually, the function to plot gridded data is still beta. Thus it is not possible '
                                  'yet to modify the figure and options are not available.')
-                    self.infoWindow = MyInfo(info_text)
-                    self.infoWindow.exec_()
+                    info_window = MyInfo(info_text)
+                    info_window.exec_()
                     self.plot_single_grid_start(georeferenced)
             else:
                 print('EGADS GUI can\'t plot variables with more than 2 dimensions.')
@@ -123,7 +122,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             for _, value in self.variables.items():
                 dim_num.append(len(value['dimensions']))
                 dim_name.append(value['dimensions'])
-                units.append(value['units'])
+                units.append(value['egads_units'])
             if dim_num.count(dim_num[0]) == len(dim_num):
                 if dim_num[0] == 1:
                     if dim_name.count(dim_name[0]) == len(dim_name):
@@ -138,7 +137,6 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                 result = 'plot'
                             elif int(self.config_dict.get('PLOTS', 'same_unit_plot')) == 1:
                                 result = 'subplot'
-
                             if result == 'subplot':
                                 if int(self.config_dict.get('PLOTS', 'subplot_disposition')) == 1:
                                     subplot_window = MySubplot(sorted(self.variables.keys()))
@@ -147,6 +145,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                         pos_dict = subplot_window.subplot_layout
                             self.plot_timeseries(result, pos_dict)
                         else:
+                            pos_dict = None
                             if int(self.config_dict.get('PLOTS', 'subplot_disposition')) == 1:
                                 subplot_window = MySubplot(sorted(self.variables.keys()))
                                 subplot_window.exec_()
@@ -154,6 +153,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                     pos_dict = subplot_window.subplot_layout
                             self.plot_timeseries('subplot', pos_dict)
                     else:
+                        pos_dict = None
                         if int(self.config_dict.get('PLOTS', 'subplot_disposition')) == 1:
                             subplot_window = MySubplot(sorted(self.variables.keys()))
                             subplot_window.exec_()
@@ -194,7 +194,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         elif plot_type == 'subplot':
             subplot_plot = []
             i = 0
-            if pos_dict:
+            if pos_dict is not None:
                 nrow = pos_dict['mpl_nrow']
                 ncol = pos_dict['mpl_ncol']
             else:
@@ -206,7 +206,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 xname = self.variables[yname]['dimensions'][0]
                 xvalues = self.dimensions[xname]['values']
                 xunits = self.dimensions[xname]['units']
-                if pos_dict:
+                if pos_dict is not None:
                     idx = pos_dict[yname]
                 else:
                     idx = i + 1
@@ -290,8 +290,8 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         logging.debug('gui - plot_window_functions.py - PlotWindow - plot_single_grid_end')
         for key, subplot in subplot_object.items():
             if subplot['georeferenced']:
-                coastline_shp_file = 'functions/shape_files/ne_110m_coastline.shp'
-                land_shp_file = 'functions/shape_files/ne_110m_land.shp'
+                coastline_shp_file = os.path.join(self.gui_path, 'graphic_materials/shape_files/ne_110m_coastline.shp')
+                land_shp_file = os.path.join(self.gui_path, 'graphic_materials/shape_files/ne_110m_land.shp')
                 for land in cartopy.io.shapereader.Reader(land_shp_file).records():
                     subplot['ax'].add_geometries(land.geometry, subplot['projection'], facecolor='#e6e6e6')
                 for coastline in cartopy.io.shapereader.Reader(coastline_shp_file).records():
@@ -470,9 +470,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             self.figure_options['grid_style'].append('-')
             self.figure_options['grid_size'].append(1)
             self.figure_options['grid_color'].append('Black')
-
             xlim_max, xlim_min, ylim_max, ylim_min = None, None, None, None
-
             for key, subplot in subplot_list.items():
                 xlim_min, xlim_max = subplot['ax'].axes.get_xlim()
                 ylim_min, ylim_max = subplot['ax'].axes.get_ylim()
@@ -4419,7 +4417,7 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                                 set_linestyle(plot_options['line_style'])
                             self.plot_options['figure_instance'][i].axes.lines[0].set_marker(None)
                         else:
-                            plt.axes().lines[i].set_linestyle(plot_options['line_style'])
+                            plt.axes().lines[i].set_linestyle(plot_options['line_style'][i])
                             plt.axes().lines[i].set_marker(None)
                     else:
                         if 'figure_instance' in self.plot_options:

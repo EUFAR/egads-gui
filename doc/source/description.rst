@@ -13,10 +13,12 @@ In the following tutorial, all pictures have been made on a Windows 10 system. O
 Exploring EGADS GUI
 *******************
 
-The simplest way to start working with EGADS GUI is to run it from the terminal::
+The simplest way to start working with EGADS GUI is to run it from the terminal if using the Python package::
 
     $ cd egads_gui/
     $ python egads_gui.py
+
+Or by double clicking on the executable if using the stand-alone package (egads_gui.exe for Windows and egads_gui for Linux).
 
 The EGADS GUI is easy to use and self explaining by the presence of information button (once a button is clicked, a popup will appear with text to explain the purpose of the area actually used) and tool tips.
 
@@ -42,9 +44,9 @@ The main window of the GUI is what the user will see first once he has launched 
    :scale: 45 %
    :align: center
 
-The main window is composed of four parts, from up to down:
+The main window is composed of four parts, from top to bottom:
 
-* the first one is a menu bar with three menus - ``File``, ``Processings`` and ``About`` - allowing the user to open/save a file, launch a processing on more than one file, quit the software, display the different algorithms imbedded in EGADS, and display information about the software.
+* the first one is a menu bar with three menus - ``File``, ``Processing`` and ``About`` - allowing the user to open/save a file, launch a processing on more than one file, quit the software, display the different algorithms imbedded in EGADS, and display information about the software.
 * the second one is a bar containing 12 icons and giving access to different kind of functions and windows as the plot window or the metadata window.
 * the third one is a central widget whose purpose is to welcome the interface dedicated to NetCDF, NASA Ames and text files.
 * the last one is a footbar, used to display few information about the file actually loaded, like the name, the weight and the file conventions.
@@ -54,7 +56,7 @@ The main window is composed of four parts, from up to down:
 The menu bar
 ------------
 
-The menu bar of EGADS GUI is composed of three submenus: File, Processings and About
+The menu bar of EGADS GUI is composed of three submenus: File, Processing and About
 
 ^^^^
 File
@@ -68,7 +70,7 @@ File is a submenu of the menu bar.
    :scale: 45 %
    :align: center
 
-From here, it is possible to ``Open``, `Save As`` and ``Close`` a file. The ``Export`` allow the user to save data to KML/KMZ file format for Google Earth. If a user wants to launch the same processing on a certain amount of files, he has access to ``Batch processing``. And to quit the software, the job is done by clicking on ``Quit``.
+From here, it is possible to ``Open``, ``Save As`` and ``Close`` a file. The ``Export`` allow the user to save data to KML/KMZ file format for Google Earth. If a user wants to launch the same processing on a certain amount of files, he has access to ``Batch processing``. And to quit the software, the job is done by clicking on ``Quit``.
 
 
 ^^^^^^^^^^^
@@ -143,7 +145,7 @@ The data icons
 
 The sixth, seventh, and eighth icons are here to manipulate data:
 
-* |create| :    With this function, the user have the possibility to create a simple variable : a time series composed of 0 or 1, or a suite of values from n_start to n_end, or a matrix with personal values. It can be useful when a small matrix with optical values is needed in the case of few optical algorithms. NOT AVAILABLE AT THIS TIME
+* |create| :    With this function, the user have the possibility to create a simple variable : a time series composed of 0 or 1, or a suite of values from n_start to n_end, or a matrix with personal values. It can be useful when a small matrix with optical values is needed in the case of few optical algorithms. NOT AVAILABLE AT THIS TIME !
 * |migrate| :   In EGADS GUI, once a variable is processed through an algorithm, the result is a new variable displayed in the ``New variables`` tab of the central widget. In this tab, a variable can't be saved in a file, only variables in the ``Variable`` tab are saved. The user has to migrate the new variable to the ``Variables`` tab. And he can do that with this function.
 * |delete| :    The purpose of this function is to delete a variable. If the file is saved after a deletion, obviously the deleted variable won't appear in the file anymore.
 
@@ -244,6 +246,9 @@ One of the main goal of EGADS is to let the user creates his own algorithms. Acc
 
 The window is composed of three tabs. The first tab is dedicated to the metadata of the algorithm and, the most important, to the mathematic formula. The second tab is dedicated to the input(s). The user will fill the different text boxes to prepare the input variable(s). The last tab is dedicated to the output(s). As the window follows the EGADS convention, few tips have to be used here and will be explained later.  Once the user click on ``Save``, an automated task will check every item in the window, in particular units, and will display a warning popup is something went wrong. The algorithm is then saved in the ``user`` sub-folder of the EGADS/Algorithms folder. For help purpose, few info buttons are present.
 The system doesn't test the algorithm created by the user, it is expected to work, and the user has to give his greatest attention when writing the algorithm using Python 3. If a complex algorithm needs to be written, the use of a text editor and the manual declaration of the algorithm in EGADS are strongly encouraged.
+
+.. NOTE ::
+  English and normal characters must be used to write every part of the algorithm. Special characters can't be used and it will lead to a crash if the GUI tries to save a file with special characters.
 
 .. NOTE ::
   For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT, p. 28.
@@ -436,7 +441,7 @@ This tab behaves completely as the ``Variables`` tab.
 The footbar
 -----------
 
-The purpose of the footbar is to display few information about the file actually loaded, like the name, the size and the conventions.
+The purpose of the footbar is to display information about the file actually loaded, like the name, the size and the conventions, and messages to confirm the actions of the user, like the modification of metadata or the creation of variables.
 
 
 ---------------------

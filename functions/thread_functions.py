@@ -11,20 +11,22 @@ import numpy
 import zipfile
 import tempfile
 import collections
+import sys
 from PyQt5 import QtCore, QtWidgets
 from distutils.version import LooseVersion
 import matplotlib as mpl
-from functions.utils import transparency_hexa_dict_function
+from functions.utils import transparency_hexa_dict_function, set_size
 
 
 class CheckEGADSGuiUpdateOnline(QtCore.QThread):
     finished = QtCore.pyqtSignal(str)
     error = QtCore.pyqtSignal()
 
-    def __init__(self, gui_version):
+    def __init__(self, gui_version, frozen):
         QtCore.QThread.__init__(self)
         logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - __init__')
         self.gui_version = gui_version
+        self.frozen = frozen
     
     def run(self):
         logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run')
@@ -34,8 +36,14 @@ class CheckEGADSGuiUpdateOnline(QtCore.QThread):
             json_object = requests.get(url=url, timeout=5).json()
             lineage_list = []
             for egads_package in json_object:
-                if 'Lineage' in egads_package['name']:
-                    lineage_list.append([egads_package['tag_name'], egads_package['assets'][0]['browser_download_url']])
+                if self.frozen:
+                    if egads_package['target_commitish'] == 'Lineage-stand-alone':
+                        lineage_list.append([egads_package['tag_name'],
+                                             egads_package['assets'][0]['browser_download_url']])
+                else:
+                    if egads_package['target_commitish'] == 'Lineage':
+                        lineage_list.append([egads_package['tag_name'],
+                                             egads_package['assets'][0]['browser_download_url']])
             lineage_list = sorted(lineage_list)
             if lineage_list:
                 if LooseVersion(self.gui_version) < LooseVersion(lineage_list[-1][0]):
@@ -126,6 +134,65 @@ class CheckEGADSVersion(QtCore.QThread):
     
     def stop(self):
         logging.debug('gui - thread_functions.py - CheckEGADSVersion - stop')
+        self.terminate()
+
+
+class DownloadFile(QtCore.QThread):
+    download_update = QtCore.pyqtSignal(list)
+    download_done = QtCore.pyqtSignal()
+    download_failed = QtCore.pyqtSignal()
+
+    def __init__(self, url_name, update_file):
+        QtCore.QThread.__init__(self)
+        logging.info('thread_functions.py - DownloadFile - __init__ - url_name ' + str(url_name))
+        self.url_name = url_name
+        self.update_file = update_file
+        self.filename = self.url_name[self.url_name.rfind("/") + 1:]
+        self.cancel = False
+
+    def run(self):
+        logging.debug('thread_functions.py - DownloadFile - run')
+        download_text = 'Downloading %s at %s'
+        pre_download_text = 'Downloading %s'
+        self.download_update.emit([0, pre_download_text % self.filename])
+        opened_file = open(self.update_file, 'wb')
+        try:
+            import requests
+            opened_url = requests.get(self.url_name, stream=True)
+            total_file_size = int(opened_url.headers['Content-length'])
+            buffer_size = 8192
+            file_size = 0
+            start = time.time()
+            for chunk in opened_url.iter_content(chunk_size=buffer_size):
+                if self.cancel:
+                    opened_file.close()
+                    break
+                opened_file.write(chunk)
+                file_size += len(chunk)
+                try:
+                    download_speed = set_size(file_size / (time.time() - start)) + '/s'
+                except ZeroDivisionError:
+                    download_speed = '0b/s'
+                self.download_update.emit([round(file_size * 100 / total_file_size),
+                                           download_text % (self.filename, download_speed)])
+            opened_file.close()
+            if not self.cancel:
+                logging.debug('thread_functions.py - DownloadFile - run - download finished')
+                self.download_done.emit()
+            else:
+                logging.debug('thread_functions.py - DownloadFile - run - download canceled')
+        except Exception:
+            logging.exception('thread_functions.py - DownloadFile - run - connexion issue ; self.url_name '
+                              + self.url_name)
+            opened_file.close()
+            self.download_failed.emit()
+
+    def cancel_download(self):
+        logging.debug('thread_functions.py - DownloadFile - cancel_download')
+        self.cancel = True
+
+    def stop(self):
+        logging.debug('thread_functions.py - DownloadFile - stop')
         self.terminate()
 
 
@@ -1439,4 +1506,23 @@ class ExportThread(QtCore.QThread):
 
     def stop(self):
         logging.debug('gui - thread_functions.py - ExportThread - stop')
+        self.terminate()
+
+
+class StatusbarMsgThread(QtCore.QThread):
+    display_msg = QtCore.pyqtSignal(str)
+
+    def __init__(self, default_msg, new_msg):
+        QtCore.QThread.__init__(self)
+        logging.debug('gui - thread_functions.py - StatusbarMsgThread - __init__')
+        self.default_msg = default_msg
+        self.new_msg = new_msg
+
+    def run(self):
+        self.display_msg.emit(self.new_msg)
+        time.sleep(5)
+        self.display_msg.emit(self.default_msg)
+
+    def stop(self):
+        logging.debug('gui - thread_functions.py - StatusbarMsgThread - stop')
         self.terminate()
