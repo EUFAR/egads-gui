@@ -4,7 +4,7 @@ import pathlib
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_optionwindow import Ui_optionWindow
 from functions.help_functions import option_information_text
-from functions.other_windows_functions import MyInfo, MyUpdate
+from functions.other_windows_functions import MyInfo, MyUpdateAvailable
 from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSUpdateOnline
 from ui._version import _gui_version
 
@@ -12,13 +12,15 @@ from ui._version import _gui_version
 class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
     available_update = QtCore.pyqtSignal(str)
 
-    def __init__(self, config_dict, egads_config_dict, frozen):
+    def __init__(self, config_dict, egads_config_dict, frozen, system, installed):
         logging.debug('gui - option_window_functions.py - MyOptions - __init__ ')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.config_dict = config_dict
         self.egads_config_dict = egads_config_dict
         self.frozen = frozen
+        self.system = system
+        self.installed = installed
         self.ow_splitter.setSizes([110, 590])
         self.information_text = option_information_text()
         self.cancel = True
@@ -104,7 +106,7 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
 
     def check_gui_update(self):
         logging.debug('gui - option_window_functions.py - MyOptions - check_gui_update')
-        self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version, self.frozen)
+        self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version, self.frozen, self.system, self.installed)
         self.check_gui_update_thread.start()
         self.check_gui_update_thread.finished.connect(self.parse_gui_update)
 
@@ -113,12 +115,22 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         if val != 'no new version':
             self.available_update.emit(val)
             if self.frozen:
-                text = ('A new update for EGADS Lineage is available on GitHub. Please exit the option window and '
-                        'click on the Update button to launch the update process.')
-                info_window = MyInfo(text)
-                info_window.exec_()
+                if self.system == 'Windows':
+                    if self.installed:
+                        text = ('A new update for EGADS Lineage GUI is available on GitHub. Please exit the option '
+                                'window and click on the Update button to launch the update process.')
+                        info_window = MyInfo(text)
+                        info_window.exec_()
+                    else:
+                        update_window = MyUpdateAvailable(val)
+                        update_window.exec_()
+                elif self.system == 'Linux':
+                    text = ('A new update for EGADS Lineage GUI is available on GitHub. Please exit the option '
+                            'window and click on the Update button to launch the update process.')
+                    info_window = MyInfo(text)
+                    info_window.exec_()
             else:
-                update_window = MyUpdate(val)
+                update_window = MyUpdateAvailable(val)
                 update_window.exec_()
         else:
             info_window = MyInfo('No new update available on GitHub for the GUI.')
@@ -133,7 +145,7 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
     def parse_egads_update(self, val):
         logging.debug('gui - option_window_functions.py - MyOptions - parse_egads_update - val ' + str(val))
         if val != 'no new version':
-            update_window = MyUpdate(val)
+            update_window = MyUpdateAvailable(val)
             update_window.exec_()
         else:
             info_window = MyInfo('No new update available on GitHub for EGADS.')

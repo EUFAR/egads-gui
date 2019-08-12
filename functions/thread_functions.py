@@ -12,6 +12,7 @@ import zipfile
 import tempfile
 import collections
 import sys
+import platform
 from PyQt5 import QtCore, QtWidgets
 from distutils.version import LooseVersion
 import matplotlib as mpl
@@ -22,11 +23,13 @@ class CheckEGADSGuiUpdateOnline(QtCore.QThread):
     finished = QtCore.pyqtSignal(str)
     error = QtCore.pyqtSignal()
 
-    def __init__(self, gui_version, frozen):
+    def __init__(self, gui_version, frozen, system, installed):
         QtCore.QThread.__init__(self)
         logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - __init__')
         self.gui_version = gui_version
         self.frozen = frozen
+        self.system = system
+        self.installed = installed
     
     def run(self):
         logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run')
@@ -36,18 +39,58 @@ class CheckEGADSGuiUpdateOnline(QtCore.QThread):
             json_object = requests.get(url=url, timeout=5).json()
             lineage_list = []
             for egads_package in json_object:
-                if self.frozen:
-                    if egads_package['target_commitish'] == 'Lineage-stand-alone':
-                        lineage_list.append([egads_package['tag_name'],
-                                             egads_package['assets'][0]['browser_download_url']])
-                else:
-                    if egads_package['target_commitish'] == 'Lineage':
-                        lineage_list.append([egads_package['tag_name'],
-                                             egads_package['assets'][0]['browser_download_url']])
+                if egads_package['target_commitish'] == 'Lineage':
+                    package_list = {'sources': None, 'windows_setup': None, 'windows_binaries': None,
+                                    'linux_binaries': None}
+                    for asset in egads_package['assets']:
+                        if 'sources' in asset['name']:
+                            package_list['sources'] = asset['browser_download_url']
+                        elif 'windows_setup' in asset['name']:
+                            package_list['windows_setup'] = asset['browser_download_url']
+                        elif 'windows_binaries' in asset['name']:
+                            package_list['windows_binaries'] = asset['browser_download_url']
+                        elif 'linux_binaries' in asset['name']:
+                            package_list['linux_binaries'] = asset['browser_download_url']
+                    lineage_list.append([egads_package['tag_name'], package_list])
             lineage_list = sorted(lineage_list)
             if lineage_list:
                 if LooseVersion(self.gui_version) < LooseVersion(lineage_list[-1][0]):
-                    self.finished.emit(lineage_list[-1][1])
+                    if self.frozen:
+                        if self.system == 'Windows':
+                            if self.installed:
+                                if lineage_list[-1][1]['windows_setup'] is not None:
+                                    self.finished.emit(lineage_list[-1][1]['windows_setup'])
+                                else:
+                                    logging.debug(
+                                        'gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new '
+                                        'version')
+                                    self.finished.emit('no new version')
+                            else:
+                                if lineage_list[-1][1]['windows_binaries'] is not None:
+                                    self.finished.emit(lineage_list[-1][1]['windows_binaries'])
+                                else:
+                                    logging.debug(
+                                        'gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new '
+                                        'version')
+                                    self.finished.emit('no new version')
+                        elif self.system == 'Linux':
+                            if lineage_list[-1][1]['linux_binaries'] is not None:
+                                self.finished.emit(lineage_list[-1][1]['linux_binaries'])
+                            else:
+                                logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new '
+                                              'version')
+                                self.finished.emit('no new version')
+                        else:
+                            logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new '
+                                          'version, present system not a windows or linux system')
+                            self.finished.emit('no new version')
+                    else:
+                        if lineage_list[-1][1]['sources'] is not None:
+                            self.finished.emit(lineage_list[-1][1]['sources'])
+                        else:
+                            logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new '
+                                          'version')
+                            self.finished.emit('no new version')
                 else:
                     logging.debug('gui - thread_functions.py - CheckEGADSGuiUpdateOnline - run - no new version')
                     self.finished.emit('no new version')

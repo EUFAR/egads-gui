@@ -38,7 +38,7 @@ from functions.export_window_functions import MyExport
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, path, config_dict, frozen, parent=None):
+    def __init__(self, path, config_dict, frozen, system, installed, parent=None):
         logging.info('gui - egads version: ' + egads.__version__)
         logging.debug('gui - mainwindow.py - MainWindow - __init__')
         QtWidgets.QMainWindow.__init__(self, parent)
@@ -46,6 +46,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.egads_path = egads.path
         self.config_dict = config_dict
         self.frozen_app = frozen
+        self.system = system
+        self.installed_app = installed
         self.egads_config_dict = egads.config_dict
         self.setupUi(self)
         self.font_list, self.default_font = setup_fonts()
@@ -512,7 +514,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         config_string.seek(0)
         egads_config_dict_copy = configparser.ConfigParser()
         egads_config_dict_copy.read_file(config_string)
-        self.option_window = MyOptions(config_dict_copy, egads_config_dict_copy, self.frozen_app)
+        self.option_window = MyOptions(config_dict_copy, egads_config_dict_copy, self.frozen_app, self.system,
+                                       self.installed_app)
         self.option_window.available_update.connect(self.display_gui_update_button)
         self.option_window.exec_()
         if not self.option_window.cancel:
@@ -566,7 +569,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.config_dict['OPTIONS'].getboolean('check_update'):
             try:
                 import requests
-                self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version, self.frozen_app)
+                self.check_gui_update_thread = CheckEGADSGuiUpdateOnline(_gui_version, self.frozen_app, self.system,
+                                                                         self.installed_app)
                 self.check_gui_update_thread.start()
                 self.check_gui_update_thread.finished.connect(self.display_gui_update_button)
             except ImportError:
@@ -586,27 +590,41 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def gui_update_info(self):
         logging.debug('gui - mainwindow.py - MainWindow - gui_update_info')
         if self.frozen_app:
-            warning_update_window = MyWarningUpdate()
-            warning_update_window.exec_()
-            if warning_update_window.update:
-                temp_folder = tempfile.gettempdir()
+            if self.system == 'Windows':
+                if self.installed_app:
+                    warning_update_window = MyWarningUpdate()
+                    warning_update_window.exec_()
+                    if warning_update_window.update:
+                        temp_folder = tempfile.gettempdir()
+                        download_window = MyUpdate(self.gui_update_url, temp_folder)
+                        download_window.exec_()
+                        filename = self.gui_update_url[self.gui_update_url.rfind('/') + 1:]
+                        os.startfile(temp_folder + '\\' + filename)
+                        time.sleep(0.1)
+                        self.close()
+                else:
+                    updade_window = MyUpdateAvailable(self.gui_update_url)
+                    updade_window.exec_()
+            elif self.system == 'Linux':
+                pass
 
-                download_window = MyUpdate(self.gui_update_url, temp_folder)
-                download_window.exec_()
-                filename = self.gui_update_url[self.gui_update_url.rfind('/') + 1:]
-                if platform.system() == 'Windows':
-                    os.startfile(temp_folder + '\\' + filename)
-                    time.sleep(0.1)
-                    self.close()
-                elif platform.system() == 'Linux':
-                    pass
-                    # shutil.copy('functions/unzip_update.py', temp_folder)
-                    # install_folder = self.config_path + '/'
-                    # command = ('python3 ' + temp_folder + '/unzip_update.py ' + temp_folder
-                    #            + '/' + filename + ' ' + install_folder)
-                    # os.system('x-terminal-emulator -e ' + command)
-                    # time.sleep(0.1)
-                    # self.close()
+                # warning_update_window = MyWarningUpdate()
+                # warning_update_window.exec_()
+                # if warning_update_window.update:
+                #     temp_folder = tempfile.gettempdir()
+                #     download_window = MyUpdate(self.gui_update_url, temp_folder)
+                #     download_window.exec_()
+                #     filename = self.gui_update_url[self.gui_update_url.rfind('/') + 1:]
+                #
+                #
+                #
+                #     shutil.copy('functions/unzip_update.py', temp_folder)
+                #     install_folder = self.config_path + '/'
+                #     command = ('python3 ' + temp_folder + '/unzip_update.py ' + temp_folder
+                #                + '/' + filename + ' ' + install_folder)
+                #     os.system('x-terminal-emulator -e ' + command)
+                #     time.sleep(0.1)
+                #     self.close()
         else:
             updade_window = MyUpdateAvailable(self.gui_update_url)
             updade_window.exec_()

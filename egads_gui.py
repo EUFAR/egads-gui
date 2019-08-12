@@ -18,6 +18,7 @@ def launch_egads_gui(gui_path):
     splash_pix = QtGui.QPixmap('icons/egads_gui_splashscreen.png')
     splash = QtWidgets.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.show()
+    app.processEvents()
     if getattr(sys, 'frozen', False):
         frozen = True
     else:
@@ -33,13 +34,23 @@ def launch_egads_gui(gui_path):
     logging.debug('gui - gui frozen ? ' + str(frozen))
     system, release, version = platform.system_alias(platform.system(), platform.release(), platform.version())
     logging.debug('gui - operating system: ' + system + ' ' + release + ' (' + version + ')')
+    installed = None
+    if system == 'Windows':
+        try:
+            import winreg
+            reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+            winreg.OpenKey(reg, r'Software\EUFAR\EGADS Lineage GUI')
+            installed = True
+        except FileNotFoundError:
+            installed = False
+    logging.debug('gui - gui installed ? ' + str(installed))
     python_version = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
     logging.debug('gui - python version: ' + python_version)
     logging.debug('gui - pyqt5 version: ' + qt_version)
     logging.debug('gui - matplotlib version: ' + mpl_version)
     logging.debug('gui - cartopy version: ' + cy_version)
     logging.debug('gui - simplekml version: ' + km_version)
-    ui = MainWindow(gui_path, config_dict, frozen)
+    ui = MainWindow(gui_path, config_dict, frozen, system, installed)
     ui.show()
     splash.finish(ui)
     sys.exit(app.exec_())

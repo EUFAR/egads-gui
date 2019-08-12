@@ -11,6 +11,12 @@
 * nothing
 
 
+### August 13 2019, Release version 1.0.1 ###
+
+  * MODIFIED:
+    * the updating system has been modified to handle new naming convention for sources and stand-alone package in the EGADS GUI GitHub repository.
+
+
 ### August 12 2019, Release version 1.0.0 ###
 
 For this version 1.0.0, a stand alone version has also been produced. EGADS Lineage GUI needs EGADS Lineage 1.0.0 or above to work properly.
