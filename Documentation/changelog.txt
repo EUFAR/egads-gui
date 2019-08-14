@@ -3,15 +3,27 @@
 * add map export possibility for GE. (v 1.1)
 * rework the plot function. (v 1.1)
 * add slider to plot window for 3D data. (v 1.1)
-* it is possible to change units in metadata window, check the new unit if it has been changed.
-* deactivate google earth - map in the export window for now.
   
 #### To fix list: ####
 
 * nothing
 
 
-### August 13 2019, Release version 1.0.1 ###
+### August 14 2019, Release version 1.0.2 ###
+
+  * MODIFIED:
+    * as Quantities doesn't permit to replace a unit by another, it is no longer possible to modify units from the GUI.
+	* compatibility with Matplotlib 3 and newer has been improved.
+	* compatibility with Linux has been improved.
+	* the updating system for Linux has been improved.
+	* the documentation has been updated.
+  
+  * FIXED:
+    * Google Earth - Map has been removed from the export window main combobox for now until the dedicated function is ready.
+	* in the option window, once the user selected a path for the log file, the path wasn't displayed correctly.
+
+
+### August 12 2019, Release version 1.0.1 ###
 
   * MODIFIED:
     * the updating system has been modified to handle new naming convention for sources and stand-alone package in the EGADS GUI GitHub repository.

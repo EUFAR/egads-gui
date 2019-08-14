@@ -1,9 +1,10 @@
 import os
 import logging
 import pathlib
+import egads
 from PyQt5 import QtWidgets, QtCore, QtGui
 from functions.algorithm_windows_functions import MyAlgorithmDisplay
-from functions.other_windows_functions import MyInfo
+from functions.other_windows_functions import MyInfo, MyUnit
 from functions.utils import humansize, clear_layout
 from functions.gui_elements import DropFrame
 from functions.help_functions import frozen_algorithm_formula_text
@@ -241,12 +242,6 @@ def modify_attribute_gui(self, string):
                 self.sender().setIcon(icon)
         else:
             if string == 'left':
-                self.modified = True
-                self.make_window_title()
-                widget[0].setEnabled(False)
-                icon = QtGui.QIcon()
-                icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-                self.sender().setIcon(icon)
                 value = self.objects_metadata_dict[str(widget[0].objectName())]
                 if isinstance(value, list):
                     if self.file_ext == 'NetCDF Files (*.nc)':
@@ -270,6 +265,12 @@ def modify_attribute_gui(self, string):
                     except AttributeError:
                         var_attr_list[value] = str(widget[0].toPlainText())
                     self.start_status_bar_msg_thread('Global attributes have been modified...')
+                self.modified = True
+                self.make_window_title()
+                widget[0].setEnabled(False)
+                icon = QtGui.QIcon()
+                icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.sender().setIcon(icon)
             elif string == 'right':
                 widget[0].setEnabled(False)
                 icon = QtGui.QIcon()

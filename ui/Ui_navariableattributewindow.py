@@ -279,7 +279,7 @@ class Ui_naVariableAttributeWindow(object):
         self.vw_fillValue_lb.setObjectName("vw_fillValue_lb")
         self.gridLayout.addWidget(self.vw_fillValue_lb, 1, 0, 1, 1)
         self.vw_units_ln = QtWidgets.QLineEdit(naVariableAttributeWindow)
-        self.vw_units_ln.setEnabled(True)
+        self.vw_units_ln.setEnabled(False)
         self.vw_units_ln.setMinimumSize(QtCore.QSize(0, 27))
         self.vw_units_ln.setMaximumSize(QtCore.QSize(16777215, 27))
         palette = QtGui.QPalette()

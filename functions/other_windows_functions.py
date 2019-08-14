@@ -876,7 +876,7 @@ class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
         if len(self.units_list) > 1:
             text = ('<p>Too handle units properly, EGADS must validate and, probably, rewrite input and out'
                     + 'put units. Please check the <b>proposals</b> made by EGADS, and click Continue if you '
-                    + 'are agree with the results. if <i>dimensionless</i> is proposed, then EGADS coul'
+                    + 'agree with the results. if <i>dimensionless</i> is proposed, then EGADS coul'
                     + 'dn\'t validate the unit. In that case, try to modify it to make it understandable '
                     + 'by EGADS.</p><ul><li><u>Inputs:</u><ul>')
             for sublist in self.units_list:
@@ -897,9 +897,13 @@ class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
                     + 'are agree with the results. if <i>dimensionless</i> is proposed, then EGADS coul'
                     + 'dn\'t validate the unit. In that case, try to modify it to make it understandable '
                     + 'by EGADS.</p><p><u>Proposal:</u><br>')
-            text += ('&nbsp;&nbsp;&nbsp;&nbsp;' + self.units_list[0][0] + ':&nbsp;&nbsp;&nbsp;&nbsp;' +
-                     self.units_list[0][1] + '&nbsp;&nbsp;&nbsp;&nbsp;->&nbsp;&nbsp;&nbsp;&nbsp;<b>' +
-                     self.units_list[0][2] + '</b></p>')
+            if len(self.units_list[0]) > 2:
+                text += ('&nbsp;&nbsp;&nbsp;&nbsp;' + self.units_list[0][0] + ':&nbsp;&nbsp;&nbsp;&nbsp;' +
+                         self.units_list[0][1] + '&nbsp;&nbsp;&nbsp;&nbsp;->&nbsp;&nbsp;&nbsp;&nbsp;<b>' +
+                         self.units_list[0][2] + '</b></p>')
+            else:
+                text += ('&nbsp;&nbsp;&nbsp;&nbsp;' + self.units_list[0][0] + '&nbsp;&nbsp;&nbsp;&nbsp;-> '
+                         + '&nbsp;&nbsp;&nbsp;&nbsp;<b>' + self.units_list[0][1] + '</b></p>')
         return text
     
     def closeWindow(self):

@@ -1,10 +1,11 @@
 import logging
+import egads
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_globalattributewindow import Ui_globalAttributeWindow
 from ui.Ui_variableattributewindow import Ui_variableAttributeWindow
 from ui.Ui_navariableattributewindow import Ui_naVariableAttributeWindow
 from functions.utils import clear_layout
-from functions.other_windows_functions import MyExistingVariable
+from functions.other_windows_functions import MyExistingVariable, MyUnit
 
 
 class MyGlobalAttributes(QtWidgets.QDialog, Ui_globalAttributeWindow):
@@ -683,12 +684,9 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
 
     def close_window_save(self):
         logging.debug('gui - metadata_windows_functions.py - MyVariableAttributes - close_window_save')
-
         new_attr_list = [str(widget.text()) for widget in self.add_list_label]
         filtered_list = [string for string in new_attr_list if string in list(self.attributes.keys())]
-
         overwrite = False
-
         if filtered_list:
             text = 'The following metadata already exist in the variable metadata dictionary:<ul>'
             for attr in filtered_list:
@@ -701,7 +699,6 @@ class MyVariableAttributes(QtWidgets.QDialog, Ui_variableAttributeWindow):
                 return
             else:
                 overwrite = True
-
         try:
             for index, widget in enumerate(self.list_label):
                 try:

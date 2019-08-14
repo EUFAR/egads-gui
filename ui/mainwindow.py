@@ -5,13 +5,10 @@ import pathlib
 import io
 import configparser
 import copy
-import collections
 import numpy
-import ntpath
 import webbrowser
 import egads
-import importlib
-import platform
+import shutil
 import tempfile
 import matplotlib
 matplotlib.use('Qt5Agg')
@@ -606,25 +603,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     updade_window = MyUpdateAvailable(self.gui_update_url)
                     updade_window.exec_()
             elif self.system == 'Linux':
-                pass
-
-                # warning_update_window = MyWarningUpdate()
-                # warning_update_window.exec_()
-                # if warning_update_window.update:
-                #     temp_folder = tempfile.gettempdir()
-                #     download_window = MyUpdate(self.gui_update_url, temp_folder)
-                #     download_window.exec_()
-                #     filename = self.gui_update_url[self.gui_update_url.rfind('/') + 1:]
-                #
-                #
-                #
-                #     shutil.copy('functions/unzip_update.py', temp_folder)
-                #     install_folder = self.config_path + '/'
-                #     command = ('python3 ' + temp_folder + '/unzip_update.py ' + temp_folder
-                #                + '/' + filename + ' ' + install_folder)
-                #     os.system('x-terminal-emulator -e ' + command)
-                #     time.sleep(0.1)
-                #     self.close()
+                warning_update_window = MyWarningUpdate()
+                warning_update_window.exec_()
+                if warning_update_window.update:
+                    temp_folder = tempfile.gettempdir()
+                    download_window = MyUpdate(self.gui_update_url, temp_folder)
+                    download_window.exec_()
+                    filename = self.gui_update_url[self.gui_update_url.rfind('/') + 1:]
+                    shutil.copy('functions/unzip_update.py', temp_folder)
+                    install_folder = self.gui_path + '/'
+                    command = ('python3 ' + temp_folder + '/unzip_update.py ' + temp_folder
+                               + '/' + filename + ' ' + install_folder)
+                    os.system('x-terminal-emulator -e ' + command)
+                    time.sleep(1.5)
+                    self.close()
         else:
             updade_window = MyUpdateAvailable(self.gui_update_url)
             updade_window.exec_()

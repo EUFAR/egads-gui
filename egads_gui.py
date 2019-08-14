@@ -11,6 +11,10 @@ from PyQt5.QtCore import QT_VERSION_STR as qt_version
 from matplotlib import __version__ as mpl_version
 from cartopy import __version__ as cy_version
 from simplekml import __version__ as km_version
+try:
+    from markdown import __version__ as mk_version
+except ImportError:
+    mk_version = None
 
 
 def launch_egads_gui(gui_path):
@@ -50,6 +54,7 @@ def launch_egads_gui(gui_path):
     logging.debug('gui - matplotlib version: ' + mpl_version)
     logging.debug('gui - cartopy version: ' + cy_version)
     logging.debug('gui - simplekml version: ' + km_version)
+    logging.debug('gui - markdown version: ' + mk_version)
     ui = MainWindow(gui_path, config_dict, frozen, system, installed)
     ui.show()
     splash.finish(ui)

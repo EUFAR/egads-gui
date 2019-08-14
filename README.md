@@ -1,7 +1,7 @@
 Version:
 -------
 
-EGADS Lineage GUI 1.0.1 (Python 3).
+EGADS Lineage GUI 1.0.2 (Python 3).
 
 
 Developments:
@@ -61,7 +61,9 @@ Do not forget to install dependancies:
 Stand-alone package:
 --------------------
 
-A stand-alone package is available for those who wants to use the GUI without a Python installation. In that case, look for ``EGADS Lineage GUI STA`` in the release part of the repository.
+A stand-alone package is available for those who wants to use the GUI without a Python installation. In that case, 
+look for ``EGADS Lineage GUI STA`` in the release part of the repository. For now the stand-alone package is only 
+compatible with Windows (from Windows Seven x32).
 
 
 Documentation:

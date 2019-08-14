@@ -2,7 +2,7 @@
 Installation
 =============
 
-The latest version of the EGADS GUI can be obtained from https://github.com/EUFAR/egads-gui/tree/Lineage and from https://github.com/EUFAR/egads-gui/releases for the Stand-alone version (look for the EGADS Lineage GUI STA vX.X.X package, STA means stand-alone).
+The latest version of the EGADS GUI can be obtained from https://github.com/EUFAR/egads-gui/tree/Lineage and from https://github.com/EUFAR/egads-gui/releases for the Stand-alone version (look for the EGADS Lineage GUI STA System vX.X.X package, STA means stand-alone).
 
 
 *************
@@ -14,17 +14,18 @@ The use of the EGADS GUI as a standard Python script requires the following pack
 * Python 3.5.4 or newer. Available at https://www.python.org/
 * PyQt 5.11.3 or newer. Available at https://www.riverbankcomputing.com/software/pyqt/download5
 * EGADS 1.0.0 or newer. Available at https://pypi.python.org/pypi/egads
-* Matplotlib 2.2.2 or newer. Available at https://pypi.python.org/pypi/matplotlib
+* Matplotlib 3.0.3 or newer. Available at https://pypi.python.org/pypi/matplotlib
 * Cartopy 0.17.0 or newer. Available at https://pypi.org/project/Cartopy/
 * Simplekml 1.3.1 or newer. Available at https://pypi.org/project/simplekml/
 * Requests 2.18.4 or newer. Optional, only for update checking. Available at https://pypi.org/project/requests/
+* Markdown 3.1.1 or newer. Optional, only to have a nice changelog in the GUI. Available at https://pypi.org/project/Markdown/
 
 
 *************
 Compatibility
 *************
 
-The EGADS GUI has been tested on Linux and Windows. Even if it has not been tested on MacOS, it should be compatible with the Apple system.
+The EGADS GUI has been tested on Linux and Windows. Even if it has not been tested on MacOS, it should be compatible with the OS made by Apple.
 
 
 ************
@@ -40,7 +41,8 @@ To learn how to install EGADS, please read the EGADS documentation available at 
 Stand-alone
 ***********
 
-Since version 1.0.0, a Stand-alone package is available for those who wants to use the GUI without a Python installation. In that case, look for ``EGADS Lineage GUI STA`` in the release part of the repository. For Windows (from Windows 7 32), donwload the .msi package and launch the installation, it should be installed outside ProgramFiles to avoid issues with admin rights, then the GUI can be run by double clicking on egads_gui.exe or from the shortcut in the Startup menu. For Linux (from kernel 3.19), donwload the .tar.gz package and uncompress it somewhere on your hard drive, preferably in your Home directory to avoid issues with admin rights, then the GUI can be launch for double clicking on egads_gui, or from the terminal.
+Since version 1.0.0, a stand-alone package is available for those who wants to use the GUI without a Python installation. In that case, look for ``EGADS Lineage GUI STA`` in the release part of the repository. For Windows (from Windows 7 32), donwload the .msi package and launch the installation, it should be installed outside ProgramFiles to avoid issues with admin rights, then the GUI can be run by double clicking on egads_gui.exe or from the shortcut in the Startup menu. A .zip package is also available for those who don't want to install it. For Linux (from Linux 4.15), download the tar.gz package somewhere on your hard drive (preferably in your home directory), extract it and run egads_gui.
+The stand-alone versions for Linux and Windows have been created with PyInstaller, Windows 7 and Ubuntu 16.04.
 
 
 *******

@@ -63,7 +63,6 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
             self.info_button_11.setVisible(False)
             self.ow_check_button_2.setEnabled(False)
             self.ow_check_button_2.setVisible(False)
-        self.read_config_dict()
         try:
             import requests
         except ImportError:
@@ -103,6 +102,8 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         self.ow_checkbox_6.setChecked(self.config_dict.getboolean('PLOTS', 'x_info_disabled'))
         self.ow_checkbox_4.setChecked(self.config_dict.getboolean('OPTIONS', 'check_update'))
         self.ow_checkbox_5.setChecked(self.egads_config_dict.getboolean('OPTIONS', 'check_update'))
+        self.ow_line_1.setCursorPosition(0)
+        self.ow_line_2.setCursorPosition(0)
 
     def check_gui_update(self):
         logging.debug('gui - option_window_functions.py - MyOptions - check_gui_update')
@@ -197,7 +198,12 @@ class MyOptions(QtWidgets.QDialog, Ui_optionWindow):
         logging.debug('gui - option_window_functions.py - MyOptions - get_folder_path')
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory")
         if folder_path:
-            self.ow_line_1.setText(str(pathlib.Path(folder_path)))
+            if self.sender().objectName() == 'ow_openButton_1':
+                self.ow_line_1.setText(str(pathlib.Path(folder_path)))
+                self.ow_line_1.setCursorPosition(0)
+            elif self.sender().objectName() == 'ow_openButton_2':
+                self.ow_line_2.setText(str(pathlib.Path(folder_path)))
+                self.ow_line_2.setCursorPosition(0)
 
     def closeWindow(self):
         logging.debug('gui - option_window_functions.py - MyOptions - closeWindow')

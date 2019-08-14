@@ -187,7 +187,10 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
             subplot_plot[0].spines['top'].set_visible(False)
             subplot_plot[0].spines['right'].set_visible(False)
             leg = subplot_plot[0].legend(prop={'family': self.default_font, 'size': '10'})
-            leg.draggable()
+            try:
+                leg.draggable()
+            except AttributeError:
+                leg.set_draggable(True)
             plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.90, wspace=0.4, hspace=0.4)
             self.set_figure_options('plot', subplot_plot)
             self.set_plot_options('plot', subplot_plot)
@@ -4323,11 +4326,17 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                             self.figure_options['figure_instance'][i].legend(prop={'family': self.default_font,
                                                                                    'size': '10'})
                             self.figure_options['figure_instance'][i].legend().set_visible(True)
-                            self.figure_options['figure_instance'][i].legend().draggable()
+                            try:
+                                self.figure_options['figure_instance'][i].legend().draggable()
+                            except AttributeError:
+                                self.figure_options['figure_instance'][i].legend().set_draggable(True)
                         else:
                             plt.gca().legend(prop={'family': self.default_font, 'size': '10'})
                             plt.gca().legend().set_visible(True)
-                            plt.gca().legend().draggable()
+                            try:
+                                plt.gca().legend().draggable()
+                            except AttributeError:
+                                plt.gca().legend().set_draggable(True)
                 else:
                     if figure_options['display_legend'][i] != self.figure_options['display_legend'][i]:
                         self.figure_options['display_legend'][i] = figure_options['display_legend'][i]
@@ -4437,9 +4446,15 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         if 'figure_instance' in self.plot_options:
                             leg = self.plot_options['figure_instance'][i].\
                                 legend(prop={'family': self.default_font, 'size': '10'})
-                            leg.draggable()
+                            try:
+                                leg.draggable()
+                            except AttributeError:
+                                leg.set_draggable(True)
                         else:
-                            plt.gca().legend().draggable()
+                            try:
+                                plt.gca().legend().draggable()
+                            except AttributeError:
+                                plt.gca().legend().set_draggable(True)
                 if plot_options['line_width'][i] != self.plot_options['line_width'][i]:
                     self.plot_options['line_width'][i] = plot_options['line_width'][i]
                     if plot_options['line_marker'][i] == 'line':
@@ -4489,9 +4504,15 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                         if 'figure_instance' in self.plot_options:
                             leg = self.plot_options['figure_instance'][i].legend(prop={'family': self.default_font,
                                                                                        'size': '10'})
-                            leg.draggable()
+                            try:
+                                leg.draggable()
+                            except AttributeError:
+                                leg.set_draggable(True)
                         else:
-                            plt.gca().legend().draggable()
+                            try:
+                                plt.gca().legend().draggable()
+                            except AttributeError:
+                                plt.gca().legend().set_draggable(True)
         self.canvas.draw()
     
     def plot_pan(self):

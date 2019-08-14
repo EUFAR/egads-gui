@@ -306,7 +306,7 @@ class Ui_variableAttributeWindow(object):
         self.vw_units_lb.setObjectName("vw_units_lb")
         self.gridLayout.addWidget(self.vw_units_lb, 0, 0, 1, 1)
         self.vw_units_ln = QtWidgets.QLineEdit(self.layoutWidget)
-        self.vw_units_ln.setEnabled(True)
+        self.vw_units_ln.setEnabled(False)
         self.vw_units_ln.setMinimumSize(QtCore.QSize(0, 27))
         self.vw_units_ln.setMaximumSize(QtCore.QSize(16777215, 27))
         palette = QtGui.QPalette()

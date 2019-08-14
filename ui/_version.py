@@ -1,3 +1,3 @@
-_gui_version = '1.0.1'
+_gui_version = '1.0.2'
 _gui_branch = 'Lineage'
-_eclipse_version = '2019.1.3'
+_pycharm_version = '2019.1.3'

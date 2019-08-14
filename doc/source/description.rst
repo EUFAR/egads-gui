@@ -100,7 +100,7 @@ About is a submenu of the menu bar.
    :scale: 45 %
    :align: center
 
-The user will find here information about the software, options and and link to the documentation.
+The user will find here information about the software, options and link to the documentation.
 
 
 ----------------------------
