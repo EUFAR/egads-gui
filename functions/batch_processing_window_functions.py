@@ -428,7 +428,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
             button_text = self.buttonGroup.checkedButton().text()
         except AttributeError:
             button_text = 'no button'
-        if os.path.isdir(path) and self.bw_edit_2.text():
+        if pathlib.Path(path).is_dir() and self.bw_edit_2.text():
             for file in os.listdir(path):
                 if file.endswith(self.button_format_text[button_text]):
                     item = QtWidgets.QListWidgetItem(file)
@@ -492,7 +492,7 @@ class MyBatchProcessing(QtWidgets.QDialog, Ui_batchProcessingWindow):
         file_path, _ = file_dialog.getOpenFileName(self, 'Select file', '', filter_types)
         path, file = os.path.split(file_path)
         item = QtWidgets.QListWidgetItem(file)
-        item.setToolTip(os.path.join(str(pathlib.Path(path)), file))
+        item.setToolTip(str(pathlib.Path(path).joinpath(file)))
         self.listWidget.addItem(item)
         self.populate_options_file_combobox()
 

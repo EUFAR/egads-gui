@@ -1,5 +1,4 @@
 import logging
-import egads
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_globalattributewindow import Ui_globalAttributeWindow
 from ui.Ui_variableattributewindow import Ui_variableAttributeWindow

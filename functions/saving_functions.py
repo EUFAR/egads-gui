@@ -1,5 +1,5 @@
-import egads
 import logging
+import pathlib
 from PyQt5 import QtCore, QtWidgets, QtGui
 from ui.Ui_waitbatchwindow import Ui_waitBatchWindow
 from functions.gui_elements import QtWaitingSpinner

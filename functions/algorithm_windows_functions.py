@@ -1,5 +1,5 @@
 import logging
-import os
+import pathlib
 import egads
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_displayalgorithmwindow import Ui_displayAlgorithmWindow
@@ -1524,14 +1524,12 @@ class MyProcessing(QtWidgets.QDialog, Ui_processingWindow):
 
 
 class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
-    def __init__(self, algorithm_categories, output_categories, frozen, gui_path):
+    def __init__(self, algorithm_categories, output_categories):
         logging.debug('gui - algorithm_windows_functions.py - MyAlgorithm - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.information_text = algorithm_creation_information_text()
         self.algorithm_categories = algorithm_categories
-        self.frozen = frozen
-        self.gui_path = gui_path
         self.output_categories = output_categories
         self.highlighter = Highlighter(self.cw_plain_4.document())
         self.cw_combobox_1.setItemDelegate(QtWidgets.QStyledItemDelegate())
@@ -2980,7 +2978,8 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
             if '.py' in filename:
                 filename = filename[:-3]
             if filename:
-                if os.path.isfile(egads.__path__[0] + '/algorithms/user/' + category + '/' + filename + '.py'):
+                file_path = pathlib.Path(egads.user_path).joinpath('user_algorithms', category, filename + '.py')
+                if pathlib.Path(file_path).is_file():
                     overwrite_window = MyOverwriteFilename(filename, category)
                     if overwrite_window.exec_():
                         filename = str(overwrite_window.ac_line.text())
@@ -3035,7 +3034,7 @@ class MyAlgorithm(QtWidgets.QDialog, Ui_creationWindow):
         complete_string = (author + date + version + alg_all + alg_imports + alg_class + alg_help
                            + alg_init + alg_out_metadata + alg_metadata + alg_run + algorithm)
         try:
-            write_algorithm(filename, complete_string, category, str(self.cw_line_2.text()), self.frozen, self.gui_path)
+            write_algorithm(filename, complete_string, category, str(self.cw_line_2.text()))
             self.success = True
         except Exception:
             logging.exception('gui - algorithm_window_functions.py - MyAlgorithm - prepare_algorithm : an '

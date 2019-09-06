@@ -2,6 +2,7 @@ import logging
 import platform
 import sys
 import os
+import pathlib
 from PyQt5 import QtWidgets, QtGui, QtCore
 from ui.mainwindow import MainWindow
 from ui._version import _gui_version
@@ -17,7 +18,7 @@ except ImportError:
     mk_version = None
 
 
-def launch_egads_gui(gui_path):
+def launch_egads_gui(gui_path, user_path):
     app = QtWidgets.QApplication(sys.argv)
     splash_pix = QtGui.QPixmap('icons/egads_gui_splashscreen.png')
     splash = QtWidgets.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
@@ -27,11 +28,13 @@ def launch_egads_gui(gui_path):
         frozen = True
     else:
         frozen = False
-    if not os.path.exists(os.path.join(gui_path, 'egads_gui.ini')):
-        create_option_file(gui_path)
+    if not pathlib.Path(pathlib.Path(user_path).joinpath('egads_gui.ini')).is_file():
+        if not pathlib.Path(user_path).is_dir():
+            pathlib.Path(user_path).mkdir()
+        create_option_file(user_path)
     config_dict = configparser.ConfigParser()
-    config_dict.read(os.path.join(gui_path, 'egads_gui.ini'))
-    create_logging_handlers(config_dict, 'egads_gui.log', gui_path)
+    config_dict.read(str(pathlib.Path(user_path).joinpath('egads_gui.ini')))
+    create_logging_handlers(config_dict, 'egads_gui.log', user_path)
     logging.info('**********************************')
     logging.info('EGADS GUI ' + _gui_version + ' is starting ...')
     logging.info('**********************************')
@@ -55,7 +58,7 @@ def launch_egads_gui(gui_path):
     logging.debug('gui - cartopy version: ' + cy_version)
     logging.debug('gui - simplekml version: ' + km_version)
     logging.debug('gui - markdown version: ' + mk_version)
-    ui = MainWindow(gui_path, config_dict, frozen, system, installed)
+    ui = MainWindow(gui_path, user_path, config_dict, frozen, system, installed)
     ui.show()
     splash.finish(ui)
     sys.exit(app.exec_())
@@ -72,5 +75,6 @@ sys.excepthook = handle_exception
 
 
 if __name__ == '__main__':
+    user_path = str(pathlib.Path.home().joinpath('.egads_lineage_gui'))
     main_path = os.path.abspath(os.path.dirname(__file__))
-    launch_egads_gui(main_path)
+    launch_egads_gui(main_path, user_path)

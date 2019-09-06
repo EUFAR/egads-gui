@@ -23,7 +23,7 @@ def objects_initialization(self):
     self.first_time_x_variable = True
     self.gui_update_url = None
     self.statusbar_msg_thread = None
-    self.min_egads_version = '0.9.5'
+    self.min_egads_version = '1.1.2'
     self.min_egads_branch = 'Lineage'
     self.buttons_lines_dict = {
                         "gm_button_1": ["gm_title_ln", None, None],

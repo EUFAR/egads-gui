@@ -1,7 +1,5 @@
-import os
 import logging
 import pathlib
-import egads
 from PyQt5 import QtWidgets, QtCore, QtGui
 from functions.algorithm_windows_functions import MyAlgorithmDisplay
 from functions.other_windows_functions import MyInfo, MyUnit
@@ -62,28 +60,37 @@ def algorithm_menu_initialization(self):
     for key in sorted(self.list_of_algorithms.keys()):
         idx = key.find(' - ')
         rep, algo, user = key[:idx], key[idx + 3:], self.list_of_algorithms[key]['user']
-        algo_action = QtWidgets.QAction(self)
-        algo_action.setIcon(icon1)
-        algo_action.setFont(font)
-        algo_action.setText(algo)
-        algo_action.triggered.connect(lambda: display_algorithm_information(self))
-        if rep == previous_rep:
-            if user:
+        if user:
+            algo_action = QtWidgets.QAction(self)
+            algo_action.setIcon(icon1)
+            algo_action.setFont(font)
+            algo_action.setText(algo)
+            algo_action.triggered.connect(lambda: display_algorithm_information(self))
+            if rep == previous_rep:
                 algo_action.setObjectName('user_' + rep + ' - ' + algo)
                 algo_folder_user.addAction(algo_action)
             else:
-                algo_action.setObjectName('embedded_' + rep + ' - ' + algo)
-                algo_folder.addAction(algo_action)
-        else:
-            previous_rep = rep
-            if user:
+                previous_rep = rep
                 algo_folder_user = QtWidgets.QMenu(self.menuUser_defined_algorithms)
                 algo_folder_user.setObjectName('user_category_' + rep)
                 algo_folder_user.setTitle(rep.title())
                 self.menuUser_defined_algorithms.addAction(algo_folder_user.menuAction())
                 algo_action.setObjectName('user_' + rep + ' - ' + algo)
                 algo_folder_user.addAction(algo_action)
+    for key in sorted(self.list_of_algorithms.keys()):
+        idx = key.find(' - ')
+        rep, algo, user = key[:idx], key[idx + 3:], self.list_of_algorithms[key]['user']
+        if not user:
+            algo_action = QtWidgets.QAction(self)
+            algo_action.setIcon(icon1)
+            algo_action.setFont(font)
+            algo_action.setText(algo)
+            algo_action.triggered.connect(lambda: display_algorithm_information(self))
+            if rep == previous_rep:
+                algo_action.setObjectName('embedded_' + rep + ' - ' + algo)
+                algo_folder.addAction(algo_action)
             else:
+                previous_rep = rep
                 algo_folder = QtWidgets.QMenu(self.menuEmbedded_algorithms)
                 algo_folder.setObjectName('embedded_category_' + rep)
                 algo_folder.setTitle(rep.title())

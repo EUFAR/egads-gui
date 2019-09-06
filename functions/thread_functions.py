@@ -163,6 +163,7 @@ class CheckEGADSVersion(QtCore.QThread):
 
     def run(self):
         logging.debug('gui - thread_functions.py - CheckEGADSVersion - run')
+        time.sleep(1)
         version_issue = {'version': True, 'branch': True}
         if LooseVersion(self.egads_version) < LooseVersion(self.min_egads_version):
             logging.info('gui - thread_functions.py - CheckEGADSVersion - run - an old version of EGADS has been '
@@ -448,7 +449,7 @@ class BatchProcessingThread(QtCore.QThread):
                         args.append(item)
                 output = algorithm().run(*args)
                 if out_format == 'NetCDF':
-                    new_file = egads.input.EgadsNetCdf(os.path.join(dest_folder, filename), 'w')
+                    new_file = egads.input.EgadsNetCdf(str(pathlib.Path(dest_folder).joinpath(filename)), 'w')
                     for key, value in f.get_attribute_list().items():
                         try:
                             new_file.add_attribute(key, float(value))
@@ -490,7 +491,7 @@ class BatchProcessingThread(QtCore.QThread):
                     else:
                         var_name = input_output['outputs'][0]
                         f.write_variable(output, varname=var_name, vartype="main", na_dict=na_dict)
-                    f.save_na_file(os.path.join(dest_folder, filename), na_dict)
+                    f.save_na_file(str(pathlib.Path(dest_folder).joinpath(filename)), na_dict)
                 f.close()
             except Exception:
                 logging.exception('gui - thread_functions.py - BatchProcessingThread - algorithm_processing - an '

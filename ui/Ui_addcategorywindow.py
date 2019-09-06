@@ -65,7 +65,7 @@ class Ui_Addcategory(object):
         self.ac_line.setStyleSheet("QLineEdit {\n"
 "    border-radius: 3px;\n"
 "    padding: 1px 4px 1px 4px;\n"
-"    background-color:  rgb(255, 255, 255);\n"
+"    background-color:  rgb(240, 240, 240);\n"
 "    color: rgb(45,45,45);\n"
 "}")
         self.ac_line.setFrame(False)

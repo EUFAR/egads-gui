@@ -1,5 +1,4 @@
 import logging
-import ntpath
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_exportwindow import Ui_exportWindow
 from ui.Ui_waitwindow import Ui_waitWindow
@@ -67,9 +66,7 @@ class MyExport(QtWidgets.QDialog, Ui_exportWindow):
         self.colormap_dict = {1: 'coolwarm', 2: 'jet', 3: 'ocean', 4: 'spectral', 5: 'hot', 6: 'hsv', 7: 'seismic',
                               8: 'terrain'}
         self.var_list = []
-
         self.ew_combobox_1.removeItem(2)
-
         logging.info('gui - export_window_functions.py - MyExport - ready')
 
     def populate_export_options(self):

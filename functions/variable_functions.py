@@ -1,5 +1,4 @@
 import logging
-import egads
 import numpy
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_createvariablewindow import Ui_createvariableWindow

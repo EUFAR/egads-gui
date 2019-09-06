@@ -9,6 +9,22 @@
 * nothing
 
 
+### September 6 2019, Release version 1.0.3 ###
+
+  * FIXED:
+    * collections and importlib weren't imported correctly in the main file, it led to an issue when displaying data and when creating an algorithm.
+	* the creation of the algorithm menu was not properly done when a user-defined algorithm is created in an existing Category.
+	* style for few windows has been corrected.
+	* fixed an issue with the legend in the plot function.
+  
+  * MODIFIED:
+    * add compatibility with EGADS Lineage 1.1.0.
+	* config file and log have been moved in the $HOME directory.
+	* improved the display of the window for egads version issue.
+	* replace a great amount of os.path by pathlib methods.
+	* the way to open a file when a file is already opened has been improved.
+
+
 ### August 14 2019, Release version 1.0.2 ###
 
   * MODIFIED:

@@ -10,6 +10,8 @@ import webbrowser
 import egads
 import shutil
 import tempfile
+import collections
+import importlib
 import matplotlib
 matplotlib.use('Qt5Agg')
 from ui._version import _gui_version
@@ -35,12 +37,13 @@ from functions.export_window_functions import MyExport
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, path, config_dict, frozen, system, installed, parent=None):
+    def __init__(self, path, user_path, config_dict, frozen, system, installed, parent=None):
         logging.info('gui - egads version: ' + egads.__version__)
         logging.debug('gui - mainwindow.py - MainWindow - __init__')
         QtWidgets.QMainWindow.__init__(self, parent)
         self.gui_path = path
-        self.egads_path = egads.path
+        self.user_path = user_path
+        self.egads_path = egads.user_path
         self.config_dict = config_dict
         self.frozen_app = frozen
         self.system = system
@@ -48,7 +51,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.egads_config_dict = egads.config_dict
         self.setupUi(self)
         self.font_list, self.default_font = setup_fonts()
-        self.list_of_algorithms = create_algorithm_dict(self.frozen_app)
+        self.list_of_algorithms = create_algorithm_dict()
         gui_initialization(self)
         objects_initialization(self)
         algorithm_menu_initialization(self)
@@ -58,6 +61,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.check_egads_version()
         self.check_egads_gui_update()
         self.actionCreateVariableBar.setVisible(False)
+        self.start_status_bar_msg_thread('Welcome to the EGADS Lineage GUI !')
         logging.info('gui - mainwindow.py - MainWindow ready')
 
     @QtCore.pyqtSlot()
@@ -170,9 +174,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def open_file(self, file_path=None):
         logging.debug('gui - mainwindow.py - MainWindow - open_file')
         if file_path is None:
-            if self.file_name:
-                self.before_close_file()
-            self.file_name, self.file_ext = self.get_file_name('open')
+            file_name, file_ext = self.get_file_name('open')
+            if file_name:
+                if self.file_name:
+                    self.before_close_file()
+                self.file_name = file_name
+                self.file_ext = file_ext
+            else:
+                return
         else:
             ext_dict = {'.nc': 'NetCDF Files (*.nc)', '.csv': 'CSV Files (*.csv *.dat *.txt)',
                         '.dat': 'CSV Files (*.csv *.dat *.txt)', '.txt': 'CSV Files (*.csv *.dat *.txt)',
@@ -345,7 +354,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                    'values': var,
                                    'dimensions': var_dimensions}
         plot_window = PlotWindow(variables, dimensions, self.x_axis_variable_name, self.font_list, self.default_font,
-                                 self.config_dict, self.gui_path)
+                                 self.config_dict, self.user_path)
         plot_window.setModal(True)
         plot_window.exec_()
 
@@ -367,8 +376,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def create_algorithm(self):
         logging.debug('gui - mainwindow.py - MainWindow - create_algorithm')
         new_algorithm_window = MyAlgorithm(prepare_algorithm_categories(self.list_of_algorithms),
-                                           prepare_output_categories(self.list_of_algorithms),
-                                           self.frozen_app, self.gui_path)
+                                           prepare_output_categories(self.list_of_algorithms))
         new_algorithm_window.exec_()
         if not new_algorithm_window.cancel:
             try:
@@ -379,7 +387,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if success is True:
                     info_text = ('<p>The algorithm has been successfully created with the following details:'
                                  + '<ul><li>File name: ' + algorithm_filename + '.py</li>'
-                                 + '<li>Folder: egads/algorithms/user/' + algorithm_category.lower() + '</li>'
+                                 + '<li>Folder: .egads_lineage/user_algorithms/' + algorithm_category.lower() + '</li>'
                                  + '<li>Algorithm name: ' + algorithm_name + '</li></ul></p>')
                     self.start_status_bar_msg_thread('A new algorithm has been created and saved...')
                 else:
@@ -387,8 +395,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                  + ' couldn\'t be written.')
                 info_window = MyInfo(info_text)
                 info_window.exec_()
-                importlib.reload(egads.algorithms.user)
-                self.list_of_algorithms = create_algorithm_dict(self.frozen_app)
+                egads._reload_user_algorithms()
+                self.list_of_algorithms = create_algorithm_dict()
                 algorithm_menu_initialization(self)
             except AttributeError:
                 logging.exception('gui - mainwindow.py - MainWindow - create_algorithm: an exception occurred during '
@@ -518,7 +526,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if not self.option_window.cancel:
             self.config_dict = self.option_window.config_dict
             self.egads_config_dict = self.option_window.egads_config_dict
-            ini_file = open(str(pathlib.Path(self.gui_path, 'egads_gui.ini')), 'w')
+            ini_file = open(str(pathlib.Path(self.user_path, 'egads_gui.ini')), 'w')
             self.config_dict.write(ini_file)
             ini_file.close()
             egads_ini_file = open(str(pathlib.Path(self.egads_path, 'egads.ini')), 'w')

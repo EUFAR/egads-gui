@@ -221,8 +221,11 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
                 subplot_plot[i].set_xlim([subplot_plot[i].axes.get_xticks()[0], subplot_plot[i].axes.get_xticks()[-1]])
                 subplot_plot[i].spines['top'].set_visible(False)
                 subplot_plot[i].spines['right'].set_visible(False)
-                leg = subplot_plot[i].legend(prop={'family':self.default_font, 'size':'10'})
-                leg.draggable()
+                leg = subplot_plot[i].legend(prop={'family': self.default_font, 'size': '10'})
+                try:
+                    leg.set_draggable(True)
+                except AttributeError:
+                    leg.draggable()
                 i += 1
             # self.figure.tight_layout()
             # plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.90, wspace=0.4, hspace=0.4)
