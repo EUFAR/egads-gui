@@ -13,10 +13,13 @@ import tempfile
 import collections
 import sys
 import platform
+import cartopy
 from PyQt5 import QtCore, QtWidgets
 from distutils.version import LooseVersion
 import matplotlib as mpl
-from functions.utils import transparency_hexa_dict_function, set_size
+from functions.utils import set_size
+from functions.material_functions import transparency_hexa_dict_function
+from functions.material_functions import cmap_default_dimensions
 
 
 class CheckEGADSGuiUpdateOnline(QtCore.QThread):
@@ -242,23 +245,153 @@ class DownloadFile(QtCore.QThread):
 
 class DrawGriddedMap(QtCore.QThread):
     started = QtCore.pyqtSignal()
-    finished = QtCore.pyqtSignal(collections.OrderedDict)
+    update = QtCore.pyqtSignal(str)
+    finished = QtCore.pyqtSignal()
     
-    def __init__(self, subplot_object):
+    def __init__(self, canvas, plot_dict, fig_options, plot_options, gui_path):
         QtCore.QThread.__init__(self)
         logging.debug('gui - thread_functions.py - DrawGriddedMap - __init__')
-        self.subplot_object = subplot_object
+        self.canvas = canvas
+        self.plot_dict = plot_dict
+        self.fig_options = fig_options
+        self.plot_options = plot_options
+        self.gui_path = gui_path
         
     def run(self):
         logging.debug('gui - thread_functions.py - DrawGriddedMap - run')
         self.started.emit()
-        for key, subplot in self.subplot_object.items():
-            pcolormesh = subplot['ax'].pcolormesh(subplot['lon_values'], subplot['lat_values'],
-                                                  subplot['var_values'], transform=subplot['projection'], cmap='jet')
-            self.subplot_object[key]['pcolormesh'] = pcolormesh
-            cax = mpl.pyplot.axes([0.9, 0.13, 0.02, 0.72])
-            mpl.pyplot.colorbar(pcolormesh, cax=cax, orientation='vertical')
-        self.finished.emit(self.subplot_object)
+        self.update.emit('Rendering data, please wait...')
+        cmap_name = self.plot_options['colorbar_style']
+        if self.plot_options['colorbar_reversed']:
+            cmap_name += '_r'
+        max_val, min_val, steps, norm, ticks, ticks_lbl = None, None, None, None, None, None
+        if not self.plot_options['colorbar_automatic_values']:
+            if self.plot_options['colorbar_ticks']:
+                min_val = self.plot_options['colorbar_ticks'][0]
+                max_val = self.plot_options['colorbar_ticks'][-1]
+                norm = mpl.colors.Normalize(vmin=min_val, vmax=max_val)
+            else:
+                max_val = self.plot_options['colorbar_max_value']
+                min_val = self.plot_options['colorbar_min_value']
+                steps = self.plot_options['colorbar_step_value']
+                norm = mpl.colors.Normalize(vmin=min_val, vmax=max_val)
+        if self.plot_dict['georeferenced']:
+            lon_values = self.plot_dict['lon_values_cyclic']
+            pcolormesh = self.plot_dict['ax'].pcolormesh(lon_values, self.plot_dict['lat_values'],
+                                                         self.plot_dict['var_values'],
+                                                         cmap=cmap_name,
+                                                         transform=cartopy.crs.PlateCarree(),
+                                                         vmin=min_val, vmax=max_val)
+        else:
+            lon_values = self.plot_dict['lon_values']
+            pcolormesh = self.plot_dict['ax'].pcolormesh(lon_values, self.plot_dict['lat_values'],
+                                                         self.plot_dict['var_values'],
+                                                         cmap=cmap_name)
+        self.plot_dict['pcolormesh'] = pcolormesh
+        if self.plot_options['colorbar']:
+            self.update.emit('Rendering colorbar, please wait...')
+            if self.plot_options['colorbar_automatic_dimensions']:
+                cmap_height = cmap_default_dimensions()[self.plot_options['colorbar_position']]['colorbar_height']
+                cmap_width = cmap_default_dimensions()[self.plot_options['colorbar_position']]['colorbar_width']
+                cmap_xposition = cmap_default_dimensions()[self.plot_options['colorbar_position']][
+                    'colorbar_axis_xposition']
+                cmap_yposition = cmap_default_dimensions()[self.plot_options['colorbar_position']][
+                    'colorbar_axis_yposition']
+                cmap_orientation = cmap_default_dimensions()[self.plot_options['colorbar_position']]['orientation']
+            else:
+                cmap_height = self.plot_options['colorbar_height']
+                cmap_width = self.plot_options['colorbar_width']
+                cmap_xposition = self.plot_options['colorbar_axis_xposition']
+                cmap_yposition = self.plot_options['colorbar_axis_yposition']
+                cmap_orientation = self.plot_options['colorbar_position']
+            if steps is not None:
+                ticks = numpy.linspace(min_val, max_val, steps)
+                ticks_lbl = [str(item) for item in ticks]
+            elif steps is None and self.plot_options['colorbar_ticks']:
+                ticks = self.plot_options['colorbar_ticks']
+                ticks_lbl = [str(item) for item in ticks]
+            cax = mpl.pyplot.axes([cmap_xposition, cmap_yposition, cmap_width, cmap_height])
+            cmap = mpl.pyplot.colorbar(pcolormesh, cax=cax, orientation=cmap_orientation, norm=norm, ticks=ticks)
+            if cmap_orientation == 'vertical':
+                cmap.ax.set_ylabel(self.plot_options['colorbar_legend'])
+                if ticks_lbl is not None:
+                    cmap.ax.set_yticklabels(ticks_lbl)
+            else:
+                cmap.ax.set_xlabel(self.plot_options['colorbar_legend'])
+                if ticks_lbl is not None:
+                    cmap.ax.set_xticklabels(ticks_lbl)
+        if self.plot_dict['georeferenced']:
+            if self.plot_options['coast']:
+                self.update.emit('Rendering coasts and lands, please wait...')
+                land_shp_path = 'graphic_materials/shape_files/ne_' + self.plot_options[
+                    'coast_resolution'] + '_land.shp'
+                land_shp_file = str(pathlib.Path(self.gui_path).joinpath(land_shp_path))
+
+                for land in cartopy.io.shapereader.Reader(land_shp_file).records():
+                    self.plot_dict['ax'].add_geometries(land.geometry, cartopy.crs.PlateCarree(), antialiased=True,
+                                                        edgecolor=self.plot_options['coast_line_color'],
+                                                        linewidth=self.plot_options['coast_line_width'],
+                                                        facecolor=self.plot_options['coast_fill_color'])
+            if self.plot_options['river']:
+                self.update.emit('Rendering rivers and lakes, please wait...')
+                riv_shp_path = ('graphic_materials/shape_files/ne_' + self.plot_options['river_resolution'] +
+                                '_rivers_lake_centerlines.shp')
+                riv_shp_file = str(pathlib.Path(self.gui_path).joinpath(riv_shp_path))
+                for river in cartopy.io.shapereader.Reader(riv_shp_file).records():
+                    self.plot_dict['ax'].add_geometries([river.geometry], cartopy.crs.PlateCarree(), antialiased=True,
+                                                        edgecolor=self.plot_options['river_line_color'],
+                                                        linewidth=self.plot_options['river_line_width'],
+                                                        facecolor='none')
+                lak_shp_path = ('graphic_materials/shape_files/ne_' + self.plot_options['river_resolution'] +
+                                '_lakes.shp')
+                lak_shp_file = str(pathlib.Path(self.gui_path).joinpath(lak_shp_path))
+                for lake in cartopy.io.shapereader.Reader(lak_shp_file).records():
+                    self.plot_dict['ax'].add_geometries([lake.geometry], cartopy.crs.PlateCarree(), antialiased=True,
+                                                        edgecolor='none',
+                                                        facecolor=self.plot_options['river_fill_color'])
+            if self.plot_options['grid']:
+                self.update.emit('Rendering grid, please wait...')
+                gl = self.plot_dict['ax'].gridlines(crs=cartopy.crs.PlateCarree(), draw_labels=False,
+                                                    linewidth=self.plot_options['grid_size'],
+                                                    color=self.plot_options['grid_color'], alpha=1,
+                                                    linestyle=self.plot_options['grid_style'])
+
+                # waiting for cartopy 0.18
+                if self.plot_options['projection'] in ['PlateCarree', 'Mercator']:
+                    gl.xlabels_top = True
+                    gl.ylabels_left = True
+                    gl.xlines = True
+                    gl.ylines = True
+                    gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
+                    gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
+                    gl.xlocator = mpl.ticker.FixedLocator(self.plot_options['xticks'])
+                    gl.ylocator = mpl.ticker.FixedLocator(self.plot_options['yticks'])
+        else:
+            pass
+            # subplot['ax'].grid(True)
+            # if self.gd_plot_options['grid']:
+            #     gl = subplot_dict['ax'].gridlines(crs=cartopy.crs.PlateCarree(), draw_labels=False,
+            #                                       linewidth=self.gd_plot_options['grid_size'],
+            #                                       color=self.gd_plot_options['grid_color'], alpha=1,
+            #                                       linestyle=self.gd_plot_options['grid_style'])
+
+        self.update.emit('Rendering figure, please wait...')
+        self.plot_dict['ax'].text(self.fig_options['ylabel_xpos'], self.fig_options['ylabel_ypos'],
+                                  self.fig_options['ylabel'], va='center', ha='center', rotation='vertical',
+                                  rotation_mode='anchor', transform=self.plot_dict['ax'].transAxes,
+                                  fontsize=self.fig_options['ylabel_size'], fontfamily=self.fig_options['ylabel_font'])
+        self.plot_dict['ax'].text(self.fig_options['xlabel_xpos'], self.fig_options['xlabel_ypos'],
+                                  self.fig_options['xlabel'], va='center', ha='center', rotation='horizontal',
+                                  rotation_mode='anchor', transform=self.plot_dict['ax'].transAxes,
+                                  fontsize=self.fig_options['xlabel_size'], fontfamily=self.fig_options['xlabel_font'])
+        self.plot_dict['ax'].text(self.fig_options['title_xpos'], self.fig_options['title_ypos'],
+                                  self.fig_options['title'], va='center', ha='center', rotation='horizontal',
+                                  rotation_mode='anchor', transform=self.plot_dict['ax'].transAxes,
+                                  fontsize=self.fig_options['title_size'], fontfamily=self.fig_options['title_font'])
+        mpl.pyplot.subplots_adjust(left=self.fig_options['margin_left'], right=self.fig_options['margin_right'],
+                                   bottom=self.fig_options['margin_bottom'], top=self.fig_options['margin_top'])
+        self.canvas.draw()
+        self.finished.emit()
     
     def stop(self):
         logging.debug('gui - thread_functions.py - DrawGriddedMap - stop')
@@ -1395,23 +1528,30 @@ class ExportThread(QtCore.QThread):
                 var = self.var_dict[self.export_dict['Variables'][0]][0].value.tolist()[::redux]
                 var_units = self.var_dict[self.export_dict['Variables'][0]][0].metadata['units']
                 var_name = self.export_dict['Variables'][0]
+                var_steps, var_min, var_max, ticks_lbl = None, None, None, None
                 if self.export_dict['Colormap']['automatic']:
                     var_min = math.floor(min(var))
                     var_max = math.ceil(max(var))
                     var_steps = 15
                 else:
-                    if self.export_dict['Colormap']['min'] is not None:
-                        var_min = float(self.export_dict['Colormap']['min'])
+
+                    if self.export_dict['Colormap']['ticks_list']:
+                        var_min = self.export_dict['Colormap']['ticks_list'][0]
+                        var_max = self.export_dict['Colormap']['ticks_list'][-1]
+                        ticks_lbl = [str(item) for item in self.export_dict['Colormap']['ticks_list']]
                     else:
-                        var_min = math.floor(min(var))
-                    if self.export_dict['Colormap']['max'] is not None:
-                        var_max = float(self.export_dict['Colormap']['max'])
-                    else:
-                        var_max = math.ceil(max(var))
-                    if self.export_dict['Colormap']['steps'] is not None:
-                        var_steps = int(self.export_dict['Colormap']['steps'])
-                    else:
-                        var_steps = 15
+                        if self.export_dict['Colormap']['min'] is not None:
+                            var_min = float(self.export_dict['Colormap']['min'])
+                        else:
+                            var_min = math.floor(min(var))
+                        if self.export_dict['Colormap']['max'] is not None:
+                            var_max = float(self.export_dict['Colormap']['max'])
+                        else:
+                            var_max = math.ceil(max(var))
+                        if self.export_dict['Colormap']['steps'] is not None:
+                            var_steps = int(self.export_dict['Colormap']['steps'])
+                        else:
+                            var_steps = 15
                 if self.export_dict['Colormap']['auto_dimension']:
                     fig_width = colormap_dict[self.export_dict['Colormap']['position']]['fig_width']
                     fig_height = colormap_dict[self.export_dict['Colormap']['position']]['fig_height']
@@ -1451,14 +1591,29 @@ class ExportThread(QtCore.QThread):
                     cmap_name += '_r'
                 cmap = getattr(mpl.cm, cmap_name)
                 norm = mpl.colors.Normalize(vmin=var_min, vmax=var_max)
-                cb1 = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm,
-                                                orientation=colormap_dict[self.export_dict['Colormap']['position']]
-                                                ['orientation'])
-                cb1.set_label(var_units)
-                value_range = numpy.linspace(var_min, var_max, var_steps + 1)
                 color_range = []
-                for color in cmap(numpy.linspace(0, 1, var_steps)):
-                    color_range.append(mpl.colors.rgb2hex(color[:3])[1:])
+                if self.export_dict['Colormap']['ticks_list']:
+                    cb1 = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm,
+                                                    orientation=colormap_dict[self.export_dict['Colormap']['position']]
+                                                    ['orientation'], ticks=self.export_dict['Colormap']['ticks_list'])
+                    value_range = self.export_dict['Colormap']['ticks_list']
+                    for color in cmap(numpy.linspace(0, 1, len(value_range))):
+                        color_range.append(mpl.colors.rgb2hex(color[:3])[1:])
+                    cb1.set_label(var_units)
+                    if colormap_dict[self.export_dict['Colormap']['position']]['orientation'] == 'vertical':
+                        cb1.ax.set_yticklabels(ticks_lbl)
+                    else:
+                        cb1.ax.set_xticklabels(ticks_lbl)
+                else:
+                    cb1 = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm,
+                                                    orientation=colormap_dict[self.export_dict['Colormap']['position']]
+                                                    ['orientation'])
+                    value_range = numpy.linspace(var_min, var_max, var_steps + 1)
+
+                    for color in cmap(numpy.linspace(0, 1, var_steps)):
+                        color_range.append(mpl.colors.rgb2hex(color[:3])[1:])
+                    cb1.set_label(var_units)
+
                 if self.export_dict['Options']['wall_transparency']:
                     transparency = transparency_hexa_dict_function()[100 - self.export_dict['Options']['transparency']]
                 else:
@@ -1563,9 +1718,31 @@ class StatusbarMsgThread(QtCore.QThread):
         self.new_msg = new_msg
 
     def run(self):
+        logging.debug('gui - thread_functions.py - StatusbarMsgThread - run')
         self.display_msg.emit(self.new_msg)
         time.sleep(5)
         self.display_msg.emit(self.default_msg)
+
+    def stop(self):
+        logging.debug('gui - thread_functions.py - StatusbarMsgThread - stop')
+        self.terminate()
+
+
+class PrintingThread(QtCore.QThread):
+    started = QtCore.pyqtSignal()
+    end = QtCore.pyqtSignal()
+
+    def __init__(self, file_name, option_dict):
+        QtCore.QThread.__init__(self)
+        logging.debug('gui - thread_functions.py - PrintingThread - __init__')
+        self.file_name = file_name
+        self.option_dict = option_dict
+
+    def run(self):
+        logging.debug('gui - thread_functions.py - PrintingThread - run')
+        self.started.emit()
+        mpl.pyplot.savefig(self.file_name, **self.option_dict)
+        self.end.emit()
 
     def stop(self):
         logging.debug('gui - thread_functions.py - StatusbarMsgThread - stop')

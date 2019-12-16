@@ -8,6 +8,7 @@ import textwrap
 import platform
 import time
 import os
+import copy
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.Ui_infowindow import Ui_infoWindow
 from ui.Ui_displaywindow import Ui_displayWindow
@@ -24,9 +25,13 @@ from ui.Ui_subplotwindow import Ui_subplotWindow
 from ui.Ui_updatewindow import Ui_updateWindow
 from ui.Ui_updateavailablewindow import Ui_updateAvailableWindow
 from ui.Ui_existingvarwindow import Ui_existingvarWindow
+from ui.Ui_projectionwindow import Ui_projectionWindow
+from ui.Ui_tickslabelswindow import Ui_tickslabelsWindow
+from ui.Ui_tickscolorbarwindow import Ui_tickscolorbarWindow
 from functions.gui_elements import QtWaitingSpinner
-from functions.utils import clear_layout
+from functions.utils import clear_layout, font_creation_function, icon_creation_function
 from functions.thread_functions import DownloadFile
+from functions.material_functions import grid_projection_option_help
 
 
 class MyExistingVariable(QtWidgets.QDialog, Ui_existingvarWindow):
@@ -450,7 +455,6 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                     self.dw_table.setRowCount(row_size)
         elif self.shape_length == 3:
             time_in, lon_in, lat_in = False, False, False
-
             dim_list = list(self.dimensions.keys())
             if 'time' in dim_list[0]:
                 time_in = True
@@ -458,20 +462,17 @@ class MyDisplay(QtWidgets.QDialog, Ui_displayWindow):
                 lon_in = True
             if 'latitude' in dim_list[1] or 'lati' in dim_list[1] or 'lat' in dim_list[1]:
                 lat_in = True
-
             lay = self.dimensions[dim_list[0]]
             row = self.dimensions[dim_list[1]]
             col = self.dimensions[dim_list[2]]
             lay_size = lay['length']
             row_size = row['length']
             col_size = col['length']
-
             self.dw_table.setColumnCount(col_size)
             self.dw_table.setRowCount(row_size)
             self.dw_table.setHorizontalHeaderLabels([str(i) for i in col['values']])
             self.dw_table.setVerticalHeaderLabels([str(i) for i in row['values']])
             self.dw_label_4.setVisible(True)
-
             if lon_in:
                 self.dw_label_4.setText('Longitude')
             else:
@@ -916,25 +917,30 @@ class MyUnit(QtWidgets.QDialog, Ui_unitWindow):
 
 
 class MyUpdateAvailable(QtWidgets.QDialog, Ui_updateAvailableWindow):
-    def __init__(self, url):
-        logging.debug('gui - other_windows_functions.py - MyUpdate - __init__ ')
+    def __init__(self, url, gui=False):
+        logging.debug('gui - other_windows_functions.py - MyUpdateAvailable - __init__ ')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.url = url
+        if not gui:
+            self.dw_label_1.setText('A new version of EGADS is available on GitHub. Click on Download update to '
+                                    'download it, or click on Visit GitHub to have a look at the EGADS repository on '
+                                    'GitHub.')
         self.dw_okButton.clicked.connect(self.closeWindow)
         self.dw_downloadButton.clicked.connect(self.download_file)
         self.dw_downloadButton_2.clicked.connect(self.visit_github)
-        logging.info('gui - other_windows_functions.py - MyUpdate - ready')
+        logging.info('gui - other_windows_functions.py - MyUpdateAvailable - ready')
 
-    def visit_github(self):
+    @staticmethod
+    def visit_github():
         webbrowser.open('https://github.com/EUFAR/egads-gui/tree/Lineage')
 
     def download_file(self):
-        logging.debug('gui - other_windows_functions.py - MyUpdate - download_file')
+        logging.debug('gui - other_windows_functions.py - MyUpdateAvailable - download_file')
         webbrowser.open(self.url)
 
     def closeWindow(self):
-        logging.debug('gui - other_windows_functions.py - MyUpdate - closeWindow')
+        logging.debug('gui - other_windows_functions.py - MyUpdateAvailable - closeWindow')
         self.close()
 
 
@@ -1077,4 +1083,268 @@ class MyCoeff(QtWidgets.QDialog, Ui_coefWindow):
 
     def closeWindow(self):
         logging.debug('gui - other_windows_functions.py - MyCoeff - closeWindow')
+        self.close()
+
+
+class MyProjection(QtWidgets.QDialog, Ui_projectionWindow):
+    def __init__(self, option_dict, projection_name):
+        logging.debug('gui - other_windows_functions.py - MyProjection - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.option_dict = option_dict
+        self.new_option_dict = copy.deepcopy(self.option_dict)
+        self.cancel = True
+        self.option_ok.clicked.connect(self.prepare_new_dict)
+        self.option_cancel.clicked.connect(self.closeWindow)
+        self.setWindowTitle('Projection: ' + projection_name)
+        self.label_list, self.line_list, self.button_list = [], [], []
+        self.parse_option_dict()
+        logging.info('gui - other_windows_functions.py - MyProjection - ready')
+
+    def parse_option_dict(self):
+        logging.debug('gui - other_windows_functions.py - MyProjection - parse_option_dict')
+        option_nbr = 0
+        grid_layout = QtWidgets.QGridLayout()
+        grid_layout.setObjectName('grid_layout')
+        self.option_layout.addLayout(grid_layout)
+        self.option_layout.setAlignment(QtCore.Qt.AlignTop)
+        for option in sorted(self.option_dict):
+            self.label_list.append(QtWidgets.QLabel())
+            self.label_list[option_nbr].setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop |
+                                                     QtCore.Qt.AlignTrailing)
+            self.label_list[option_nbr].setMinimumSize(QtCore.QSize(0, 27))
+            self.label_list[option_nbr].setMaximumSize(QtCore.QSize(16777215, 27))
+            self.label_list[option_nbr].setFont(font_creation_function('normal'))
+            self.label_list[option_nbr].setText(option + ':')
+            self.label_list[option_nbr].setStyleSheet("QLabel {\n"
+                                                      "    color: rgb(45,45,45);\n"
+                                                      "}")
+            self.label_list[option_nbr].setObjectName(option + '_lb')
+            grid_layout.addWidget(self.label_list[option_nbr], option_nbr, 0, 1, 1)
+            self.line_list.append(QtWidgets.QLineEdit())
+            self.line_list[option_nbr].setMinimumSize(QtCore.QSize(100, 27))
+            self.line_list[option_nbr].setMaximumSize(QtCore.QSize(16777215, 27))
+            self.line_list[option_nbr].setFont(font_creation_function('small'))
+            self.line_list[option_nbr].setText(str(self.option_dict[option]))
+            self.line_list[option_nbr].setStyleSheet("QLineEdit {\n"
+                                                     "    border-radius: 3px;\n"
+                                                     "    padding: 1px 4px 1px 4px;\n"
+                                                     "    background-color:  rgb(240, 240, 240);\n"
+                                                     "    color: rgb(45,45,45);\n"
+                                                     "}\n"
+                                                     "\n"
+                                                     "QLineEdit:disabled {\n"
+                                                     "    background-color:  rgb(200,200,200);\n"
+                                                     "    color: rgb(45,45,45);\n"
+                                                     "}")
+            self.line_list[option_nbr].setObjectName(option + '_ln')
+            grid_layout.addWidget(self.line_list[option_nbr], option_nbr, 1, 1, 1)
+            if option == 'globe':
+                self.line_list[option_nbr].setEnabled(False)
+            self.button_list.append(QtWidgets.QToolButton())
+            self.button_list[option_nbr].setMinimumSize(QtCore.QSize(27, 27))
+            self.button_list[option_nbr].setMaximumSize(QtCore.QSize(27, 27))
+            self.button_list[option_nbr].setStyleSheet("QToolButton {\n"
+                                                       "    border: 1px solid transparent;\n"
+                                                       "    background-color: transparent;\n"
+                                                       "    width: 27px;\n"
+                                                       "    height: 27px;\n"
+                                                       "}\n"
+                                                       "\n"
+                                                       "QToolButton:flat {\n"
+                                                       "    border: none;\n"
+                                                       "}")
+            self.button_list[option_nbr].setIcon(icon_creation_function('info_icon.svg'))
+            self.button_list[option_nbr].setIconSize(QtCore.QSize(23, 23))
+            self.button_list[option_nbr].setObjectName(option + '_bt')
+            grid_layout.addWidget(self.button_list[option_nbr], option_nbr, 2, 1, 1)
+            self.button_list[option_nbr].clicked.connect(self.option_information)
+            option_nbr += 1
+
+    def prepare_new_dict(self):
+        logging.debug('gui - other_windows_functions.py - MyProjection - prepare_new_dict')
+        for i, widget in enumerate(self.label_list):
+            option = str(widget.text())[:-1]
+            if str(self.option_dict[option]) != str(self.line_list[i].text()):
+                value = str(self.line_list[i].text())
+                try:
+                    if value == 'None':
+                        value = None
+                    elif '.' in value:
+                        value = float(value)
+                    else:
+                        value = int(value)
+                    self.new_option_dict[option] = value
+                except ValueError:
+                    text = ('The option <i>' + option + '</i> can\'t be understand by Cartopy. Please correct it. ' 
+                            '<br><br>For your information, most options require numbers and not text.')
+                    info_window = MyInfo(text)
+                    info_window.exec_()
+                    return
+        self.cancel = False
+        self.closeWindow()
+
+    def option_information(self):
+        logging.debug('gui - other_windows_functions.py - MyProjection - option_information')
+        text = grid_projection_option_help()[self.sender().objectName()[:-3]]
+        info_window = MyInfo(text)
+        info_window.exec_()
+
+    def closeWindow(self):
+        logging.debug('gui - other_windows_functions.py - MyProjection - closeWindow')
+        if self.cancel:
+            self.new_option_dict = None
+        self.close()
+
+
+class MyTicks(QtWidgets.QDialog, Ui_tickslabelsWindow):
+    def __init__(self, option_dict):
+        logging.debug('gui - other_windows_functions.py - MyTicks - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.option_dict = option_dict
+        self.new_option_dict = copy.deepcopy(self.option_dict)
+        self.cancel = True
+        self.ok_button.clicked.connect(self.prepare_new_dict)
+        self.cancel_button.clicked.connect(self.close)
+        self.x_add_button.clicked.connect(self.add_col)
+        self.y_add_button.clicked.connect(self.add_col)
+        self.x_del_button.clicked.connect(self.remove_col)
+        self.y_del_button.clicked.connect(self.remove_col)
+        self.parse_option_dict()
+        logging.info('gui - other_windows_functions.py - MyTicks - ready')
+
+    def parse_option_dict(self):
+        logging.debug('gui - other_windows_functions.py - MyTicks - parse_option_dict')
+        x_ticks = self.option_dict['xticks']
+        y_ticks = self.option_dict['yticks']
+        self.x_table.setColumnCount(len(x_ticks))
+        self.y_table.setColumnCount(len(y_ticks))
+        for i, tick in enumerate(x_ticks):
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(str(tick))
+            self.x_table.setItem(0, i, item)
+        for i, tick in enumerate(y_ticks):
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(str(tick))
+            self.y_table.setItem(0, i, item)
+
+    def add_col(self):
+        logging.debug('gui - other_windows_functions.py - MyTicks - add_col')
+        x_y = self.sender().objectName()[:1]
+        if x_y == 'x':
+            table = self.x_table
+        else:
+            table = self.y_table
+        table.insertColumn(table.columnCount())
+
+    def remove_col(self):
+        logging.debug('gui - other_windows_functions.py - MyTicks - remove_col')
+        x_y = self.sender().objectName()[:1]
+        if x_y == 'x':
+            table = self.x_table
+        else:
+            table = self.y_table
+        table.removeColumn(table.columnCount() - 1)
+
+    def prepare_new_dict(self):
+        logging.debug('gui - other_windows_functions.py - MyTicks - prepare_new_dict')
+        x_list, y_list = [], []
+        if self.x_table.columnCount() == 0 or self.y_table.columnCount() == 0:
+            text = 'Ticks for one or both axis can\'t be empty. Please make a correction.'
+            info_window = MyInfo(text)
+            info_window.exec_()
+            return
+        for i in range(self.x_table.columnCount()):
+            try:
+                x_list.append(float(self.x_table.item(0, i).text()))
+            except ValueError:
+                text = ('One or more values for the X axis can\'t be understand by Cartopy. Please correct them.'
+                        + '<br><br>For your information, Cartopy requires numbers, floats or integers, for ticks, not'
+                        + 'text.')
+                info_window = MyInfo(text)
+                info_window.exec_()
+                return
+        for i in range(self.y_table.columnCount()):
+            try:
+                y_list.append(float(self.y_table.item(0, i).text()))
+            except ValueError:
+                text = ('One or more values for the Y axis can\'t be understand by Cartopy. Please correct them.'
+                        + '<br><br>For your information, Cartopy requires numbers, floats or integers, for ticks, not'
+                        + 'text.')
+                info_window = MyInfo(text)
+                info_window.exec_()
+                return
+        if x_list and y_list:
+            self.new_option_dict['xticks'] = x_list
+            self.new_option_dict['yticks'] = y_list
+            self.cancel = False
+            self.close()
+
+    def closeEvent(self, event):
+        logging.debug('gui - other_windows_functions.py - MyTicks - closeEvent')
+        if self.cancel:
+            self.new_option_dict = None
+        self.close()
+
+
+class MyColorbarTicks(QtWidgets.QDialog, Ui_tickscolorbarWindow):
+    def __init__(self, option_dict):
+        logging.debug('gui - other_windows_functions.py - MyColorbarTicks - __init__')
+        QtWidgets.QWidget.__init__(self)
+        self.setupUi(self)
+        self.option_dict = option_dict
+        self.new_option_dict = copy.deepcopy(option_dict)
+        self.cancel = True
+        self.ok_button.clicked.connect(self.prepare_new_dict)
+        self.cancel_button.clicked.connect(self.close)
+        self.add_button.clicked.connect(self.add_col)
+        self.del_button.clicked.connect(self.remove_col)
+        self.parse_option_dict()
+        logging.info('gui - other_windows_functions.py - MyColorbarTicks - ready')
+
+    def parse_option_dict(self):
+        logging.debug('gui - other_windows_functions.py - MyColorbarTicks - parse_option_dict')
+        if self.option_dict:
+            self.table.setColumnCount(len(self.option_dict))
+            for i, tick in enumerate(self.option_dict):
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(str(tick))
+                self.table.setItem(0, i, item)
+
+    def add_col(self):
+        logging.debug('gui - other_windows_functions.py - MyColorbarTicks - add_col')
+        self.table.insertColumn(self.table.columnCount())
+
+    def remove_col(self):
+        logging.debug('gui - other_windows_functions.py - MyColorbarTicks - remove_col')
+        self.table.removeColumn(self.table.columnCount() - 1)
+
+    def prepare_new_dict(self):
+        logging.debug('gui - other_windows_functions.py - MyColorbarTicks - prepare_new_dict')
+        tick_list = []
+        if self.table.columnCount() == 0:
+            text = 'Ticks for the colorbar can\'t be empty. Please make a correction.'
+            info_window = MyInfo(text)
+            info_window.exec_()
+            return
+        for i in range(self.table.columnCount()):
+            try:
+                tick_list.append(float(self.table.item(0, i).text()))
+            except ValueError:
+                text = ('One or more values can\'t be understand by Cartopy. Please correct them.'
+                        + '<br><br>For your information, Cartopy requires numbers, floats or integers, for ticks, not'
+                        + 'text.')
+                info_window = MyInfo(text)
+                info_window.exec_()
+                return
+        if tick_list:
+            self.new_option_dict = tick_list
+            self.cancel = False
+            self.close()
+
+    def closeEvent(self, event):
+        logging.debug('gui - other_windows_functions.py - MyColorbarTicks - closeEvent')
+        if self.cancel:
+            self.new_option_dict = None
         self.close()

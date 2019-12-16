@@ -47,6 +47,7 @@ class MyWaitSaving(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.final_dict = None
         self.setup_spinner()
         self.launch_saving_thread()
+        logging.info('gui - saving_functions.py - MyWaitSaving - ready')
 
     def update_progress(self, val):
         progress_str, progress_nbr = val[0], val[1]

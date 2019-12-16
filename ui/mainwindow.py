@@ -12,6 +12,8 @@ import shutil
 import tempfile
 import collections
 import importlib
+import xml
+import datetime
 import matplotlib
 matplotlib.use('Qt5Agg')
 from ui._version import _gui_version
@@ -27,10 +29,12 @@ from functions.algorithm_windows_functions import MyProcessing, MyAlgorithm
 from functions.gui_functions import gui_initialization, algorithm_menu_initialization, clear_gui
 from functions.gui_functions import update_icons_state, status_bar_update, update_global_attribute_gui, file_drop_layout
 from functions.gui_functions import update_variable_attribute_gui, update_new_variable_list_gui
+from functions.gui_functions import create_quick_access_menu, create_recent_file_menu
 from functions.reading_functions import add_new_variable_gui, var_reading, new_var_reading, reading_file
-from functions.material_functions import objects_initialization, setup_fonts
+from functions.material_functions import setup_fonts, widgets_metadata_dict
 from functions.thread_functions import CheckEGADSGuiUpdateOnline, CheckEGADSVersion, StatusbarMsgThread
 from functions.utils import prepare_algorithm_categories, prepare_output_categories, create_algorithm_dict
+from functions.utils import add_element, get_element_value
 from functions.saving_functions import saving_file
 from functions.batch_processing_window_functions import MyBatchProcessing
 from functions.export_window_functions import MyExport
@@ -53,11 +57,38 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.font_list, self.default_font = setup_fonts()
         self.list_of_algorithms = create_algorithm_dict()
         gui_initialization(self)
-        objects_initialization(self)
+        self.modified = False
+        self.opened_file = None
+        self.file_name = ''
+        self.file_ext = ''
+        self.default_message = ''
+        self.file_is_opened = False
+        self.list_of_dimensions = {}
+        self.list_of_global_attributes = {}
+        self.list_of_variables_and_attributes = {}
+        self.list_of_new_variables_and_attributes = {}
+        self.list_of_unread_variables = {}
+        self.x_axis_variable_set = False
+        self.x_axis_variable_name = None
+        self.new_variables = False
+        self.x_variable = None
+        self.first_time_x_variable = True
+        self.gui_update_url = None
+        self.statusbar_msg_thread = None
+        self.min_egads_version = '1.1.2'
+        self.min_egads_branch = 'Lineage'
+        self.buttons_lines_dict = None
+        self.variable_menu = None
+        self.check_egads_version_thread = None
+        self.check_gui_update_thread = None
+        self.objects_metadata_dict = widgets_metadata_dict()
         algorithm_menu_initialization(self)
         self.make_window_title()
         self.variable_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.variable_list.customContextMenuRequested.connect(self.right_click_menu)
+        self.opened_file_list = []
+        self.create_quick_access()
+        self.create_recent_access()
         self.check_egads_version()
         self.check_egads_gui_update()
         self.actionCreateVariableBar.setVisible(False)
@@ -183,12 +214,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 return
         else:
-            ext_dict = {'.nc': 'NetCDF Files (*.nc)', '.csv': 'CSV Files (*.csv *.dat *.txt)',
-                        '.dat': 'CSV Files (*.csv *.dat *.txt)', '.txt': 'CSV Files (*.csv *.dat *.txt)',
-                        '.na': 'NASA Ames Files (*.na)'}
-            self.file_name = file_path
-            self.file_ext = ext_dict[os.path.splitext(file_path)[1]]
+            if pathlib.Path(file_path).is_file():
+                if self.file_name:
+                    self.before_close_file()
+                ext_dict = {'.nc': 'NetCDF Files (*.nc)', '.csv': 'CSV Files (*.csv *.dat *.txt)',
+                            '.dat': 'CSV Files (*.csv *.dat *.txt)', '.txt': 'CSV Files (*.csv *.dat *.txt)',
+                            '.na': 'NASA Ames Files (*.na)'}
+                self.file_name = file_path
+                self.file_ext = ext_dict[os.path.splitext(file_path)[1]]
+            else:
+                text = ('EGADS can\'t find the following file:\n\n\t\t\t' + file_path + '\n\nPlease check that the file'
+                        + ' exists before trying to open it.')
+                info_window = MyInfo(text)
+                info_window.exec_()
+                return
         if self.file_name:
+            self.add_file_to_opened_file_list()
             if self.file_ext == 'NetCDF Files (*.nc)' or self.file_ext == 'NASA Ames Files (*.na)':
                 reading_file(self)
             else:
@@ -354,7 +395,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                    'values': var,
                                    'dimensions': var_dimensions}
         plot_window = PlotWindow(variables, dimensions, self.x_axis_variable_name, self.font_list, self.default_font,
-                                 self.config_dict, self.user_path)
+                                 self.config_dict, self.gui_path)
         plot_window.setModal(True)
         plot_window.exec_()
 
@@ -519,13 +560,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         config_string.seek(0)
         egads_config_dict_copy = configparser.ConfigParser()
         egads_config_dict_copy.read_file(config_string)
-        self.option_window = MyOptions(config_dict_copy, egads_config_dict_copy, self.frozen_app, self.system,
-                                       self.installed_app)
-        self.option_window.available_update.connect(self.display_gui_update_button)
-        self.option_window.exec_()
-        if not self.option_window.cancel:
-            self.config_dict = self.option_window.config_dict
-            self.egads_config_dict = self.option_window.egads_config_dict
+        option_window = MyOptions(config_dict_copy, egads_config_dict_copy, self.frozen_app, self.system,
+                                  self.installed_app, self.user_path)
+        option_window.available_update.connect(self.display_gui_update_button)
+        option_window.exec_()
+        if not option_window.cancel:
+            self.config_dict = option_window.config_dict
+            self.egads_config_dict = option_window.egads_config_dict
             ini_file = open(str(pathlib.Path(self.user_path, 'egads_gui.ini')), 'w')
             self.config_dict.write(ini_file)
             ini_file.close()
@@ -533,6 +574,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.egads_config_dict.write(egads_ini_file)
             egads_ini_file.close()
             self.start_status_bar_msg_thread('Options have been modified and saved...')
+            if self.config_dict['FILES_FOLDERS'].getboolean('enable_user_folders'):
+                create_quick_access_menu(self)
+            else:
+                self.menuQuick_access.clear()
+                self.menuQuick_access.setEnabled(False)
+            if self.config_dict['FILES_FOLDERS'].getboolean('keep_opened_files'):
+                self.menuOpen_recent.clear()
+                self.menuOpen_recent.setEnabled(True)
+            else:
+                self.menuOpen_recent.clear()
+                self.menuOpen_recent.setEnabled(False)
     
     def check_egads_version(self):
         logging.debug('gui - mainwindow.py - MainWindow - check_egads_version')
@@ -634,9 +686,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         batch_processing_window = MyBatchProcessing(self.list_of_algorithms, self.config_dict)
         batch_processing_window.exec_()
 
-    def get_file_name(self, action):
+    def get_file_name(self, action, folder=None):
         logging.debug('gui - mainwindow.py - MainWindow - get_file_name : action ' + str(action))
-        file_dialog = QtWidgets.QFileDialog()
+        if folder is not None:
+            file_dialog = QtWidgets.QFileDialog(directory=folder)
+        else:
+            file_dialog = QtWidgets.QFileDialog()
         filter_types = 'NetCDF Files (*.nc);;NASA Ames Files (*.na)'
         out_file_name, out_file_ext = None, None
         if action == 'save':
@@ -668,15 +723,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for widget in all_buttons:
             if 'none_button' not in widget.objectName() and widget.objectName():
                 widget.setIcon(icon)
-                value = self.buttons_lines_dict[str(widget.objectName())]
-                linewidget = self.findChildren(QtWidgets.QLineEdit, value[0])
+                linewidget = self.findChild(QtWidgets.QLineEdit, widget.objectName()[:-2] + 'ln')
                 if not linewidget:
-                    linewidget = self.findChildren(QtWidgets.QPlainTextEdit, value[0])
-                linewidget[0].setEnabled(False)
+                    linewidget = self.findChild(QtWidgets.QPlainTextEdit, widget.objectName()[:-2] + 'ln')
+                linewidget.setEnabled(False)
         self.opened_file.close()
         filename = self.file_name
         self.tab_view.setCurrentIndex(0)
-        objects_initialization(self)
+        self.modified = False
+        self.opened_file = None
+        self.file_name = ''
+        self.file_ext = ''
+        self.default_message = ''
+        self.file_is_opened = False
+        self.list_of_dimensions = {}
+        self.list_of_global_attributes = {}
+        self.list_of_variables_and_attributes = {}
+        self.list_of_new_variables_and_attributes = {}
+        self.list_of_unread_variables = {}
+        self.x_axis_variable_set = False
+        self.x_axis_variable_name = None
+        self.new_variables = False
+        self.x_variable = None
+        self.first_time_x_variable = True
         status_bar_update(self)
         clear_gui(self)
         update_icons_state(self, 'close_file')
@@ -730,8 +799,63 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         logging.debug('gui - mainwindow.py - MainWindow - open_help')
         webbrowser.open('https://egads-gui.readthedocs.io/en/lineage/')
 
+    def create_quick_access(self):
+        if self.config_dict['FILES_FOLDERS'].getboolean('enable_user_folders'):
+            if pathlib.Path(pathlib.Path(self.user_path).joinpath('user_folder_list.xml')).exists():
+                create_quick_access_menu(self)
+            else:
+                doc = xml.dom.minidom.Document()
+                doc_root = add_element(doc, "EGADSLineageGui", doc)
+                add_element(doc, "CreationDate", doc_root, datetime.date.isoformat(datetime.date.today()))
+                add_element(doc, "Folders", doc_root)
+                f = open(str(pathlib.Path(self.user_path).joinpath('user_folder_list.xml')), 'w')
+                f.write(doc.toprettyxml())
+                f.close()
+
+    def create_recent_access(self):
+        if self.config_dict['FILES_FOLDERS'].getboolean('keep_opened_files'):
+            if pathlib.Path(pathlib.Path(self.user_path).joinpath('opened_file_list.xml')).exists():
+                f = open(str(pathlib.Path(self.user_path).joinpath('opened_file_list.xml')), 'r')
+                doc = xml.dom.minidom.parse(f)
+                folders = doc.getElementsByTagName('Files')[0]
+                nodes = folders.getElementsByTagName('File')
+                for node in nodes:
+                    self.opened_file_list.append(get_element_value(node, 'Path'))
+                f.close()
+            else:
+                doc = xml.dom.minidom.Document()
+                doc_root = add_element(doc, "EGADSLineageGui", doc)
+                add_element(doc, "CreationDate", doc_root, datetime.date.isoformat(datetime.date.today()))
+                add_element(doc, "Files", doc_root)
+                f = open(str(pathlib.Path(self.user_path).joinpath('opened_file_list.xml')), 'w')
+                f.write(doc.toprettyxml())
+                f.close()
+            create_recent_file_menu(self)
+
+    def add_file_to_opened_file_list(self):
+        if self.file_name in self.opened_file_list:
+            self.opened_file_list.remove(self.file_name)
+            self.opened_file_list.insert(0, self.file_name)
+        else:
+            if len(self.opened_file_list) == 10:
+                self.opened_file_list.pop(-1)
+            self.opened_file_list.insert(0, self.file_name)
+        create_recent_file_menu(self)
+
     def closeEvent(self, event):
         logging.debug('gui - mainwindow.py - MainWindow - closeEvent')
+        if self.config_dict['FILES_FOLDERS'].getboolean('keep_opened_files'):
+            if self.opened_file_list:
+                doc = xml.dom.minidom.Document()
+                doc_root = add_element(doc, "EGADSLineageGui", doc)
+                add_element(doc, "CreationDate", doc_root, datetime.date.isoformat(datetime.date.today()))
+                files = add_element(doc, "Files", doc_root)
+                for recent_file in self.opened_file_list:
+                    file = add_element(doc, "File", files)
+                    add_element(doc, "Path", file, recent_file)
+                f = open(str(pathlib.Path(self.user_path).joinpath('opened_file_list.xml')), 'w')
+                f.write(doc.toprettyxml())
+                f.close()
         if self.modified:
             ask_save_window = MyAsk('Quit')
             ask_save_window.exec_()

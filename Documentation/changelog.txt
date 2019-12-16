@@ -1,12 +1,35 @@
 #### To do list: ####
 
-* add map export possibility for GE. (v 1.1)
-* rework the plot function. (v 1.1)
-* add slider to plot window for 3D data. (v 1.1)
+* add map export possibility for GE. (v 1.2)
+* add HDF5 handling (with EGADS v 1.2.0, v 1.2)
   
 #### To fix list: ####
 
 * nothing
+
+
+### December 16 2019, Release version 1.1.0 ###
+
+More projections in Cartopy have been added to the plot function. At this time, labels can be added to only two projections (PlateCarree and Mercator). Once the version 0.18 of Cartopy is released, labels will be available for more projections. 
+  
+  * FIXED:
+    * size of splitters in the variable and new variable tabs has been corrected.
+	* text for EGADS and GUI updates has been fixed.
+	* style has been fixed for option and export windows.
+  
+  * ADDED:
+    * a function to update the config file has been added.
+	* a new item in the File menu gives the user the possibility to access quickly user-defined folders, if the dedicated option has been enabled in the options.
+	* a list of opened files is now available if the user enables the option.	
+	* an option has been added to plot standard 2D and 3D data based on user needs.
+	* an option has been added to plot georeferenced data as standard data.
+	* if a file is open, a check on the file path is done before opening it to be sure that the file exists.
+	* few info messages have been added in the option window and in the plot window.
+	* it is now possible to set ticks manually for the colorbar in the export window.
+
+  * MODIFIED:
+	* it is now possible to plot 3D gridded data, buttons are available to navigate into layers.
+	* the plot window has been reworked and enhanced.
 
 
 ### September 6 2019, Release version 1.0.3 ###

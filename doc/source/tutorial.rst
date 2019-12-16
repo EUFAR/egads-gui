@@ -260,13 +260,6 @@ From the variable attributes window
    :align: center
 
 
-*********************************
-How to create a simple variable ?
-*********************************
-
-This function has not been implemented yet.
-
-
 **************************
 How to process a variable?
 **************************
@@ -368,7 +361,7 @@ How to delete a variable?
 How to create an algorithm through the GUI?
 *******************************************
 
-EGADS GUI offers the possibility to create algorithm from a window, by filling in different type of fields. If a complex algorithm has to be written, the most suitable way is to use a text editor like Notepad++ (Windows) or Kate (Linux) and modify the template provided in the EGADS algorithm directory. For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT, p. 28.
+EGADS GUI offers the possibility to create algorithm from a window, by filling in different type of fields. If a complex algorithm has to be written, the most suitable way is to use a text editor like Notepad++ (Windows) or Kate (Linux) and modify the template provided in the EGADS algorithm directory. For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT.
 
 * To launch the algorithm creation window, just click on |create algorithm|.
 
@@ -416,7 +409,7 @@ EGADS GUI offers the possibility to create algorithm from a window, by filling i
   There is no system to check the algorithm result. Once the algorithm is saved, EGADS and its GUI expect the algorithm to be true and stable.
 
 .. NOTE::
-  If using the stand-alone version of the GUI, new algorithms are saved in the ``user_algorithms`` folder in the main directory. The user still has the possibility to create an algorithm manually with a text editor. In that case, follow the EGADS documentation about new algorithms and save the algorithm in the ``user_algorithms`` folder. Do not forget to edit or create __init__.py files.
+  If using the stand-alone version of the GUI, new algorithms are saved in the ``user_algorithms`` folder in the main directory. The user always has the possibility to create an algorithm manually with a text editor. In that case, follow the EGADS documentation about new algorithms and save the algorithm in the ``user_algorithms`` folder. Do not forget to edit or create __init__.py files.
 
 
 **********************************************
@@ -482,7 +475,7 @@ The EGADS GUI offers the possibility to display the values of a variable.
 How to plot a variable ?
 ************************
 
-By integrating the Python module Matplotlib, the EGADS GUI gives the user a great tool to plot data and save the result in a graphic file. Actually only time series can be plotted. Gridded data should be integrated quickly.
+By integrating the Python modules Matplotlib and Cartopy, the EGADS GUI gives the user a great tool to plot data and save the result in a graphic file. Times series and gridded data, georeferenced or not, are handled by the plot window. Actually, there is a limitation with gridded data. Due to an early version of Cartopy, the modification of ticks and labels is only possible for PlateCarree and Mercator projection, until a new version of Cartopy is released.
 
 * To access the plot module, select first the ``Variables`` tab.
 
@@ -512,6 +505,15 @@ By integrating the Python module Matplotlib, the EGADS GUI gives the user a grea
    :height: 789px
    :scale: 45 %
    :align: center
+
+* An example of what can be achieved with gridded data.
+
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_plot_data_4.png
+   :width: 1252px
+   :height: 789px
+   :scale: 45 %
+   :align: center
+
 
 ******************************************
 How to export data to an external format ?

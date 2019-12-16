@@ -2,10 +2,9 @@ import logging
 import pathlib
 from PyQt5 import QtCore, QtWidgets, QtGui
 from ui.Ui_waitbatchwindow import Ui_waitBatchWindow
-from functions.gui_functions import modify_attribute_gui, update_icons_state, clear_gui
+from functions.gui_functions import update_icons_state, clear_gui
 from functions.gui_functions import update_global_attribute_gui, update_variable_attribute_gui, status_bar_update
 from functions.gui_functions import netcdf_gui_initialization, nasaames_gui_initialization
-from functions.material_functions import add_global_attributes_to_buttons
 from functions.gui_elements import QtWaitingSpinner
 from functions.thread_functions import ReadFileThread
 from functions.other_windows_functions import MyInfo
@@ -28,7 +27,20 @@ def reading_file(self):
         self.list_of_dimensions = self.reading_window.final_dict['dim_list']
         self.list_of_variables_and_attributes = self.reading_window.final_dict['var_attr_list']
         self.list_of_unread_variables = self.reading_window.final_dict['unread_var']
-        add_global_attributes_to_buttons(self)
+        self.buttons_lines_dict = {'gm_button_1': ['gm_title_ln', None, self.list_of_global_attributes],
+                                   'gm_button_2': ['gm_institution_ln', None, self.list_of_global_attributes],
+                                   'gm_button_3': ['gm_source_ln', None, self.list_of_global_attributes],
+                                   'gm_button_4': ['gm_project_ln', None, self.list_of_global_attributes],
+                                   'gm_button_5': ['gm_history_ln', None, self.list_of_global_attributes],
+                                   'gm_button_6': ['gm_comments_ln', None, self.list_of_global_attributes],
+                                   'new_button_1': ['new_varName_ln', self.new_variable_list,
+                                                    self.list_of_new_variables_and_attributes],
+                                   'new_button_2': ['new_longName_ln', self.new_variable_list,
+                                                    self.list_of_new_variables_and_attributes],
+                                   'new_button_3': ['new_category_ln', self.new_variable_list,
+                                                    self.list_of_new_variables_and_attributes],
+                                   'new_button_4': ['new_units_ln', self.new_variable_list,
+                                                    self.list_of_new_variables_and_attributes]}
         if self.file_ext == 'NetCDF Files (*.nc)':
             netcdf_gui_initialization(self)
             update_global_attribute_gui(self, 'NetCDF')
@@ -69,14 +81,14 @@ def var_reading(self):
     
 
 def add_new_variable_gui(self):
-    logging.debug('gui - gui_functions.py - add_new_variable_gui')
+    logging.debug('gui - reading_functions.py - add_new_variable_gui')
     self.tab_view.insertTab(2, self.tab_3, 'New variables')
     self.new_variable_list.setEnabled(True)
     self.new_variable_list.itemClicked.connect(lambda: new_var_reading(self))
 
 
 def new_var_reading(self):
-    logging.debug('gui - gui_functions.py - new_var_reading : variable ' + str(self.new_variable_list.currentItem(
+    logging.debug('gui - reading_functions.py - new_var_reading : variable ' + str(self.new_variable_list.currentItem(
     ).text()))
     update_icons_state(self, 'new_var_reading')
     clear_gui(self, 'new_variable')
@@ -105,6 +117,7 @@ class MyWaitReading(QtWidgets.QDialog, Ui_waitBatchWindow):
         self.final_dict = None
         self.setup_spinner()
         self.launch_reading_thread()
+        logging.info('gui - reading_functions.py - MyWaitReading - ready')
 
     def update_progress(self, val):
         progress_str, progress_nbr = val[0], val[1]

@@ -25,6 +25,7 @@ def create_option_file(user_path):
     config_dict.add_section('SYSTEM')
     config_dict.add_section('PLOTS')
     config_dict.add_section('OPTIONS')
+    config_dict.add_section('FILES_FOLDERS')
     config_dict.set('LOG', 'level', 'DEBUG')
     config_dict.set('LOG', 'path', str(user_path))
     config_dict.set('SYSTEM', 'read_as_float', 'False')
@@ -33,9 +34,44 @@ def create_option_file(user_path):
     config_dict.set('PLOTS', 'same_unit_plot', '2')
     config_dict.set('PLOTS', 'subplot_disposition', '0')
     config_dict.set('PLOTS', 'x_info_disabled', 'False')
+    config_dict.set('PLOTS', 'manual_axis_distribution', 'False')
+    config_dict.set('PLOTS', 'first_dimension_axis', '0')
+    config_dict.set('PLOTS', 'second_dimension_axis', '0')
+    config_dict.set('PLOTS', 'third_dimension_axis', '0')
+    config_dict.set('PLOTS', 'geo_as_standard', 'False')
     config_dict.set('OPTIONS', 'check_update', 'False')
+    config_dict.set('FILES_FOLDERS', 'keep_opened_files', 'True')
+    config_dict.set('FILES_FOLDERS', 'enable_user_folders', 'True')
     config_dict.write(ini_file)
     ini_file.close()
+
+
+def update_config_file(user_path):
+    option_missing = False
+    config_dict = configparser.ConfigParser()
+    config_dict.read(str(pathlib.Path(user_path).joinpath('egads_gui.ini')))
+    try:
+        config_dict['FILES_FOLDERS']
+    except KeyError:
+        option_missing = True
+        config_dict.add_section('FILES_FOLDERS')
+    if config_dict['FILES_FOLDERS'].getboolean('keep_opened_files') is None:
+        option_missing = True
+        config_dict.set('FILES_FOLDERS', 'keep_opened_files', 'True')
+    if config_dict['FILES_FOLDERS'].getboolean('enable_user_folders') is None:
+        option_missing = True
+        config_dict.set('FILES_FOLDERS', 'enable_user_folders', 'True')
+    if config_dict['PLOTS'].getboolean('manual_axis_distribution') is None:
+        option_missing = True
+        config_dict.set('PLOTS', 'manual_axis_distribution', 'False')
+        config_dict.set('PLOTS', 'first_dimension_axis', '0')
+        config_dict.set('PLOTS', 'second_dimension_axis', '0')
+        config_dict.set('PLOTS', 'third_dimension_axis', '0')
+        config_dict.set('PLOTS', 'geo_as_standard', 'False')
+    if option_missing:
+        ini_file = open(str(pathlib.Path(user_path, 'egads_gui.ini')), 'w')
+        config_dict.write(ini_file)
+        ini_file.close()
 
 
 def create_logging_handlers(config_dict, filename, default_path):
@@ -369,113 +405,8 @@ def populate_combobox(combobox, item_list, make_choice=True, set_index=None):
             combobox.setCurrentIndex(set_index)
 
 
-def transparency_hexa_dict_function():
-    logging.debug('gui - utils.py - transparency_hexa_dict_function')
-    hexa_dict = {100: 'FF',
-                 99: 'FC',
-                 98: 'FA',
-                 97: 'F7',
-                 96: 'F5',
-                 95: 'F2',
-                 94: 'F0',
-                 93: 'ED',
-                 92: 'EB',
-                 91: 'E8',
-                 90: 'E6',
-                 89: 'E3',
-                 88: 'E0',
-                 87: 'DE',
-                 86: 'DB',
-                 85: 'D9',
-                 84: 'D6',
-                 83: 'D4',
-                 82: 'D1',
-                 81: 'CF',
-                 80: 'CC',
-                 79: 'C9',
-                 78: 'C7',
-                 77: 'C4',
-                 76: 'C2',
-                 75: 'BF',
-                 74: 'BD',
-                 73: 'BA',
-                 72: 'B8',
-                 71: 'B5',
-                 70: 'B3',
-                 69: 'B0',
-                 68: 'AD',
-                 67: 'AB',
-                 66: 'A8',
-                 65: 'A6',
-                 64: 'A3',
-                 63: 'A1',
-                 62: '9E',
-                 61: '9C',
-                 60: '99',
-                 59: '96',
-                 58: '94',
-                 57: '91',
-                 56: '8F',
-                 55: '8C',
-                 54: '8A',
-                 53: '87',
-                 52: '85',
-                 51: '82',
-                 50: '80',
-                 49: '7D',
-                 48: '7A',
-                 47: '78',
-                 46: '75',
-                 45: '73',
-                 44: '70',
-                 43: '6E',
-                 42: '6B',
-                 41: '69',
-                 40: '66',
-                 39: '63',
-                 38: '61',
-                 37: '5E',
-                 36: '5C',
-                 35: '59',
-                 34: '57',
-                 33: '54',
-                 32: '52',
-                 31: '4F',
-                 30: '4D',
-                 29: '4A',
-                 28: '47',
-                 27: '45',
-                 26: '42',
-                 25: '40',
-                 24: '3D',
-                 23: '3B',
-                 22: '38',
-                 21: '36',
-                 20: '33',
-                 19: '30',
-                 18: '2E',
-                 17: '2B',
-                 16: '29',
-                 15: '26',
-                 14: '24',
-                 13: '21',
-                 12: '1F',
-                 11: '1C',
-                 10: '1A',
-                 9: '17',
-                 8: '14',
-                 7: '12',
-                 6: '0F',
-                 5: '0D',
-                 4: '0A',
-                 3: '08',
-                 2: '05',
-                 1: '03',
-                 0: '00'}
-    return hexa_dict
-
-
 def set_size(bytes_size):
+    logging.debug('gui - utils.py - set_size')
     suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
     i = 0
     while bytes_size >= 1024 and i < len(suffixes)-1:
@@ -483,3 +414,51 @@ def set_size(bytes_size):
         i += 1
     f = ('%.2f' % bytes_size).rstrip('0').rstrip('.')
     return '%s %s' % (f, suffixes[i])
+
+
+def add_element(doc, element_name, parent, value=None):
+    logging.debug('gui - utils.py - add_element')
+    new_element = doc.createElementNS('EGADSLineageGui', element_name)
+    if value:
+        new_text = doc.createTextNode(value)
+        new_element.appendChild(new_text)
+    parent.appendChild(new_element)
+    return new_element
+
+
+def get_element_value(parent, element_name):
+    logging.debug('gui - utils.py - get_element_value')
+    elements = parent.getElementsByTagName(element_name)
+    if elements:
+        element = elements[0]
+        nodes = element.childNodes
+        for node in nodes:
+            if node.nodeType == node.TEXT_NODE:
+                return node.data.strip()
+
+
+def icon_creation_function(icon_filename):
+    logging.debug('gui - utils.py - icon_creation_function')
+    icon = QtGui.QIcon()
+    icon.addPixmap(QtGui.QPixmap('icons/' + str(icon_filename)), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    return icon
+
+
+def font_creation_function(font_style):
+    logging.debug('gui - utils.py - font_creation_function')
+    font = QtGui.QFont()
+    font.setFamily("fonts/SourceSansPro-Regular.ttf")
+    font.setKerning(True)
+    font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+    if font_style == 'normal':
+        font.setPointSize(10)
+    elif font_style == 'big':
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+    elif font_style == 'small':
+        font.setPointSize(9)
+    elif font_style == 'small-italic':
+        font.setPointSize(9)
+        font.setItalic(True)
+    return font

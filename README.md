@@ -1,7 +1,7 @@
 Version:
 -------
 
-EGADS Lineage GUI 1.0.3 (Python 3).
+EGADS Lineage GUI 1.1.0 (Python 3).
 
 
 Developments:
@@ -49,13 +49,16 @@ Actually, EGADS GUI is a simple python script. Just open a terminal in the EGADS
 
 Do not forget to install dependancies:
 * Python (3.5.4 or newer)
-* PyQt5 (5.11.2 or newer)
-* EGADS Lineage (0.9.5 or newer)
+* PyQt5 (5.11.3 or newer)
+* EGADS Lineage (1.0.0 or newer)
 * Matplotlib (2.2.2 or newer)
-* Cartopy (0.17 or newer)
+* Cartopy (0.17 or newer, optional, only to draw maps)
 * Simplekml (1.3.1 or newer)
 * Markdown (3.1.1 or newer, optional, only to read the changelog in the GUI)
 * Requests (2.18.4 or newer, optional, only to check updates if the user activates the option)
+* Pillow (5.2 or newer, optional, only to save figures in JPEG format)
+
+Anaconda3 can be a good alternative, in particular if the use of Cartopy is mandatory and if the user can't build Cartopy himself.
 
 
 Stand-alone package:

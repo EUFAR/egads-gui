@@ -6,8 +6,8 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from functions.gui_elements import PushButtonRight
 from PyQt5 import QtCore, QtGui, QtWidgets
+from functions.gui_elements import PushButtonRight
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -393,10 +393,10 @@ class Ui_MainWindow(object):
         self.gm_title_ln.setFrame(False)
         self.gm_title_ln.setObjectName("gm_title_ln")
         self.gridLayout_4.addWidget(self.gm_title_ln, 0, 1, 1, 1)
-        self.gm_button_1 = PushButtonRight(self.scrollAreaWidgetContents)
-        self.gm_button_1.setMinimumSize(QtCore.QSize(27, 27))
-        self.gm_button_1.setMaximumSize(QtCore.QSize(27, 27))
-        self.gm_button_1.setStyleSheet("QToolButton {\n"
+        self.gm_title_bt = PushButtonRight(self.scrollAreaWidgetContents)
+        self.gm_title_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.gm_title_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.gm_title_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -406,13 +406,13 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.gm_button_1.setText("")
+        self.gm_title_bt.setText("")
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.gm_button_1.setIcon(icon1)
-        self.gm_button_1.setIconSize(QtCore.QSize(23, 23))
-        self.gm_button_1.setObjectName("gm_button_1")
-        self.gridLayout_4.addWidget(self.gm_button_1, 0, 2, 1, 1)
+        self.gm_title_bt.setIcon(icon1)
+        self.gm_title_bt.setIconSize(QtCore.QSize(23, 23))
+        self.gm_title_bt.setObjectName("gm_title_bt")
+        self.gridLayout_4.addWidget(self.gm_title_bt, 0, 2, 1, 1)
         spacerItem = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_4.addItem(spacerItem, 0, 3, 2, 1)
         self.gm_title_lb = QtWidgets.QLabel(self.scrollAreaWidgetContents)
@@ -531,10 +531,10 @@ class Ui_MainWindow(object):
         self.gm_source_ln.setFrame(False)
         self.gm_source_ln.setObjectName("gm_source_ln")
         self.gridLayout_4.addWidget(self.gm_source_ln, 0, 5, 1, 1)
-        self.gm_button_3 = PushButtonRight(self.scrollAreaWidgetContents)
-        self.gm_button_3.setMinimumSize(QtCore.QSize(27, 27))
-        self.gm_button_3.setMaximumSize(QtCore.QSize(27, 27))
-        self.gm_button_3.setStyleSheet("QToolButton {\n"
+        self.gm_source_bt = PushButtonRight(self.scrollAreaWidgetContents)
+        self.gm_source_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.gm_source_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.gm_source_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -544,11 +544,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.gm_button_3.setText("")
-        self.gm_button_3.setIcon(icon1)
-        self.gm_button_3.setIconSize(QtCore.QSize(23, 23))
-        self.gm_button_3.setObjectName("gm_button_3")
-        self.gridLayout_4.addWidget(self.gm_button_3, 0, 6, 1, 1)
+        self.gm_source_bt.setText("")
+        self.gm_source_bt.setIcon(icon1)
+        self.gm_source_bt.setIconSize(QtCore.QSize(23, 23))
+        self.gm_source_bt.setObjectName("gm_source_bt")
+        self.gridLayout_4.addWidget(self.gm_source_bt, 0, 6, 1, 1)
         self.gm_institution_lb = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.gm_institution_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.gm_institution_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -562,10 +562,10 @@ class Ui_MainWindow(object):
         self.gm_institution_lb.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.gm_institution_lb.setObjectName("gm_institution_lb")
         self.gridLayout_4.addWidget(self.gm_institution_lb, 1, 0, 1, 1)
-        self.gm_button_2 = PushButtonRight(self.scrollAreaWidgetContents)
-        self.gm_button_2.setMinimumSize(QtCore.QSize(27, 27))
-        self.gm_button_2.setMaximumSize(QtCore.QSize(27, 27))
-        self.gm_button_2.setStyleSheet("QToolButton {\n"
+        self.gm_institution_bt = PushButtonRight(self.scrollAreaWidgetContents)
+        self.gm_institution_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.gm_institution_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.gm_institution_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -575,11 +575,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.gm_button_2.setText("")
-        self.gm_button_2.setIcon(icon1)
-        self.gm_button_2.setIconSize(QtCore.QSize(23, 23))
-        self.gm_button_2.setObjectName("gm_button_2")
-        self.gridLayout_4.addWidget(self.gm_button_2, 1, 2, 1, 1)
+        self.gm_institution_bt.setText("")
+        self.gm_institution_bt.setIcon(icon1)
+        self.gm_institution_bt.setIconSize(QtCore.QSize(23, 23))
+        self.gm_institution_bt.setObjectName("gm_institution_bt")
+        self.gridLayout_4.addWidget(self.gm_institution_bt, 1, 2, 1, 1)
         self.gm_project_lb = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.gm_project_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.gm_project_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -683,10 +683,10 @@ class Ui_MainWindow(object):
         self.gm_institution_ln.setFrame(False)
         self.gm_institution_ln.setObjectName("gm_institution_ln")
         self.gridLayout_4.addWidget(self.gm_institution_ln, 1, 1, 1, 1)
-        self.gm_button_4 = PushButtonRight(self.scrollAreaWidgetContents)
-        self.gm_button_4.setMinimumSize(QtCore.QSize(27, 27))
-        self.gm_button_4.setMaximumSize(QtCore.QSize(27, 27))
-        self.gm_button_4.setStyleSheet("QToolButton {\n"
+        self.gm_project_bt = PushButtonRight(self.scrollAreaWidgetContents)
+        self.gm_project_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.gm_project_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.gm_project_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -696,11 +696,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.gm_button_4.setText("")
-        self.gm_button_4.setIcon(icon1)
-        self.gm_button_4.setIconSize(QtCore.QSize(23, 23))
-        self.gm_button_4.setObjectName("gm_button_4")
-        self.gridLayout_4.addWidget(self.gm_button_4, 1, 6, 1, 1)
+        self.gm_project_bt.setText("")
+        self.gm_project_bt.setIcon(icon1)
+        self.gm_project_bt.setIconSize(QtCore.QSize(23, 23))
+        self.gm_project_bt.setObjectName("gm_project_bt")
+        self.gridLayout_4.addWidget(self.gm_project_bt, 1, 6, 1, 1)
         self.gm_project_ln = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.gm_project_ln.setEnabled(False)
         self.gm_project_ln.setMinimumSize(QtCore.QSize(0, 27))
@@ -1059,10 +1059,10 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.gm_history_ln, 2, 1, 1, 5)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.gm_button_5 = PushButtonRight(self.scrollAreaWidgetContents)
-        self.gm_button_5.setMinimumSize(QtCore.QSize(27, 27))
-        self.gm_button_5.setMaximumSize(QtCore.QSize(27, 27))
-        self.gm_button_5.setStyleSheet("QToolButton {\n"
+        self.gm_history_bt = PushButtonRight(self.scrollAreaWidgetContents)
+        self.gm_history_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.gm_history_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.gm_history_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -1072,11 +1072,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.gm_button_5.setText("")
-        self.gm_button_5.setIcon(icon1)
-        self.gm_button_5.setIconSize(QtCore.QSize(23, 23))
-        self.gm_button_5.setObjectName("gm_button_5")
-        self.verticalLayout.addWidget(self.gm_button_5)
+        self.gm_history_bt.setText("")
+        self.gm_history_bt.setIcon(icon1)
+        self.gm_history_bt.setIconSize(QtCore.QSize(23, 23))
+        self.gm_history_bt.setObjectName("gm_history_bt")
+        self.verticalLayout.addWidget(self.gm_history_bt)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
         self.gridLayout_4.addLayout(self.verticalLayout, 2, 6, 1, 1)
@@ -1348,10 +1348,10 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.gm_comments_ln, 3, 1, 1, 5)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.gm_button_6 = PushButtonRight(self.scrollAreaWidgetContents)
-        self.gm_button_6.setMinimumSize(QtCore.QSize(27, 27))
-        self.gm_button_6.setMaximumSize(QtCore.QSize(27, 27))
-        self.gm_button_6.setStyleSheet("QToolButton {\n"
+        self.gm_comments_bt = PushButtonRight(self.scrollAreaWidgetContents)
+        self.gm_comments_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.gm_comments_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.gm_comments_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -1361,11 +1361,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.gm_button_6.setText("")
-        self.gm_button_6.setIcon(icon1)
-        self.gm_button_6.setIconSize(QtCore.QSize(23, 23))
-        self.gm_button_6.setObjectName("gm_button_6")
-        self.verticalLayout_2.addWidget(self.gm_button_6)
+        self.gm_comments_bt.setText("")
+        self.gm_comments_bt.setIcon(icon1)
+        self.gm_comments_bt.setIconSize(QtCore.QSize(23, 23))
+        self.gm_comments_bt.setObjectName("gm_comments_bt")
+        self.verticalLayout_2.addWidget(self.gm_comments_bt)
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem2)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 3, 6, 1, 1)
@@ -1838,7 +1838,7 @@ class Ui_MainWindow(object):
         self.va_dimensionList_ln.setPlainText("")
         self.va_dimensionList_ln.setObjectName("va_dimensionList_ln")
         self.horizontalLayout.addWidget(self.va_dimensionList_ln)
-        self.none_button_1 = PushButtonRight(self.scrollAreaWidgetContents_2)
+        self.none_button_1 = QtWidgets.QToolButton(self.scrollAreaWidgetContents_2)
         self.none_button_1.setEnabled(False)
         self.none_button_1.setMinimumSize(QtCore.QSize(27, 27))
         self.none_button_1.setMaximumSize(QtCore.QSize(27, 27))
@@ -2207,11 +2207,11 @@ class Ui_MainWindow(object):
         self.va_varName_ln.setFrame(False)
         self.va_varName_ln.setObjectName("va_varName_ln")
         self.gridLayout_5.addWidget(self.va_varName_ln, 0, 1, 1, 1)
-        self.va_button_1 = PushButtonRight(self.layoutWidget)
-        self.va_button_1.setEnabled(False)
-        self.va_button_1.setMinimumSize(QtCore.QSize(27, 27))
-        self.va_button_1.setMaximumSize(QtCore.QSize(27, 27))
-        self.va_button_1.setStyleSheet("QToolButton {\n"
+        self.va_varName_bt = PushButtonRight(self.layoutWidget)
+        self.va_varName_bt.setEnabled(False)
+        self.va_varName_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.va_varName_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.va_varName_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -2221,11 +2221,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.va_button_1.setText("")
-        self.va_button_1.setIcon(icon1)
-        self.va_button_1.setIconSize(QtCore.QSize(23, 23))
-        self.va_button_1.setObjectName("va_button_1")
-        self.gridLayout_5.addWidget(self.va_button_1, 0, 2, 1, 1)
+        self.va_varName_bt.setText("")
+        self.va_varName_bt.setIcon(icon1)
+        self.va_varName_bt.setIconSize(QtCore.QSize(23, 23))
+        self.va_varName_bt.setObjectName("va_varName_bt")
+        self.gridLayout_5.addWidget(self.va_varName_bt, 0, 2, 1, 1)
         self.va_longName_lb = QtWidgets.QLabel(self.layoutWidget)
         self.va_longName_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.va_longName_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -2333,11 +2333,11 @@ class Ui_MainWindow(object):
         self.va_longName_ln.setFrame(False)
         self.va_longName_ln.setObjectName("va_longName_ln")
         self.gridLayout_5.addWidget(self.va_longName_ln, 1, 1, 1, 1)
-        self.va_button_2 = PushButtonRight(self.layoutWidget)
-        self.va_button_2.setEnabled(False)
-        self.va_button_2.setMinimumSize(QtCore.QSize(27, 27))
-        self.va_button_2.setMaximumSize(QtCore.QSize(27, 27))
-        self.va_button_2.setStyleSheet("QToolButton {\n"
+        self.va_longName_bt = PushButtonRight(self.layoutWidget)
+        self.va_longName_bt.setEnabled(False)
+        self.va_longName_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.va_longName_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.va_longName_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -2347,11 +2347,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.va_button_2.setText("")
-        self.va_button_2.setIcon(icon1)
-        self.va_button_2.setIconSize(QtCore.QSize(23, 23))
-        self.va_button_2.setObjectName("va_button_2")
-        self.gridLayout_5.addWidget(self.va_button_2, 1, 2, 1, 1)
+        self.va_longName_bt.setText("")
+        self.va_longName_bt.setIcon(icon1)
+        self.va_longName_bt.setIconSize(QtCore.QSize(23, 23))
+        self.va_longName_bt.setObjectName("va_longName_bt")
+        self.gridLayout_5.addWidget(self.va_longName_bt, 1, 2, 1, 1)
         self.va_category_lb = QtWidgets.QLabel(self.layoutWidget)
         self.va_category_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.va_category_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -2459,11 +2459,11 @@ class Ui_MainWindow(object):
         self.va_category_ln.setFrame(False)
         self.va_category_ln.setObjectName("va_category_ln")
         self.gridLayout_5.addWidget(self.va_category_ln, 2, 1, 1, 1)
-        self.va_button_3 = PushButtonRight(self.layoutWidget)
-        self.va_button_3.setEnabled(False)
-        self.va_button_3.setMinimumSize(QtCore.QSize(27, 27))
-        self.va_button_3.setMaximumSize(QtCore.QSize(27, 27))
-        self.va_button_3.setStyleSheet("QToolButton {\n"
+        self.va_category_bt = PushButtonRight(self.layoutWidget)
+        self.va_category_bt.setEnabled(False)
+        self.va_category_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.va_category_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.va_category_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -2473,11 +2473,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.va_button_3.setText("")
-        self.va_button_3.setIcon(icon1)
-        self.va_button_3.setIconSize(QtCore.QSize(23, 23))
-        self.va_button_3.setObjectName("va_button_3")
-        self.gridLayout_5.addWidget(self.va_button_3, 2, 2, 1, 1)
+        self.va_category_bt.setText("")
+        self.va_category_bt.setIcon(icon1)
+        self.va_category_bt.setIconSize(QtCore.QSize(23, 23))
+        self.va_category_bt.setObjectName("va_category_bt")
+        self.gridLayout_5.addWidget(self.va_category_bt, 2, 2, 1, 1)
         self.va_units_lb = QtWidgets.QLabel(self.layoutWidget)
         self.va_units_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.va_units_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -2585,27 +2585,6 @@ class Ui_MainWindow(object):
         self.va_units_ln.setFrame(False)
         self.va_units_ln.setObjectName("va_units_ln")
         self.gridLayout_5.addWidget(self.va_units_ln, 3, 1, 1, 1)
-        self.va_button_4 = PushButtonRight(self.layoutWidget)
-        self.va_button_4.setEnabled(False)
-        self.va_button_4.setMinimumSize(QtCore.QSize(27, 27))
-        self.va_button_4.setMaximumSize(QtCore.QSize(27, 27))
-        self.va_button_4.setStyleSheet("QToolButton {\n"
-"    border: 1px solid transparent;\n"
-"    background-color: transparent;\n"
-"    width: 27px;\n"
-"    height: 27px;\n"
-"}\n"
-"\n"
-"QToolButton:flat {\n"
-"    border: none;\n"
-"}")
-        self.va_button_4.setText("")
-        self.va_button_4.setIcon(icon1)
-        self.va_button_4.setIconSize(QtCore.QSize(23, 23))
-        self.va_button_4.setObjectName("va_button_4")
-        self.va_button_4.setEnabled(False)
-        self.va_button_4.setVisible(False)
-        self.gridLayout_5.addWidget(self.va_button_4, 3, 2, 1, 1)
         self.va_fillValue_lb = QtWidgets.QLabel(self.layoutWidget)
         self.va_fillValue_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.va_fillValue_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -3544,7 +3523,7 @@ class Ui_MainWindow(object):
         self.new_dimensionList_ln.setPlainText("")
         self.new_dimensionList_ln.setObjectName("new_dimensionList_ln")
         self.horizontalLayout_2.addWidget(self.new_dimensionList_ln)
-        self.none_button_2 = PushButtonRight(self.scrollAreaWidgetContents_3)
+        self.none_button_2 = QtWidgets.QToolButton(self.scrollAreaWidgetContents_3)
         self.none_button_2.setEnabled(False)
         self.none_button_2.setMinimumSize(QtCore.QSize(27, 27))
         self.none_button_2.setMaximumSize(QtCore.QSize(27, 27))
@@ -3912,11 +3891,11 @@ class Ui_MainWindow(object):
         self.new_varName_ln.setFrame(False)
         self.new_varName_ln.setObjectName("new_varName_ln")
         self.gridLayout_6.addWidget(self.new_varName_ln, 0, 1, 1, 1)
-        self.new_button_1 = PushButtonRight(self.layoutWidget1)
-        self.new_button_1.setEnabled(False)
-        self.new_button_1.setMinimumSize(QtCore.QSize(27, 27))
-        self.new_button_1.setMaximumSize(QtCore.QSize(27, 27))
-        self.new_button_1.setStyleSheet("QToolButton {\n"
+        self.new_varName_bt = PushButtonRight(self.layoutWidget1)
+        self.new_varName_bt.setEnabled(False)
+        self.new_varName_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.new_varName_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.new_varName_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -3926,11 +3905,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.new_button_1.setText("")
-        self.new_button_1.setIcon(icon1)
-        self.new_button_1.setIconSize(QtCore.QSize(23, 23))
-        self.new_button_1.setObjectName("new_button_1")
-        self.gridLayout_6.addWidget(self.new_button_1, 0, 2, 1, 1)
+        self.new_varName_bt.setText("")
+        self.new_varName_bt.setIcon(icon1)
+        self.new_varName_bt.setIconSize(QtCore.QSize(23, 23))
+        self.new_varName_bt.setObjectName("new_varName_bt")
+        self.gridLayout_6.addWidget(self.new_varName_bt, 0, 2, 1, 1)
         self.new_longName_lb = QtWidgets.QLabel(self.layoutWidget1)
         self.new_longName_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.new_longName_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -4038,11 +4017,11 @@ class Ui_MainWindow(object):
         self.new_longName_ln.setFrame(False)
         self.new_longName_ln.setObjectName("new_longName_ln")
         self.gridLayout_6.addWidget(self.new_longName_ln, 1, 1, 1, 1)
-        self.new_button_2 = PushButtonRight(self.layoutWidget1)
-        self.new_button_2.setEnabled(False)
-        self.new_button_2.setMinimumSize(QtCore.QSize(27, 27))
-        self.new_button_2.setMaximumSize(QtCore.QSize(27, 27))
-        self.new_button_2.setStyleSheet("QToolButton {\n"
+        self.new_longName_bt = PushButtonRight(self.layoutWidget1)
+        self.new_longName_bt.setEnabled(False)
+        self.new_longName_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.new_longName_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.new_longName_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -4052,11 +4031,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.new_button_2.setText("")
-        self.new_button_2.setIcon(icon1)
-        self.new_button_2.setIconSize(QtCore.QSize(23, 23))
-        self.new_button_2.setObjectName("new_button_2")
-        self.gridLayout_6.addWidget(self.new_button_2, 1, 2, 1, 1)
+        self.new_longName_bt.setText("")
+        self.new_longName_bt.setIcon(icon1)
+        self.new_longName_bt.setIconSize(QtCore.QSize(23, 23))
+        self.new_longName_bt.setObjectName("new_longName_bt")
+        self.gridLayout_6.addWidget(self.new_longName_bt, 1, 2, 1, 1)
         self.new_category_lb = QtWidgets.QLabel(self.layoutWidget1)
         self.new_category_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.new_category_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -4164,11 +4143,11 @@ class Ui_MainWindow(object):
         self.new_category_ln.setFrame(False)
         self.new_category_ln.setObjectName("new_category_ln")
         self.gridLayout_6.addWidget(self.new_category_ln, 2, 1, 1, 1)
-        self.new_button_3 = PushButtonRight(self.layoutWidget1)
-        self.new_button_3.setEnabled(False)
-        self.new_button_3.setMinimumSize(QtCore.QSize(27, 27))
-        self.new_button_3.setMaximumSize(QtCore.QSize(27, 27))
-        self.new_button_3.setStyleSheet("QToolButton {\n"
+        self.new_category_bt = PushButtonRight(self.layoutWidget1)
+        self.new_category_bt.setEnabled(False)
+        self.new_category_bt.setMinimumSize(QtCore.QSize(27, 27))
+        self.new_category_bt.setMaximumSize(QtCore.QSize(27, 27))
+        self.new_category_bt.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -4178,11 +4157,11 @@ class Ui_MainWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.new_button_3.setText("")
-        self.new_button_3.setIcon(icon1)
-        self.new_button_3.setIconSize(QtCore.QSize(23, 23))
-        self.new_button_3.setObjectName("new_button_3")
-        self.gridLayout_6.addWidget(self.new_button_3, 2, 2, 1, 1)
+        self.new_category_bt.setText("")
+        self.new_category_bt.setIcon(icon1)
+        self.new_category_bt.setIconSize(QtCore.QSize(23, 23))
+        self.new_category_bt.setObjectName("new_category_bt")
+        self.gridLayout_6.addWidget(self.new_category_bt, 2, 2, 1, 1)
         self.new_units_lb = QtWidgets.QLabel(self.layoutWidget1)
         self.new_units_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.new_units_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -4290,27 +4269,6 @@ class Ui_MainWindow(object):
         self.new_units_ln.setFrame(False)
         self.new_units_ln.setObjectName("new_units_ln")
         self.gridLayout_6.addWidget(self.new_units_ln, 3, 1, 1, 1)
-        self.new_button_4 = PushButtonRight(self.layoutWidget1)
-        self.new_button_4.setEnabled(False)
-        self.new_button_4.setMinimumSize(QtCore.QSize(27, 27))
-        self.new_button_4.setMaximumSize(QtCore.QSize(27, 27))
-        self.new_button_4.setStyleSheet("QToolButton {\n"
-"    border: 1px solid transparent;\n"
-"    background-color: transparent;\n"
-"    width: 27px;\n"
-"    height: 27px;\n"
-"}\n"
-"\n"
-"QToolButton:flat {\n"
-"    border: none;\n"
-"}")
-        self.new_button_4.setText("")
-        self.new_button_4.setIcon(icon1)
-        self.new_button_4.setIconSize(QtCore.QSize(23, 23))
-        self.new_button_4.setObjectName("new_button_4")
-        self.new_button_4.setEnabled(False)
-        self.new_button_4.setVisible(False)
-        self.gridLayout_6.addWidget(self.new_button_4, 3, 2, 1, 1)
         self.new_fillValue_lb = QtWidgets.QLabel(self.layoutWidget1)
         self.new_fillValue_lb.setMinimumSize(QtCore.QSize(0, 27))
         self.new_fillValue_lb.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -4864,7 +4822,8 @@ class Ui_MainWindow(object):
 "   height: 1px;\n"
 "   margin-top: 2px;\n"
 "   margin-bottom: 2px;\n"
-"}")
+"}\n"
+"")
         self.menuBar.setNativeMenuBar(True)
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
@@ -4874,7 +4833,26 @@ class Ui_MainWindow(object):
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.menuFile.setFont(font)
+        self.menuFile.setStyleSheet("")
         self.menuFile.setObjectName("menuFile")
+        self.menuOpen_recent = QtWidgets.QMenu(self.menuFile)
+        self.menuOpen_recent.setEnabled(False)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.menuOpen_recent.setFont(font)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap("icons/open_popup_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.menuOpen_recent.setIcon(icon2)
+        self.menuOpen_recent.setObjectName("menuOpen_recent")
+        self.menuQuick_access = QtWidgets.QMenu(self.menuFile)
+        self.menuQuick_access.setEnabled(False)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap("icons/quick_access_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.menuQuick_access.setIcon(icon3)
+        self.menuQuick_access.setObjectName("menuQuick_access")
         self.menuProcessings = QtWidgets.QMenu(self.menuBar)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
@@ -4892,9 +4870,9 @@ class Ui_MainWindow(object):
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.menuEmbedded_algorithms.setFont(font)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("icons/new_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.menuEmbedded_algorithms.setIcon(icon2)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap("icons/new_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.menuEmbedded_algorithms.setIcon(icon4)
         self.menuEmbedded_algorithms.setObjectName("menuEmbedded_algorithms")
         self.menuUser_defined_algorithms = QtWidgets.QMenu(self.menuProcessings)
         font = QtGui.QFont()
@@ -4905,9 +4883,9 @@ class Ui_MainWindow(object):
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.menuUser_defined_algorithms.setFont(font)
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("icons/create_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.menuUser_defined_algorithms.setIcon(icon3)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap("icons/create_algo_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.menuUser_defined_algorithms.setIcon(icon5)
         self.menuUser_defined_algorithms.setObjectName("menuUser_defined_algorithms")
         self.menuAbout = QtWidgets.QMenu(self.menuBar)
         font = QtGui.QFont()
@@ -4956,9 +4934,7 @@ class Ui_MainWindow(object):
         self.statusBar.setObjectName("statusBar")
         MainWindow.setStatusBar(self.statusBar)
         self.actionOpenBar = QtWidgets.QAction(MainWindow)
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("icons/open_popup_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionOpenBar.setIcon(icon4)
+        self.actionOpenBar.setIcon(icon2)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -4968,9 +4944,9 @@ class Ui_MainWindow(object):
         self.actionOpenBar.setObjectName("actionOpenBar")
         self.actionCloseBar = QtWidgets.QAction(MainWindow)
         self.actionCloseBar.setEnabled(False)
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap("icons/off_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionCloseBar.setIcon(icon5)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap("icons/off_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionCloseBar.setIcon(icon6)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -4980,7 +4956,7 @@ class Ui_MainWindow(object):
         self.actionCloseBar.setObjectName("actionCloseBar")
         self.actionAlgorithmsBar = QtWidgets.QAction(MainWindow)
         self.actionAlgorithmsBar.setEnabled(False)
-        self.actionAlgorithmsBar.setIcon(icon2)
+        self.actionAlgorithmsBar.setIcon(icon4)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -4989,7 +4965,7 @@ class Ui_MainWindow(object):
         self.actionAlgorithmsBar.setFont(font)
         self.actionAlgorithmsBar.setObjectName("actionAlgorithmsBar")
         self.actionCreatealgorithmBar = QtWidgets.QAction(MainWindow)
-        self.actionCreatealgorithmBar.setIcon(icon3)
+        self.actionCreatealgorithmBar.setIcon(icon5)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -4999,9 +4975,9 @@ class Ui_MainWindow(object):
         self.actionCreatealgorithmBar.setObjectName("actionCreatealgorithmBar")
         self.actionCreateVariableBar = QtWidgets.QAction(MainWindow)
         self.actionCreateVariableBar.setEnabled(False)
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap("icons/new_var_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionCreateVariableBar.setIcon(icon6)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap("icons/new_var_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionCreateVariableBar.setIcon(icon7)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5011,9 +4987,9 @@ class Ui_MainWindow(object):
         self.actionCreateVariableBar.setObjectName("actionCreateVariableBar")
         self.actionMigrateVariableBar = QtWidgets.QAction(MainWindow)
         self.actionMigrateVariableBar.setEnabled(False)
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap("icons/migrate_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionMigrateVariableBar.setIcon(icon7)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap("icons/migrate_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionMigrateVariableBar.setIcon(icon8)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5023,9 +4999,9 @@ class Ui_MainWindow(object):
         self.actionMigrateVariableBar.setObjectName("actionMigrateVariableBar")
         self.actionDeleteVariableBar = QtWidgets.QAction(MainWindow)
         self.actionDeleteVariableBar.setEnabled(False)
-        icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap("icons/del_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionDeleteVariableBar.setIcon(icon8)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap("icons/del_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionDeleteVariableBar.setIcon(icon9)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5035,9 +5011,9 @@ class Ui_MainWindow(object):
         self.actionDeleteVariableBar.setObjectName("actionDeleteVariableBar")
         self.actionGlobalAttributesBar = QtWidgets.QAction(MainWindow)
         self.actionGlobalAttributesBar.setEnabled(False)
-        icon9 = QtGui.QIcon()
-        icon9.addPixmap(QtGui.QPixmap("icons/glo_metadata_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionGlobalAttributesBar.setIcon(icon9)
+        icon10 = QtGui.QIcon()
+        icon10.addPixmap(QtGui.QPixmap("icons/glo_metadata_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionGlobalAttributesBar.setIcon(icon10)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5047,9 +5023,9 @@ class Ui_MainWindow(object):
         self.actionGlobalAttributesBar.setObjectName("actionGlobalAttributesBar")
         self.actionVariableAttributesBar = QtWidgets.QAction(MainWindow)
         self.actionVariableAttributesBar.setEnabled(False)
-        icon10 = QtGui.QIcon()
-        icon10.addPixmap(QtGui.QPixmap("icons/var_metadata_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionVariableAttributesBar.setIcon(icon10)
+        icon11 = QtGui.QIcon()
+        icon11.addPixmap(QtGui.QPixmap("icons/var_metadata_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionVariableAttributesBar.setIcon(icon11)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5059,9 +5035,9 @@ class Ui_MainWindow(object):
         self.actionVariableAttributesBar.setObjectName("actionVariableAttributesBar")
         self.actionPlotBar = QtWidgets.QAction(MainWindow)
         self.actionPlotBar.setEnabled(False)
-        icon11 = QtGui.QIcon()
-        icon11.addPixmap(QtGui.QPixmap("icons/plot_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionPlotBar.setIcon(icon11)
+        icon12 = QtGui.QIcon()
+        icon12.addPixmap(QtGui.QPixmap("icons/plot_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionPlotBar.setIcon(icon12)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5070,9 +5046,9 @@ class Ui_MainWindow(object):
         self.actionPlotBar.setFont(font)
         self.actionPlotBar.setObjectName("actionPlotBar")
         self.actionBatch_processing = QtWidgets.QAction(MainWindow)
-        icon12 = QtGui.QIcon()
-        icon12.addPixmap(QtGui.QPixmap("icons/batch_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionBatch_processing.setIcon(icon12)
+        icon13 = QtGui.QIcon()
+        icon13.addPixmap(QtGui.QPixmap("icons/batch_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionBatch_processing.setIcon(icon13)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5081,9 +5057,9 @@ class Ui_MainWindow(object):
         self.actionBatch_processing.setFont(font)
         self.actionBatch_processing.setObjectName("actionBatch_processing")
         self.actionExit = QtWidgets.QAction(MainWindow)
-        icon13 = QtGui.QIcon()
-        icon13.addPixmap(QtGui.QPixmap("icons/exit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionExit.setIcon(icon13)
+        icon14 = QtGui.QIcon()
+        icon14.addPixmap(QtGui.QPixmap("icons/exit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionExit.setIcon(icon14)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5092,9 +5068,9 @@ class Ui_MainWindow(object):
         self.actionExit.setFont(font)
         self.actionExit.setObjectName("actionExit")
         self.actionHelp = QtWidgets.QAction(MainWindow)
-        icon14 = QtGui.QIcon()
-        icon14.addPixmap(QtGui.QPixmap("icons/help_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionHelp.setIcon(icon14)
+        icon15 = QtGui.QIcon()
+        icon15.addPixmap(QtGui.QPixmap("icons/help_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionHelp.setIcon(icon15)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5103,9 +5079,9 @@ class Ui_MainWindow(object):
         self.actionHelp.setFont(font)
         self.actionHelp.setObjectName("actionHelp")
         self.actionAbout_EGADS = QtWidgets.QAction(MainWindow)
-        icon15 = QtGui.QIcon()
-        icon15.addPixmap(QtGui.QPixmap("icons/about_popup_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionAbout_EGADS.setIcon(icon15)
+        icon16 = QtGui.QIcon()
+        icon16.addPixmap(QtGui.QPixmap("icons/about_popup_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionAbout_EGADS.setIcon(icon16)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5115,30 +5091,30 @@ class Ui_MainWindow(object):
         self.actionAbout_EGADS.setObjectName("actionAbout_EGADS")
         self.actionSeparator = QtWidgets.QAction(MainWindow)
         self.actionSeparator.setEnabled(False)
-        icon16 = QtGui.QIcon()
-        icon16.addPixmap(QtGui.QPixmap("icons/separator_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon16.addPixmap(QtGui.QPixmap("icons/separator_icon.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
-        self.actionSeparator.setIcon(icon16)
+        icon17 = QtGui.QIcon()
+        icon17.addPixmap(QtGui.QPixmap("icons/separator_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon17.addPixmap(QtGui.QPixmap("icons/separator_icon.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
+        self.actionSeparator.setIcon(icon17)
         self.actionSeparator.setObjectName("actionSeparator")
         self.actionSeparator2 = QtWidgets.QAction(MainWindow)
         self.actionSeparator2.setEnabled(False)
-        self.actionSeparator2.setIcon(icon16)
+        self.actionSeparator2.setIcon(icon17)
         self.actionSeparator2.setVisible(True)
         self.actionSeparator2.setIconVisibleInMenu(True)
         self.actionSeparator2.setObjectName("actionSeparator2")
         self.actionSeparator3 = QtWidgets.QAction(MainWindow)
         self.actionSeparator3.setEnabled(False)
-        self.actionSeparator3.setIcon(icon16)
+        self.actionSeparator3.setIcon(icon17)
         self.actionSeparator3.setObjectName("actionSeparator3")
         self.actionSeparator4 = QtWidgets.QAction(MainWindow)
         self.actionSeparator4.setEnabled(False)
-        self.actionSeparator4.setIcon(icon16)
+        self.actionSeparator4.setIcon(icon17)
         self.actionSeparator4.setObjectName("actionSeparator4")
         self.actionSaveAsBar = QtWidgets.QAction(MainWindow)
         self.actionSaveAsBar.setEnabled(False)
-        icon17 = QtGui.QIcon()
-        icon17.addPixmap(QtGui.QPixmap("icons/save_as_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionSaveAsBar.setIcon(icon17)
+        icon18 = QtGui.QIcon()
+        icon18.addPixmap(QtGui.QPixmap("icons/save_as_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionSaveAsBar.setIcon(icon18)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5148,9 +5124,9 @@ class Ui_MainWindow(object):
         self.actionSaveAsBar.setObjectName("actionSaveAsBar")
         self.actionDisplayBar = QtWidgets.QAction(MainWindow)
         self.actionDisplayBar.setEnabled(False)
-        icon18 = QtGui.QIcon()
-        icon18.addPixmap(QtGui.QPixmap("icons/data_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionDisplayBar.setIcon(icon18)
+        icon19 = QtGui.QIcon()
+        icon19.addPixmap(QtGui.QPixmap("icons/data_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionDisplayBar.setIcon(icon19)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5159,9 +5135,9 @@ class Ui_MainWindow(object):
         self.actionDisplayBar.setFont(font)
         self.actionDisplayBar.setObjectName("actionDisplayBar")
         self.actionOptions = QtWidgets.QAction(MainWindow)
-        icon19 = QtGui.QIcon()
-        icon19.addPixmap(QtGui.QPixmap("icons/option_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionOptions.setIcon(icon19)
+        icon20 = QtGui.QIcon()
+        icon20.addPixmap(QtGui.QPixmap("icons/option_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionOptions.setIcon(icon20)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5171,12 +5147,12 @@ class Ui_MainWindow(object):
         self.actionOptions.setObjectName("actionOptions")
         self.actionSeparator5 = QtWidgets.QAction(MainWindow)
         self.actionSeparator5.setEnabled(False)
-        self.actionSeparator5.setIcon(icon16)
+        self.actionSeparator5.setIcon(icon17)
         self.actionSeparator5.setObjectName("actionSeparator5")
         self.actionUpdate = QtWidgets.QAction(MainWindow)
-        icon20 = QtGui.QIcon()
-        icon20.addPixmap(QtGui.QPixmap("icons/egads_update_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionUpdate.setIcon(icon20)
+        icon21 = QtGui.QIcon()
+        icon21.addPixmap(QtGui.QPixmap("icons/egads_update_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionUpdate.setIcon(icon21)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5186,9 +5162,9 @@ class Ui_MainWindow(object):
         self.actionUpdate.setObjectName("actionUpdate")
         self.actionExport = QtWidgets.QAction(MainWindow)
         self.actionExport.setEnabled(False)
-        icon21 = QtGui.QIcon()
-        icon21.addPixmap(QtGui.QPixmap("icons/export_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionExport.setIcon(icon21)
+        icon22 = QtGui.QIcon()
+        icon22.addPixmap(QtGui.QPixmap("icons/export_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionExport.setIcon(icon22)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -5196,7 +5172,23 @@ class Ui_MainWindow(object):
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.actionExport.setFont(font)
         self.actionExport.setObjectName("actionExport")
+        self.actionClear_list = QtWidgets.QAction(MainWindow)
+        self.actionClear_list.setIcon(icon9)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.actionClear_list.setFont(font)
+        self.actionClear_list.setObjectName("actionClear_list")
+        self.actionTMP = QtWidgets.QAction(MainWindow)
+        self.actionTMP.setObjectName("actionTMP")
+        self.actionTMP_2 = QtWidgets.QAction(MainWindow)
+        self.actionTMP_2.setObjectName("actionTMP_2")
+        self.menuOpen_recent.addSeparator()
         self.menuFile.addAction(self.actionOpenBar)
+        self.menuFile.addAction(self.menuOpen_recent.menuAction())
+        self.menuFile.addAction(self.menuQuick_access.menuAction())
         self.menuFile.addAction(self.actionSaveAsBar)
         self.menuFile.addAction(self.actionCloseBar)
         self.menuFile.addSeparator()
@@ -5265,6 +5257,8 @@ class Ui_MainWindow(object):
         self.new_egadsProcessor_lb.setText(_translate("MainWindow", "<html><head/><body><p>EGADS<br/>processors:</p></body></html>"))
         self.tab_view.setTabText(self.tab_view.indexOf(self.tab_3), _translate("MainWindow", "New Variables"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuOpen_recent.setTitle(_translate("MainWindow", "Open recent..."))
+        self.menuQuick_access.setTitle(_translate("MainWindow", "Quick access..."))
         self.menuProcessings.setTitle(_translate("MainWindow", "Processing"))
         self.menuEmbedded_algorithms.setTitle(_translate("MainWindow", "Embedded algorithms"))
         self.menuUser_defined_algorithms.setTitle(_translate("MainWindow", "User-defined algorithms"))
@@ -5310,4 +5304,8 @@ class Ui_MainWindow(object):
         self.actionUpdate.setToolTip(_translate("MainWindow", "An update is available. Click for more detail"))
         self.actionExport.setText(_translate("MainWindow", "Export..."))
         self.actionExport.setToolTip(_translate("MainWindow", "Export variables to another format"))
+        self.actionClear_list.setText(_translate("MainWindow", "Clear list..."))
+        self.actionClear_list.setToolTip(_translate("MainWindow", "Clear the list"))
+        self.actionTMP.setText(_translate("MainWindow", "TMP"))
+        self.actionTMP_2.setText(_translate("MainWindow", "TMP"))
 

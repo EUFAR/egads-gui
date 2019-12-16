@@ -3,60 +3,14 @@ import platform
 import matplotlib
 
 
-def objects_initialization(self):
-    logging.debug('gui - material_functions.py - objects_initialization')
-    self.modified = False
-    self.opened_file = None
-    self.file_name = ''
-    self.file_ext = ''
-    self.default_message = ''
-    self.file_is_opened = False
-    self.list_of_dimensions = {}
-    self.list_of_global_attributes = {}
-    self.list_of_variables_and_attributes = {}
-    self.list_of_new_variables_and_attributes = {}
-    self.list_of_unread_variables = {}
-    self.x_axis_variable_set = False
-    self.x_axis_variable_name = None
-    self.new_variables = False
-    self.x_variable = None
-    self.first_time_x_variable = True
-    self.gui_update_url = None
-    self.statusbar_msg_thread = None
-    self.min_egads_version = '1.1.2'
-    self.min_egads_branch = 'Lineage'
-    self.buttons_lines_dict = {
-                        "gm_button_1": ["gm_title_ln", None, None],
-                        "gm_button_2": ["gm_institution_ln", None, None],
-                        "gm_button_3": ["gm_source_ln", None, None],
-                        "gm_button_4": ["gm_project_ln", None, None],
-                        "gm_button_5": ["gm_history_ln", None, None],
-                        "gm_button_6": ["gm_comments_ln", None, None],
-                        "new_button_1": ["new_varName_ln", self.new_variable_list,
-                                         self.list_of_new_variables_and_attributes],
-                        "new_button_2": ["new_longName_ln", self.new_variable_list,
-                                         self.list_of_new_variables_and_attributes],
-                        "new_button_3": ["new_category_ln", self.new_variable_list,
-                                         self.list_of_new_variables_and_attributes],
-                        "new_button_4": ["new_units_ln", self.new_variable_list,
-                                         self.list_of_new_variables_and_attributes]
-                        }
-    
-    self.objects_metadata_dict = {
-                        "gm_title_ln": ["title", "MNAME"],
-                        "gm_institution_ln": ["institution", "ORG"],
-                        "gm_source_ln": ["source", "SNAME"],
-                        "gm_project_ln": ["project", "ONAME"],
-                        "gm_history_ln": ["history", "NCOM"],
-                        "gm_comments_ln": ["", "SCOM"],
-                        "va_varName_ln": "var_name",
-                        "va_longName_ln": "long_name",
-                        "va_category_ln": "Category",
-                        "va_units_ln": "units",
-                        "new_varName_ln": "var_name",
-                        "new_longName_ln": "long_name",
-                        "new_category_ln": "Category",
-                        "new_units_ln": "units"}
+def widgets_metadata_dict():
+    object_dict = {'gm_title_ln': ['title', 'MNAME'], 'gm_institution_ln': ['institution', 'ORG'],
+                   'gm_source_ln': ['source', 'SNAME'], 'gm_project_ln': ['project', 'ONAME'],
+                   'gm_history_ln': ['history', 'NCOM'], 'gm_comments_ln': ["", 'SCOM'],
+                   'va_varName_ln': 'var_name', 'va_longName_ln': 'long_name', 'va_category_ln': 'Category',
+                   'va_units_ln': 'units', 'new_varName_ln': 'var_name', 'new_longName_ln': 'long_name',
+                   'new_category_ln': 'Category', 'new_units_ln': 'units'}
+    return object_dict
 
 
 def setup_fonts():
@@ -66,93 +20,114 @@ def setup_fonts():
                      [str(f.name) for f in matplotlib.font_manager.fontManager.afmlist])
     elif platform.system() == 'Windows':
         font_list = [matplotlib.font_manager.FontProperties(fname=fname).get_name() for fname in matplotlib.
-                     font_manager.win32InstalledFonts()]
+                     font_manager.win32InstalledFonts(fontext='ttf')] + \
+                    [matplotlib.font_manager.FontProperties(fname=fname).get_name() for fname in matplotlib.
+                     font_manager.win32InstalledFonts(fontext='afm')]
     else:
         raise Exception('The program couldnt determined which os is intalled')
     for index, item in enumerate(font_list):
         font_list[index] = str(item)
     default_font = matplotlib.font_manager.FontProperties(family=[str(matplotlib.rcParams['font.family'][
-                                                                           0])]).get_name()
+                                                                          0])]).get_name()
     if default_font not in font_list:
         font_list.append(default_font)
-    font_list = sorted(set(font_list))
-    return font_list, default_font
+    return sorted(set(font_list)), default_font
+
+
+def grid_projection_list():
+    object_list = ['AlbersEqualArea', 'PlateCarree', 'AzimuthalEquidistant', 'EquidistantConic', 'LambertConformal',
+                   'LambertCylindrical', 'Mercator', 'Miller', 'Mollweide', 'Orthographic', 'Robinson', 'Sinusoidal',
+                   'Geostationary', 'EckertI', 'EqualEarth', 'NorthPolarStereo', 'SouthPolarStereo']
+    return sorted(object_list)
+
+
+def grid_projection_parameters():
+    object_dict = {'AlbersEqualArea': {'central_longitude': 0.0, 'central_latitude': 0.0, 'false_easting': 0.0,
+                                       'false_northing': 0.0, 'standard_parallels': (20.0, 50.0), 'globe': None},
+                   'PlateCarree': {'central_longitude': 0.0, 'globe': None},
+                   'AzimuthalEquidistant': {'central_longitude': 0.0, 'central_latitude': 0.0, 'false_easting': 0.0,
+                                            'false_northing': 0.0, 'globe': None},
+                   'EquidistantConic': {'central_longitude': 0.0, 'central_latitude': 0.0, 'false_easting': 0.0,
+                                        'false_northing': 0.0, 'standard_parallels': (20.0, 50.0), 'globe': None},
+                   'LambertConformal': {'central_longitude': -96.0, 'central_latitude': 39.0, 'false_easting': 0.0,
+                                        'false_northing': 0.0, 'secant_latitudes': None, 'standard_parallels': None,
+                                        'globe': None, 'cutoff': -30},
+                   'LambertCylindrical': {'central_longitude': 0.0},
+                   'Mercator': {'central_longitude': 0.0, 'min_latitude': -80.0, 'max_latitude': 84.0, 'globe': None,
+                                'latitude_true_scale': None, 'false_easting': 0.0, 'false_northing': 0.0,
+                                'scale_factor': None},
+                   'Miller': {'central_longitude': 0.0, 'globe': None},
+                   'Mollweide': {'central_longitude': 0, 'globe': None, 'false_easting': None, 'false_northing': None},
+                   'Orthographic': {'central_longitude': 0.0, 'central_latitude': 0.0, 'globe': None},
+                   'Robinson': {'central_longitude': 0, 'globe': None, 'false_easting': None, 'false_northing': None},
+                   'Sinusoidal': {'central_longitude': 0.0, 'false_easting': 0.0, 'false_northing': 0.0, 'globe': None},
+                   'Geostationary': {'central_longitude': 0.0, 'satellite_height': 35785831, 'false_easting': 0,
+                                     'false_northing': 0, 'globe': None, 'sweep_axis': 'y'},
+                   'EckertI': {'central_longitude': 0, 'false_easting': None, 'false_northing': None, 'globe': None},
+                   'EqualEarth': {'central_longitude': 0, 'false_easting': None, 'false_northing': None, 'globe': None},
+                   'NorthPolarStereo': {'central_longitude': 0.0, 'true_scale_latitude': None, 'globe': None},
+                   'SouthPolarStereo': {'central_longitude': 0.0, 'true_scale_latitude': None, 'globe': None}}
+    return object_dict
+
+
+def grid_projection_option_help():
+    object_dict = {'central_longitude': 'The central longitude. Optional, defaults to 0.',
+                   'central_latitude': 'The central latitude. Optional, defaults to 0.',
+                   'false_easting': 'X offset from planar origin in metres. Optional, defaults to 0.',
+                   'false_northing': 'Y offset from planar origin in metres. Optional, defaults to 0.',
+                   'standard_parallels': 'The one or two latitudes of correct scale. Optional, defaults to (20, 50).',
+                   'globe': 'A cartopy.crs.Globe. If omitted, a default globe is created. It is not possible to '
+                            'modify this option in the GUI.',
+                   'secant_latitudes': 'This keyword is deprecated in v0.12 of Cartopy and directly replaced by '
+                                       'standard parallels. Optional, defaults to None.',
+                   'cutoff': 'Latitude of map cutoff. The map extends to infinity opposite the central pole so we '
+                             'must cut off the map drawing before then. A value of 0 will draw half the globe. '
+                             'Optional, defaults to -30.',
+                   'min_latitude': 'The maximum southerly extent of the projection. Optional, defaults to -80 degrees.',
+                   'max_latitude': 'The maximum northerly extent of the projection. Optional, defaults to 84 degrees.',
+                   'latitude_true_scale': 'The latitude where the scale is 1. Optional, defaults to 0 degrees.',
+                   'true_scale_latitude': 'The latitude where the scale is 1. Optional, defaults to 0 degrees.',
+                   'scale_factor': 'Scale factor at natural origin. Optional, defaults to unused.',
+                   'zone': 'The numeric zone of the UTM required.',
+                   'southern_hemisphere': 'Set to True if the zone is in the southern hemisphere. Optional, '
+                                          'defaults to False.',
+                   'pole_longitude': 'Pole longitude position, in unrotated degrees. Optional, defaults to 0.',
+                   'pole_latitude': 'Pole latitude position, in unrotated degrees. Optional, defaults to 0.',
+                   'central_rotated_longitude': 'Longitude rotation about the new pole, in degrees. Optional, '
+                                                'defaults to 0.',
+                   'satellite_height': 'The height of the satellite. Optional, defaults to 35785831 meters (true '
+                                       'geostationary orbit).',
+                   'sweep_axis': 'Controls which axis is scanned first, and thus which angle is applied first. The '
+                                 'default is appropriate for Meteosat, while ‘x’ should be used for GOES. (‘x’ or '
+                                 '‘y’, optional. Defaults to ‘y’.)'}
+    return object_dict
+
+
+def line_style_list():
+    object_list = ['Dashed', 'Dash-dot', 'Dotted', 'Solid']
+    return object_list
+
+
+def marker_style_dict():
+    object_dict = {'Circle': 'o', 'Diamond': 'd', 'Hexagon': 'h', 'Pentagon': 'p', 'Plus': '+', 'Point': '.',
+                   'Square': 's', 'Star': '*', 'Triangle': '^', 'X': 'x'}
+    return object_dict
+
+
+def colors_dict():
+    object_dict = {'Black': 'k', 'Blue': 'b', 'Cyan': 'c', 'Green': 'g', 'Magenta': 'm', 'Red': 'r', 'Yellow': 'y',
+                   'White': 'w'}
+    return object_dict
+
+
+def images_extension_dict():
+    object_dict = {'EPS Files (*.eps)': '.eps', 'JPEG Files (*.jpg *.jpeg *.jpe)': '.jpg', 'PDF Files (*.pdf)': '.pdf',
+                   'PNG Files (*.png *.pns)': '.png', 'TIFF Files (*.tif *.tiff)': '.tif'}
+    return object_dict
 
 
 def setup_plot_material(self):
     logging.debug('gui - material_functions.py - setup_plot_material')
-    self.plot_options = {}
-    self.figure_options = {}
-    self.line_styles = ["Dashed",
-                        "Dash-dot",
-                        "Dotted",
-                        "Solid"]
-    
-    self.line_styles_dict = {"Dashed": "--",
-                             "Dash-dot": "-.",
-                             "Dotted": ":",
-                             "Solid": "-"}
-    self.line_styles_dict_inv = {v: k for k, v in self.line_styles_dict.items()}
-    
-    self.marker_styles = ["Circle",
-                          "Diamond",
-                          "Hegagon",
-                          "Pentagon",
-                          "Plus",
-                          "Point",
-                          "Square",
-                          "Star",
-                          "Triangle",
-                          "X"]
-    
-    self.marker_styles_dict = {"Circle": "o",
-                               "Diamond": "d",
-                               "Hegagon": "h",
-                               "Pentagon": "p",
-                               "Plus": "+",
-                               "Point": ".",
-                               "Square": "s",
-                               "Star": "*",
-                               "Triangle": "^",
-                               "X": "x"}
-    self.marker_styles_dict_inv = {v: k for k, v in self.marker_styles_dict.items()}
-    
-    self.colors = ["HEX Color",
-                   "RGB Color",
-                   "Black",
-                   "Blue",
-                   "Cyan",
-                   "Green",
-                   "Magenta",
-                   "Red",
-                   "Yellow",
-                   "White"]
-    
-    self.colors_grid = ["Black",
-                        "Blue",
-                        "Cyan",
-                        "Green",
-                        "Magenta",
-                        "Red",
-                        "Yellow",
-                        "White"]
-    
-    self.colors_dict = {"Black": "k",
-                        "Blue": "b",
-                        "Cyan": "c",
-                        "Green": "g",
-                        "Magenta": "m",
-                        "Red": "r",
-                        "Yellow": "y",
-                        "White": "w"}
-    self.colors_dict_inv = {v: k for k, v in self.colors_dict.items()}
-    
-    self.image_extensions = {'EPS Files (*.eps)': '.eps',
-                             'JPEG Files (*.jpg *.jpeg *.jpe)': '.jpg',
-                             'PDF Files (*.pdf)': '.pdf',
-                             'PNG Files (*.png *.pns)': '.png',
-                             'TIFF Files (*.tif *.tiff)': '.tif'}
-
     self.pw_figureOptions_vl_1 = []
     self.pw_figureOptions_vl_2 = []
     self.pw_figureOptions_gl_1 = []
@@ -275,10 +250,41 @@ def setup_plot_material(self):
     self.plot_option_num = 0
 
 
-def add_global_attributes_to_buttons(self):
-    logging.debug('gui - material_functions.py - add_global_attributes_to_buttons')
-    self.buttons_lines_dict['gm_button_1'][2] = self.list_of_global_attributes
-    self.buttons_lines_dict['gm_button_2'][2] = self.list_of_global_attributes
-    self.buttons_lines_dict['gm_button_3'][2] = self.list_of_global_attributes
-    self.buttons_lines_dict['gm_button_4'][2] = self.list_of_global_attributes
-    self.buttons_lines_dict['gm_button_5'][2] = self.list_of_global_attributes
+def cmap_default_dimensions():
+    object_dict = {0: {'colorbar_height': 0.03, 'colorbar_width': 0.7, 'colorbar_axis_xposition': 0.15,
+                       'colorbar_axis_yposition': 0.07, 'orientation': 'horizontal'},
+                   1: {'colorbar_height': 0.03, 'colorbar_width': 0.7, 'colorbar_axis_xposition': 0.15,
+                       'colorbar_axis_yposition': 0.93, 'orientation': 'horizontal'},
+                   2: {'colorbar_height': 0.72, 'colorbar_width': 0.02, 'colorbar_axis_xposition': 0.03,
+                       'colorbar_axis_yposition': 0.13, 'orientation': 'vertical'},
+                   3: {'colorbar_height': 0.72, 'colorbar_width': 0.02, 'colorbar_axis_xposition': 0.87,
+                       'colorbar_axis_yposition': 0.13, 'orientation': 'vertical'}}
+    return object_dict
+
+
+def cmap_default_fig_margins():
+    object_dict = {0: {'margin_left': 0.05, 'margin_right': 0.95, 'margin_bottom': 0.2, 'margin_top': 0.9},
+                   1: {'margin_left': 0.05, 'margin_right': 0.95, 'margin_bottom': 0.1, 'margin_top': 0.8},
+                   2: {'margin_left': 0.2, 'margin_right': 0.95, 'margin_bottom': 0.1, 'margin_top': 0.9},
+                   3: {'margin_left': 0.1, 'margin_right': 0.85, 'margin_bottom': 0.1, 'margin_top': 0.9}}
+    return object_dict
+
+
+def cmap_dict():
+    object_dict = {1: 'coolwarm', 2: 'jet', 3: 'ocean', 4: 'spectral', 5: 'hot', 6: 'hsv', 7: 'seismic',  8: 'terrain'}
+    return object_dict
+
+
+def transparency_hexa_dict_function():
+    logging.debug('gui - utils.py - transparency_hexa_dict_function')
+    hexa_dict = {100: 'FF', 99: 'FC', 98: 'FA', 97: 'F7', 96: 'F5', 95: 'F2', 94: 'F0', 93: 'ED', 92: 'EB', 91: 'E8',
+                 90: 'E6', 89: 'E3', 88: 'E0', 87: 'DE', 86: 'DB', 85: 'D9', 84: 'D6', 83: 'D4', 82: 'D1', 81: 'CF',
+                 80: 'CC', 79: 'C9', 78: 'C7', 77: 'C4', 76: 'C2', 75: 'BF', 74: 'BD', 73: 'BA', 72: 'B8', 71: 'B5',
+                 70: 'B3', 69: 'B0', 68: 'AD', 67: 'AB', 66: 'A8', 65: 'A6', 64: 'A3', 63: 'A1', 62: '9E', 61: '9C',
+                 60: '99', 59: '96', 58: '94', 57: '91', 56: '8F', 55: '8C', 54: '8A', 53: '87', 52: '85', 51: '82',
+                 50: '80', 49: '7D', 48: '7A', 47: '78', 46: '75', 45: '73', 44: '70', 43: '6E', 42: '6B', 41: '69',
+                 40: '66', 39: '63', 38: '61', 37: '5E', 36: '5C', 35: '59', 34: '57', 33: '54', 32: '52', 31: '4F',
+                 30: '4D', 29: '4A', 28: '47', 27: '45', 26: '42', 25: '40', 24: '3D', 23: '3B', 22: '38', 21: '36',
+                 20: '33', 19: '30', 18: '2E', 17: '2B', 16: '29', 15: '26', 14: '24', 13: '21', 12: '1F', 11: '1C',
+                 10: '1A', 9: '17', 8: '14', 7: '12', 6: '0F', 5: '0D', 4: '0A', 3: '08', 2: '05', 1: '03', 0: '00'}
+    return hexa_dict

@@ -6,11 +6,14 @@ import pathlib
 from PyQt5 import QtWidgets, QtGui, QtCore
 from ui.mainwindow import MainWindow
 from ui._version import _gui_version
-from functions.utils import create_option_file, create_logging_handlers
+from functions.utils import create_option_file, create_logging_handlers, update_config_file
 import configparser
 from PyQt5.QtCore import QT_VERSION_STR as qt_version
 from matplotlib import __version__ as mpl_version
-from cartopy import __version__ as cy_version
+try:
+    from cartopy import __version__ as cy_version
+except ImportError:
+    cy_version = None
 from simplekml import __version__ as km_version
 try:
     from markdown import __version__ as mk_version
@@ -32,6 +35,7 @@ def launch_egads_gui(gui_path, user_path):
         if not pathlib.Path(user_path).is_dir():
             pathlib.Path(user_path).mkdir()
         create_option_file(user_path)
+    update_config_file(user_path)
     config_dict = configparser.ConfigParser()
     config_dict.read(str(pathlib.Path(user_path).joinpath('egads_gui.ini')))
     create_logging_handlers(config_dict, 'egads_gui.log', user_path)

@@ -597,7 +597,7 @@ QLineEdit:disabled {
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QToolButton" name="gm_button_1">
+               <widget class="QToolButton" name="gm_title_bt">
                 <property name="minimumSize">
                  <size>
                   <width>27</width>
@@ -965,7 +965,7 @@ QLineEdit:disabled {
                </widget>
               </item>
               <item row="0" column="6">
-               <widget class="QToolButton" name="gm_button_3">
+               <widget class="QToolButton" name="gm_source_bt">
                 <property name="minimumSize">
                  <size>
                   <width>27</width>
@@ -1039,7 +1039,7 @@ QToolButton:flat {
                </widget>
               </item>
               <item row="1" column="2">
-               <widget class="QToolButton" name="gm_button_2">
+               <widget class="QToolButton" name="gm_institution_bt">
                 <property name="minimumSize">
                  <size>
                   <width>27</width>
@@ -1358,7 +1358,7 @@ QLineEdit:disabled {
                </widget>
               </item>
               <item row="1" column="6">
-               <widget class="QToolButton" name="gm_button_4">
+               <widget class="QToolButton" name="gm_project_bt">
                 <property name="minimumSize">
                  <size>
                   <width>27</width>
@@ -2087,7 +2087,7 @@ QScrollBar::right-arrow:horizontal:pressed {
               <item row="2" column="6">
                <layout class="QVBoxLayout" name="verticalLayout">
                 <item>
-                 <widget class="QToolButton" name="gm_button_5">
+                 <widget class="QToolButton" name="gm_history_bt">
                   <property name="minimumSize">
                    <size>
                     <width>27</width>
@@ -2586,7 +2586,7 @@ QScrollBar::right-arrow:horizontal:pressed {
               <item row="3" column="6">
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
-                 <widget class="QToolButton" name="gm_button_6">
+                 <widget class="QToolButton" name="gm_comments_bt">
                   <property name="minimumSize">
                    <size>
                     <width>27</width>
@@ -4022,7 +4022,7 @@ QLineEdit:disabled {
                    </widget>
                   </item>
                   <item row="0" column="2">
-                   <widget class="QToolButton" name="va_button_1">
+                   <widget class="QToolButton" name="va_varName_bt">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -4348,7 +4348,7 @@ QLineEdit:disabled {
                    </widget>
                   </item>
                   <item row="1" column="2">
-                   <widget class="QToolButton" name="va_button_2">
+                   <widget class="QToolButton" name="va_longName_bt">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -4674,7 +4674,7 @@ QLineEdit:disabled {
                    </widget>
                   </item>
                   <item row="2" column="2">
-                   <widget class="QToolButton" name="va_button_3">
+                   <widget class="QToolButton" name="va_category_bt">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -4996,50 +4996,6 @@ QLineEdit:disabled {
                     </property>
                     <property name="frame">
                      <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="2">
-                   <widget class="QToolButton" name="va_button_4">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>27</width>
-                      <height>27</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>27</width>
-                      <height>27</height>
-                     </size>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">QToolButton {
-	border: 1px solid transparent;
-	background-color: transparent;
-	width: 27px;
-	height: 27px;
-}
-
-QToolButton:flat {
-	border: none;
-}</string>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset>
-                      <normaloff>icons/edit_icon.svg</normaloff>icons/edit_icon.svg</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>23</width>
-                      <height>23</height>
-                     </size>
                     </property>
                    </widget>
                   </item>
@@ -7334,7 +7290,7 @@ QLineEdit:disabled {
                    </widget>
                   </item>
                   <item row="0" column="2">
-                   <widget class="QToolButton" name="new_button_1">
+                   <widget class="QToolButton" name="new_varName_bt">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -7660,7 +7616,7 @@ QLineEdit:disabled {
                    </widget>
                   </item>
                   <item row="1" column="2">
-                   <widget class="QToolButton" name="new_button_2">
+                   <widget class="QToolButton" name="new_longName_bt">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -7986,7 +7942,7 @@ QLineEdit:disabled {
                    </widget>
                   </item>
                   <item row="2" column="2">
-                   <widget class="QToolButton" name="new_button_3">
+                   <widget class="QToolButton" name="new_category_bt">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -8308,50 +8264,6 @@ QLineEdit:disabled {
                     </property>
                     <property name="frame">
                      <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="2">
-                   <widget class="QToolButton" name="new_button_4">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>27</width>
-                      <height>27</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>27</width>
-                      <height>27</height>
-                     </size>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">QToolButton {
-	border: 1px solid transparent;
-	background-color: transparent;
-	width: 27px;
-	height: 27px;
-}
-
-QToolButton:flat {
-	border: none;
-}</string>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset>
-                      <normaloff>icons/edit_icon.svg</normaloff>icons/edit_icon.svg</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>23</width>
-                      <height>23</height>
-                     </size>
                     </property>
                    </widget>
                   </item>
@@ -9508,7 +9420,8 @@ QMenu::separator {
    height: 1px;
    margin-top: 2px;
    margin-bottom: 2px;
-}</string>
+}
+</string>
    </property>
    <property name="nativeMenuBar">
     <bool>true</bool>
@@ -9522,10 +9435,48 @@ QMenu::separator {
       <kerning>true</kerning>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuOpen_recent">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="font">
+      <font>
+       <family>FreeSans</family>
+       <pointsize>10</pointsize>
+       <stylestrategy>PreferAntialias</stylestrategy>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="title">
+      <string>Open recent...</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/open_popup_icon.svg</normaloff>icons/open_popup_icon.svg</iconset>
+     </property>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuQuick_access">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Quick access...</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/quick_access_icon.svg</normaloff>icons/quick_access_icon.svg</iconset>
+     </property>
+    </widget>
     <addaction name="actionOpenBar"/>
+    <addaction name="menuOpen_recent"/>
+    <addaction name="menuQuick_access"/>
     <addaction name="actionSaveAsBar"/>
     <addaction name="actionCloseBar"/>
     <addaction name="separator"/>
@@ -10172,6 +10123,36 @@ QStatusBar QLabel {
      <stylestrategy>PreferAntialias</stylestrategy>
      <kerning>true</kerning>
     </font>
+   </property>
+  </action>
+  <action name="actionClear_list">
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/del_icon.svg</normaloff>icons/del_icon.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Clear list...</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear the list</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FreeSans</family>
+     <pointsize>10</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+     <kerning>true</kerning>
+    </font>
+   </property>
+  </action>
+  <action name="actionTMP">
+   <property name="text">
+    <string>TMP</string>
+   </property>
+  </action>
+  <action name="actionTMP_2">
+   <property name="text">
+    <string>TMP</string>
    </property>
   </action>
  </widget>

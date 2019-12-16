@@ -1,11 +1,13 @@
 import logging
 import pathlib
+import xml
 from PyQt5 import QtWidgets, QtCore, QtGui
 from functions.algorithm_windows_functions import MyAlgorithmDisplay
 from functions.other_windows_functions import MyInfo, MyUnit
-from functions.utils import humansize, clear_layout
+from functions.utils import humansize, clear_layout, get_element_value, font_creation_function, icon_creation_function
 from functions.gui_elements import DropFrame
 from functions.help_functions import frozen_algorithm_formula_text
+from functions.material_functions import widgets_metadata_dict
     
 
 def gui_initialization(self):
@@ -17,6 +19,8 @@ def gui_initialization(self):
     self.actionSeparator5.setText('')
     self.actionSeparator5.setVisible(False)
     self.actionUpdate.setVisible(False)
+    self.splitter.setSizes([270, 582])
+    self.splitter_2.setSizes([270, 582])
     self.tab_view.removeTab(2)
     self.tab_view.setEnabled(False)
     self.tab_view.setVisible(False)
@@ -37,8 +41,15 @@ def gui_initialization(self):
     all_buttons = self.tab_view.findChildren(QtWidgets.QToolButton)
     for widget in all_buttons:
         if 'none_button' not in widget.objectName() and widget.objectName():
-            widget.clicked.connect(lambda: modify_attribute_gui(self, 'left'))
-            widget.rightClick.connect(lambda: modify_attribute_gui(self, 'right'))
+            if 'gm_' in widget.objectName():
+                widget.clicked.connect(lambda: modify_attribute_gui_global(self, 'left'))
+                widget.rightClick.connect(lambda: modify_attribute_gui_global(self, 'right'))
+            elif 'va_' in widget.objectName():
+                widget.clicked.connect(lambda: modify_attribute_gui_var(self, 'left'))
+                widget.rightClick.connect(lambda: modify_attribute_gui_var(self, 'right'))
+            elif 'new_' in widget.objectName():
+                widget.clicked.connect(lambda: modify_attribute_gui_new(self, 'left'))
+                widget.rightClick.connect(lambda: modify_attribute_gui_new(self, 'right'))
 
 
 def algorithm_menu_initialization(self):
@@ -107,7 +118,7 @@ def netcdf_gui_initialization(self):
     self.tab_view.setVisible(True)
     self.gm_comments_ln.setVisible(False)
     self.gm_comments_lb.setVisible(False)
-    self.gm_button_6.setVisible(False)
+    self.gm_comments_bt.setVisible(False)
     self.gm_project_lb.setText('Project:')
     self.gm_history_lb.setText('History:')
     self.gm_title_lb.setText('Title:')
@@ -119,8 +130,8 @@ def netcdf_gui_initialization(self):
     self.va_longName_ln.setVisible(True)
     self.va_category_ln.setVisible(True)
     self.va_egadsProcessor_ln.setVisible(True)
-    self.va_button_2.setVisible(True)
-    self.va_button_3.setVisible(True)
+    self.va_longName_bt.setVisible(True)
+    self.va_category_bt.setVisible(True)
     self.variable_list.setVisible(True)
     self.variable_list.setEnabled(True)
     
@@ -144,8 +155,8 @@ def nasaames_gui_initialization(self):
     self.va_longName_ln.setVisible(True)
     self.va_category_ln.setVisible(True)
     self.va_egadsProcessor_ln.setVisible(True)
-    self.va_button_2.setVisible(True)
-    self.va_button_3.setVisible(True)
+    self.va_longName_bt.setVisible(True)
+    self.va_category_bt.setVisible(True)
     self.variable_list.setVisible(True)
     self.variable_list.setEnabled(True)
      
@@ -231,95 +242,150 @@ def display_algorithm_information(self):
     self.displayAlgorithmWindow.exec_()
 
 
-def modify_attribute_gui(self, string):
-    logging.debug('gui - gui_functions.py - modify_attribute_gui : sender().objectName() '
-                  + str(self.sender().objectName()) + ' ; ' + string)
-    if self.sender().objectName() != "":
-        value = self.buttons_lines_dict[str(self.sender().objectName())]
-        widget = self.findChildren(QtWidgets.QLineEdit, value[0])
-        if not widget:
-            widget = self.findChildren(QtWidgets.QPlainTextEdit, value[0])
-        list_widget = value[1]
-        var_attr_list = value[2]
-        if not widget[0].isEnabled():
-            if string == 'left':
-                widget[0].setEnabled(True)
-                icon = QtGui.QIcon()
-                icon.addPixmap(QtGui.QPixmap("icons/save_as_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-                self.sender().setIcon(icon)
-        else:
-            if string == 'left':
-                value = self.objects_metadata_dict[str(widget[0].objectName())]
-                if isinstance(value, list):
-                    if self.file_ext == 'NetCDF Files (*.nc)':
-                        value = value[0]
-                    elif self.file_ext == 'NASA Ames Files (*.na)':
-                        value = value[1]
-                if list_widget is not None:
-                    if value == 'var_name':
-                        var_attr_list[str(widget[0].text())] = var_attr_list.pop(str(list_widget.currentItem().text()))
-                        list_widget.currentItem().setText(str(widget[0].text()))
+def modify_attribute_gui_global(self, click):
+    button = self.sender()
+    line = self.findChild(QtWidgets.QLineEdit, button.objectName()[:-2] + 'ln')
+    if not line:
+        line = self.findChild(QtWidgets.QPlainTextEdit, button.objectName()[:-2] + 'ln')
+    if not line.isEnabled():
+        if click == 'left':
+            line.setEnabled(True)
+            button.setIcon(icon_creation_function('save_as_icon.svg'))
+    else:
+        if click == 'left':
+            metadata = widgets_metadata_dict()[str(line.objectName())]
+            if isinstance(metadata, list):
+                if self.file_ext == 'NetCDF Files (*.nc)':
+                    metadata = metadata[0]
+                elif self.file_ext == 'NASA Ames Files (*.na)':
+                    metadata = metadata[1]
+            try:
+                self.list_of_global_attributes[metadata] = str(line.text())
+            except AttributeError:
+                self.list_of_global_attributes[metadata] = str(line.toPlainText())
+            self.start_status_bar_msg_thread('Global attributes have been modified...')
+            self.modified = True
+            self.make_window_title()
+            line.setEnabled(False)
+            button.setIcon(icon_creation_function('edit_icon.svg'))
+        elif click == 'right':
+            line.setEnabled(False)
+            button.setIcon(icon_creation_function('edit_icon.svg'))
+            metadata = widgets_metadata_dict()[str(line.objectName())]
+            if isinstance(metadata, list):
+                if self.file_ext == 'NetCDF Files (*.nc)':
+                    metadata = metadata[0]
+                elif self.file_ext == 'NASA Ames Files (*.na)':
+                    metadata = metadata[1]
+            if isinstance(self.list_of_global_attributes[metadata], list):
+                long_string = ''
+                for string in self.list_of_global_attributes[metadata]:
+                    if isinstance(string, int):
+                        long_string += str(string) + '-'
                     else:
-                        var = str(list_widget.currentItem().text())
-                        try:
-                            var_attr_list[var][0].metadata[value] = str(widget[0].text())
-                        except AttributeError:
-                            var_attr_list[var][0].metadata[value] = str(widget[0].toPlainText())
-                    self.start_status_bar_msg_thread('Variable attributes have been modified...')
+                        long_string += string + ', '
+                if long_string[-1:] == '-':
+                    text = long_string[:-1]
                 else:
-                    try:
-                        var_attr_list[value] = str(widget[0].text())
-                    except AttributeError:
-                        var_attr_list[value] = str(widget[0].toPlainText())
-                    self.start_status_bar_msg_thread('Global attributes have been modified...')
-                self.modified = True
-                self.make_window_title()
-                widget[0].setEnabled(False)
-                icon = QtGui.QIcon()
-                icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-                self.sender().setIcon(icon)
-            elif string == 'right':
-                widget[0].setEnabled(False)
-                icon = QtGui.QIcon()
-                icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-                self.sender().setIcon(icon)
-                value = self.objects_metadata_dict[str(widget[0].objectName())]
-                if isinstance(value, list):
-                    if self.file_ext == 'NetCDF Files (*.nc)':
-                        value = value[0]
-                    elif self.file_ext == 'NASA Ames Files (*.na)':
-                        value = value[1]
-                if list_widget is not None:
-                    var = str(list_widget.currentItem().text())
-                    if value == 'var_name':
-                        widget[0].setText(var)
-                    else:
-                        try:
-                            widget[0].setText(var_attr_list[var][0].metadata[value])
-                            widget[0].setCursorPosition(0)
-                        except AttributeError:
-                            widget[0].toPlainText(var_attr_list[var][0].metadata[value])
-                else:
-                    if isinstance(var_attr_list[value], list):
-                        long_string = ''
-                        for string in var_attr_list[value]:
-                            if isinstance(string, int):
-                                long_string += str(string) + '-'
-                            else:
-                                long_string += string + ', '
-                        if long_string[-1:] == '-':
-                            text = long_string[:-1]
-                        else:
-                            text = long_string[:-2]
-                    else:
-                        text = var_attr_list[value]    
-                    try:
-                        widget[0].setText(text)
-                        widget[0].setCursorPosition(0)
-                    except AttributeError:
-                        widget[0].setPlainText(text)
-                self.start_status_bar_msg_thread('The modification has been canceled...')
-            
+                    text = long_string[:-2]
+            else:
+                text = self.list_of_global_attributes[metadata]
+            try:
+                line.setText(text)
+                line.setCursorPosition(0)
+            except AttributeError:
+                line.setPlainText(text)
+            self.start_status_bar_msg_thread('The modification has been canceled...')
+
+
+def modify_attribute_gui_var(self, click):
+    button = self.sender()
+    line = self.findChild(QtWidgets.QLineEdit, button.objectName()[:-2] + 'ln')
+    if not line:
+        line = self.findChild(QtWidgets.QPlainTextEdit, button.objectName()[:-2] + 'ln')
+    if not line.isEnabled():
+        if click == 'left':
+            line.setEnabled(True)
+            button.setIcon(icon_creation_function('save_as_icon.svg'))
+    else:
+        if click == 'left':
+            metadata = widgets_metadata_dict()[str(line.objectName())]
+            if metadata == 'var_name':
+                self.list_of_variables_and_attributes[str(line.text())] = self.list_of_variables_and_attributes.pop(str(
+                    self.variable_list.currentItem().text()))
+                self.variable_list.currentItem().setText(str(line.text()))
+            else:
+                var = str(self.variable_list.currentItem().text())
+                try:
+                    self.list_of_variables_and_attributes[var][0].metadata[metadata] = str(line.text())
+                except AttributeError:
+                    self.list_of_variables_and_attributes[var][0].metadata[metadata] = str(line.toPlainText())
+            self.start_status_bar_msg_thread('Variable attributes have been modified...')
+            self.modified = True
+            self.make_window_title()
+            line.setEnabled(False)
+            button.setIcon(icon_creation_function('edit_icon.svg'))
+        elif click == 'right':
+            line.setEnabled(False)
+            button.setIcon(icon_creation_function('edit_icon.svg'))
+            metadata = widgets_metadata_dict()[str(line.objectName())]
+            if isinstance(metadata, list):
+                if self.file_ext == 'NetCDF Files (*.nc)':
+                    metadata = metadata[0]
+                elif self.file_ext == 'NASA Ames Files (*.na)':
+                    metadata = metadata[1]
+            var = str(self.variable_list.currentItem().text())
+            if value == 'var_name':
+                line.setText(var)
+            else:
+                try:
+                    line.setText(self.list_of_variables_and_attributes[var][0].metadata[metadata])
+                    line.setCursorPosition(0)
+                except AttributeError:
+                    line.toPlainText(self.list_of_variables_and_attributes[var][0].metadata[metadata])
+
+
+def modify_attribute_gui_new(self, click):
+    button = self.sender()
+    line = self.findChild(QtWidgets.QLineEdit, button.objectName()[:-2] + 'ln')
+    if not line:
+        line = self.findChild(QtWidgets.QPlainTextEdit, button.objectName()[:-2] + 'ln')
+    if not line.isEnabled():
+        if click == 'left':
+            line.setEnabled(True)
+            button.setIcon(icon_creation_function('save_as_icon.svg'))
+    else:
+        if click == 'left':
+            metadata = widgets_metadata_dict()[str(line.objectName())]
+            if metadata == 'var_name':
+                self.list_of_new_variables_and_attributes[str(line.text())] =\
+                    self.list_of_new_variables_and_attributes.pop(str(self.variable_list.currentItem().text()))
+                self.new_variable_list.currentItem().setText(str(line.text()))
+            else:
+                var = str(self.new_variable_list.currentItem().text())
+                try:
+                    self.list_of_new_variables_and_attributes[var][0].metadata[metadata] = str(line.text())
+                except AttributeError:
+                    self.list_of_new_variables_and_attributes[var][0].metadata[metadata] = str(line.toPlainText())
+            self.start_status_bar_msg_thread('Variable attributes have been modified...')
+            self.modified = True
+            self.make_window_title()
+            line.setEnabled(False)
+            button.setIcon(icon_creation_function('edit_icon.svg'))
+        elif click == 'right':
+            line.setEnabled(False)
+            button.setIcon(icon_creation_function('edit_icon.svg'))
+            metadata = widgets_metadata_dict()[str(line.objectName())]
+            var = str(self.new_variable_list.currentItem().text())
+            if value == 'var_name':
+                line.setText(var)
+            else:
+                try:
+                    line.setText(self.list_of_new_variables_and_attributes[var][0].metadata[metadata])
+                    line.setCursorPosition(0)
+                except AttributeError:
+                    line.toPlainText(self.list_of_new_variables_and_attributes[var][0].metadata[metadata])
+
 
 def update_global_attribute_gui(self, source):
     logging.debug('gui - gui_functions.py - update_global_attribute_gui : source ' + str(source))
@@ -438,24 +504,21 @@ def update_icons_state(self, string=None):
     if string == 'var_reading':
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.va_button_1.setIcon(icon)
-        self.va_button_2.setIcon(icon)
-        self.va_button_3.setIcon(icon)
-        self.va_button_4.setIcon(icon)
+        self.va_varName_bt.setIcon(icon)
+        self.va_longName_bt.setIcon(icon)
+        self.va_category_bt.setIcon(icon)
         if len(self.variable_list.selectedItems()) > 1:
-            self.va_button_1.setEnabled(False)
-            self.va_button_2.setEnabled(False)
-            self.va_button_3.setEnabled(False)
-            self.va_button_4.setEnabled(False)
+            self.va_varName_bt.setEnabled(False)
+            self.va_longName_bt.setEnabled(False)
+            self.va_category_bt.setEnabled(False)
             self.actionDisplayBar.setEnabled(False)
             self.actionVariableAttributesBar.setEnabled(False)
             self.actionDeleteVariableBar.setEnabled(True)
             self.actionPlotBar.setEnabled(True)
         else:
-            self.va_button_1.setEnabled(True)
-            self.va_button_2.setEnabled(True)
-            self.va_button_3.setEnabled(True)
-            self.va_button_4.setEnabled(True)
+            self.va_varName_bt.setEnabled(True)
+            self.va_longName_bt.setEnabled(True)
+            self.va_category_bt.setEnabled(True)
             self.actionDisplayBar.setEnabled(True)
             self.actionVariableAttributesBar.setEnabled(True)
             self.actionDeleteVariableBar.setEnabled(True)
@@ -463,25 +526,22 @@ def update_icons_state(self, string=None):
     if string == 'new_var_reading':
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icons/edit_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.new_button_1.setIcon(icon)
-        self.new_button_2.setIcon(icon)
-        self.new_button_3.setIcon(icon)
-        self.new_button_4.setIcon(icon)
+        self.new_varName_bt.setIcon(icon)
+        self.new_longName_bt.setIcon(icon)
+        self.new_category_bt.setIcon(icon)
         if len(self.new_variable_list.selectedItems()) > 1:
-            self.new_button_1.setEnabled(False)
-            self.new_button_2.setEnabled(False)
-            self.new_button_3.setEnabled(False)
-            self.new_button_4.setEnabled(False)
+            self.new_varName_bt.setEnabled(False)
+            self.new_longName_bt.setEnabled(False)
+            self.new_category_bt.setEnabled(False)
             self.actionDisplayBar.setEnabled(False)
             self.actionVariableAttributesBar.setEnabled(False)
             self.actionDeleteVariableBar.setEnabled(True)
             self.actionPlotBar.setEnabled(True)
             self.actionMigrateVariableBar.setEnabled(True)
         else:
-            self.new_button_1.setEnabled(True)
-            self.new_button_2.setEnabled(True)
-            self.new_button_3.setEnabled(True)
-            self.new_button_4.setEnabled(True)
+            self.new_varName_bt.setEnabled(True)
+            self.new_longName_bt.setEnabled(True)
+            self.new_category_bt.setEnabled(True)
             self.actionDisplayBar.setEnabled(True)
             self.actionVariableAttributesBar.setEnabled(True)
             self.actionDeleteVariableBar.setEnabled(True)
@@ -518,7 +578,6 @@ def update_icons_state(self, string=None):
                 self.actionPlotBar.setEnabled(False)
         elif self.tab_view.currentIndex() == 2:
             try:
-
                 if not self.new_variable_list.selectedItems():
                     self.actionDisplayBar.setEnabled(False)
                     self.actionVariableAttributesBar.setEnabled(False)
@@ -698,3 +757,71 @@ def too_many_files(self):
                 'be processed, please use the Bath processing function in the File menu.'
     self.infoWindow = MyInfo(info_text)
     self.infoWindow.exec_()
+
+
+def create_quick_access_menu(self):
+    self.menuQuick_access.clear()
+    self.menuQuick_access.setEnabled(True)
+    font = QtGui.QFont()
+    font.setFamily("fonts/SourceSansPro-Regular.ttf")
+    font.setPointSize(10)
+    font.setKerning(True)
+    font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+    icon = QtGui.QIcon()
+    icon.addPixmap(QtGui.QPixmap("icons/quick_access_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    f = open(str(pathlib.Path(self.user_path).joinpath('user_folder_list.xml')), 'r')
+    doc = xml.dom.minidom.parse(f)
+    folders = doc.getElementsByTagName('Folders')[0]
+    nodes = folders.getElementsByTagName('Folder')
+    for node in nodes:
+        quick_folder = QtWidgets.QAction(self)
+        quick_folder.setIcon(icon)
+        quick_folder.setFont(font)
+        quick_folder.setText(get_element_value(node, 'Name'))
+        quick_folder.setToolTip(get_element_value(node, 'Path'))
+        quick_folder.triggered.connect(lambda: quick_access_open_folder(self))
+        quick_folder.setObjectName(get_element_value(node, 'Name'))
+        self.menuQuick_access.addAction(quick_folder)
+    f.close()
+
+
+def quick_access_open_folder(self):
+    path = self.sender().toolTip()
+    file_name, _ = self.get_file_name('open', path)
+    if file_name:
+        self.open_file(file_name)
+
+
+def create_recent_file_menu(self):
+    self.menuOpen_recent.clear()
+    self.menuOpen_recent.setEnabled(True)
+    if self.opened_file_list:
+        font = font_creation_function('normal')
+        icon = icon_creation_function('del_icon.svg')
+        for i, file in enumerate(self.opened_file_list):
+            recent_file = QtWidgets.QAction(self)
+            recent_file.setFont(font)
+            recent_file.setToolTip(file)
+            recent_file.setObjectName(file)
+            if len(file) > 65:
+                file = file[:30] + ' ... ' + file[-30:]
+            recent_file.setText(file)
+            recent_file.triggered.connect(lambda: open_recent_filename(self))
+            self.menuOpen_recent.addAction(recent_file)
+        self.menuOpen_recent.addSeparator()
+        del_action = QtWidgets.QAction(self)
+        del_action.setFont(font)
+        del_action.setIcon(icon)
+        del_action.setText('Clear the list...')
+        del_action.triggered.connect(lambda: clear_file_list_in_menu(self))
+        del_action.setObjectName('del_action')
+        self.menuOpen_recent.addAction(del_action)
+
+
+def clear_file_list_in_menu(self):
+    self.opened_file_list.clear()
+    create_recent_file_menu(self)
+
+
+def open_recent_filename(self):
+    self.open_file(self.sender().objectName())

@@ -4,8 +4,9 @@ from ui.Ui_exportwindow import Ui_exportWindow
 from ui.Ui_waitwindow import Ui_waitWindow
 from functions.gui_elements import QtWaitingSpinner
 from functions.thread_functions import ExportThread
-from functions.other_windows_functions import MyInfo
+from functions.other_windows_functions import MyInfo, MyColorbarTicks
 from functions.help_functions import export_information_text
+from functions.material_functions import cmap_dict
 
 
 class MyExport(QtWidgets.QDialog, Ui_exportWindow):
@@ -43,6 +44,7 @@ class MyExport(QtWidgets.QDialog, Ui_exportWindow):
         self.info_button_9.clicked.connect(self.export_button_info)
         self.info_button_10.clicked.connect(self.export_button_info)
         self.info_button_11.clicked.connect(self.export_button_info)
+        self.ew_ticks_button.clicked.connect(self.colorbar_tick_option_window)
         self.ew_combobox_2.currentIndexChanged.connect(self.activate_export_button)
         self.ew_combobox_3.currentIndexChanged.connect(self.activate_export_button)
         self.ew_combobox_4.currentIndexChanged.connect(self.activate_export_button)
@@ -60,12 +62,14 @@ class MyExport(QtWidgets.QDialog, Ui_exportWindow):
         self.ew_combobox_6.currentIndexChanged.connect(self.activate_export_button)
         self.ew_checkbox_5.clicked.connect(self.activate_colormap_values)
         self.ew_checkbox_6.clicked.connect(self.activate_colormap_dimensions)
+        self.ew_line_2.textEdited.connect(self.colorbar_tick_option_man_remove)
+        self.ew_line_3.textEdited.connect(self.colorbar_tick_option_man_remove)
+        self.ew_line_4.textEdited.connect(self.colorbar_tick_option_man_remove)
         self.idx_base = 0
         self.export_format = None
         self.export_dict = {}
-        self.colormap_dict = {1: 'coolwarm', 2: 'jet', 3: 'ocean', 4: 'spectral', 5: 'hot', 6: 'hsv', 7: 'seismic',
-                              8: 'terrain'}
         self.var_list = []
+        self.cbar_ticks_options = []
         self.ew_combobox_1.removeItem(2)
         logging.info('gui - export_window_functions.py - MyExport - ready')
 
@@ -173,6 +177,14 @@ class MyExport(QtWidgets.QDialog, Ui_exportWindow):
         self.ew_label_14.setEnabled(not self.ew_checkbox_5.isChecked())
         self.ew_label_15.setEnabled(not self.ew_checkbox_5.isChecked())
         self.ew_label_16.setEnabled(not self.ew_checkbox_5.isChecked())
+        self.ew_ticks_button.setEnabled(not self.ew_checkbox_5.isChecked())
+        self.pw_grid_label_57.setEnabled(not self.ew_checkbox_5.isChecked())
+        self.pw_grid_label_57.setText('')
+
+    def colorbar_tick_option_man_remove(self):
+        logging.debug('gui - export_window_functions.py - MyExport - colorbar_tick_option_man_remove')
+        self.pw_grid_label_57.setText('')
+        self.cbar_ticks_options = []
 
     def activate_transparency_checkbox(self):
         logging.debug('gui - export_window_functions.py - MyExport - activate_transparency_checkbox')
@@ -266,7 +278,7 @@ class MyExport(QtWidgets.QDialog, Ui_exportWindow):
         export_dict['Coordinates']['lon'] = self.ew_combobox_2.currentText()
         export_dict['Coordinates']['lat'] = self.ew_combobox_3.currentText()
         export_dict['Coordinates']['alt'] = self.ew_combobox_4.currentText()
-        export_dict['Colormap']['colormap'] = self.colormap_dict[self.ew_combobox_6.currentIndex()]
+        export_dict['Colormap']['colormap'] = cmap_dict()[self.ew_combobox_6.currentIndex()]
         export_dict['Colormap']['position'] = int(self.ew_combobox_7.currentIndex())
         export_dict['Colormap']['color_value'] = int(self.ew_combobox_8.currentIndex())
         export_dict['Options']['wall'] = self.ew_checkbox_1.isChecked()
@@ -293,6 +305,7 @@ class MyExport(QtWidgets.QDialog, Ui_exportWindow):
             export_dict['Colormap']['steps'] = float(self.ew_line_3.text())
         except ValueError:
             export_dict['Colormap']['steps'] = None
+        export_dict['Colormap']['ticks_list'] = self.cbar_ticks_options
         try:
             export_dict['Colormap']['fig_width'] = float(self.ew_line_5.text())
         except ValueError:
@@ -333,6 +346,17 @@ class MyExport(QtWidgets.QDialog, Ui_exportWindow):
         logging.debug('gui - export_window_functions.py - MyExport - export_button_info')
         info_window = MyInfo(self.export_information_text[self.sender().objectName()])
         info_window.exec_()
+
+    def colorbar_tick_option_window(self):
+        logging.debug('gui - export_window_functions.py - MyExport - colorbar_tick_option_window')
+        cbar_ticks_window = MyColorbarTicks(self.cbar_ticks_options)
+        cbar_ticks_window.exec_()
+        if cbar_ticks_window.new_option_dict is not None:
+            self.cbar_ticks_options = cbar_ticks_window.new_option_dict
+            self.ew_line_2.setText('man')
+            self.ew_line_3.setText('man')
+            self.ew_line_4.setText('man')
+            self.pw_grid_label_57.setText(str(self.cbar_ticks_options))
 
     def closeWindow(self):
         logging.debug('gui - export_window_functions.py - MyExport - closeWindow')

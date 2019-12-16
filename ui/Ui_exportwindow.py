@@ -78,14 +78,14 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:vertical {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  margin: 21px 0px 21px 0px;\n"
 "}\n"
 "\n"
 "QScrollBar:horizontal {\n"
-"  border: 1px solid white;\n"
+"  border: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  margin: 0px 21px 0px 21px;\n"
@@ -118,15 +118,14 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical {\n"
-"  border-top: 1px solid rgb(240,240,240);\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid rgb(240,240,240);\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -138,15 +137,14 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid rgb(240,240,240);\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -180,15 +178,14 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid rgb(240,240,240);\n"
-"  border-right: 1px solid white;\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid rgb(240,240,240);\n"
+"  border-right: 0px solid white;\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
@@ -200,15 +197,14 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal {\n"
-"  border-top: 1px solid white;\n"
-"  border-left: 1px solid white;\n"
-"  border-right: 1px solid rgb(240,240,240);\n"
-"  border-bottom: 1px solid white;\n"
+"  border-top: 0px solid white;\n"
+"  border-left: 0px solid white;\n"
+"  border-right: 0px solid rgb(240,240,240);\n"
+"  border-bottom: 0px solid white;\n"
 "  background-color: rgb(240, 240, 240);\n"
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
@@ -346,7 +342,7 @@ class Ui_exportWindow(object):
         self.horizontalLayout.addWidget(self.info_button_1)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
-        self.gridLayout_13.addLayout(self.horizontalLayout, 0, 0, 1, 1)
+        self.gridLayout_13.addLayout(self.horizontalLayout, 0, 0, 1, 2)
         spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_13.addItem(spacerItem2, 1, 0, 1, 1)
         self.ew_splitter = QtWidgets.QSplitter(exportWindow)
@@ -471,7 +467,6 @@ class Ui_exportWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: bottom;\n"
 "  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
@@ -491,7 +486,6 @@ class Ui_exportWindow(object):
 "  height: 20px;\n"
 "  subcontrol-position: top;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
@@ -533,7 +527,6 @@ class Ui_exportWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: right;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 0px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
@@ -553,7 +546,6 @@ class Ui_exportWindow(object):
 "  width: 20px;\n"
 "  subcontrol-position: left;\n"
 "  subcontrol-origin: margin;\n"
-"  border-bottom-left-radius: 3px;\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
@@ -624,7 +616,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:pressed {\n"
@@ -637,7 +629,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:pressed {\n"
@@ -656,7 +648,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
@@ -671,10 +667,10 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
-"QScrollBar::add-line:vertical:pressed {\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
 "  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
@@ -712,7 +708,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:pressed {\n"
@@ -731,7 +727,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::left-arrow:horizontal {\n"
@@ -1062,7 +1062,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:pressed {\n"
@@ -1075,7 +1075,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:pressed {\n"
@@ -1094,7 +1094,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
@@ -1109,10 +1113,10 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
-"QScrollBar::add-line:vertical:pressed {\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
 "  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
@@ -1150,7 +1154,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:pressed {\n"
@@ -1169,7 +1173,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::left-arrow:horizontal {\n"
@@ -1604,7 +1612,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:pressed {\n"
@@ -1617,7 +1625,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:pressed {\n"
@@ -1636,7 +1644,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
@@ -1651,10 +1663,10 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
-"QScrollBar::add-line:vertical:pressed {\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
 "  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
@@ -1692,7 +1704,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:pressed {\n"
@@ -1711,7 +1723,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::left-arrow:horizontal {\n"
@@ -2157,7 +2173,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:vertical:pressed {\n"
@@ -2170,7 +2186,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(167, 167, 167);\n"
+"  background-color: rgb(166, 166, 166);\n"
 "}\n"
 "\n"
 "QScrollBar:handle:horizontal:pressed {\n"
@@ -2189,7 +2205,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
@@ -2204,10 +2224,10 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
-"QScrollBar::add-line:vertical:pressed {\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
 "  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
@@ -2245,7 +2265,7 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal:pressed {\n"
@@ -2264,7 +2284,11 @@ class Ui_exportWindow(object):
 "}\n"
 "\n"
 "QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(219, 219, 219);\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
 "}\n"
 "\n"
 "QScrollBar::left-arrow:horizontal {\n"
@@ -2293,7 +2317,7 @@ class Ui_exportWindow(object):
         self.ew_scroll_area_4.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.ew_scroll_area_4.setObjectName("ew_scroll_area_4")
         self.scrollAreaWidgetContents_4 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, -22, 544, 430))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 544, 396))
         self.scrollAreaWidgetContents_4.setObjectName("scrollAreaWidgetContents_4")
         self.gridLayout_10 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_4)
         self.gridLayout_10.setContentsMargins(0, 0, 0, 0)
@@ -2771,102 +2795,7 @@ class Ui_exportWindow(object):
         spacerItem32 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_24.addItem(spacerItem32)
         self.gridLayout_11 = QtWidgets.QGridLayout()
-        self.gridLayout_11.setVerticalSpacing(7)
         self.gridLayout_11.setObjectName("gridLayout_11")
-        self.ew_label_15 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
-        self.ew_label_15.setEnabled(False)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.ew_label_15.sizePolicy().hasHeightForWidth())
-        self.ew_label_15.setSizePolicy(sizePolicy)
-        self.ew_label_15.setMinimumSize(QtCore.QSize(0, 27))
-        self.ew_label_15.setMaximumSize(QtCore.QSize(16777215, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.ew_label_15.setFont(font)
-        self.ew_label_15.setStyleSheet("QLabel {\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"QLabel:disabled {\n"
-"    color: rgb(145,145,145);\n"
-"}")
-        self.ew_label_15.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ew_label_15.setObjectName("ew_label_15")
-        self.gridLayout_11.addWidget(self.ew_label_15, 1, 0, 1, 1)
-        self.ew_line_4 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_4)
-        self.ew_line_4.setEnabled(False)
-        self.ew_line_4.setMinimumSize(QtCore.QSize(70, 27))
-        self.ew_line_4.setMaximumSize(QtCore.QSize(70, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(9)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.ew_line_4.setFont(font)
-        self.ew_line_4.setStyleSheet("QLineEdit {\n"
-"    border-radius: 3px;\n"
-"    padding: 1px 4px 1px 4px;\n"
-"    background-color:  rgb(240, 240, 240);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"    \n"
-"QLineEdit:disabled {\n"
-"    background-color:  rgb(200,200,200);\n"
-"    color: rgb(45,45,45);\n"
-"}")
-        self.ew_line_4.setObjectName("ew_line_4")
-        self.gridLayout_11.addWidget(self.ew_line_4, 2, 1, 1, 1)
-        self.ew_line_3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_4)
-        self.ew_line_3.setEnabled(False)
-        self.ew_line_3.setMinimumSize(QtCore.QSize(70, 27))
-        self.ew_line_3.setMaximumSize(QtCore.QSize(70, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(9)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.ew_line_3.setFont(font)
-        self.ew_line_3.setStyleSheet("QLineEdit {\n"
-"    border-radius: 3px;\n"
-"    padding: 1px 4px 1px 4px;\n"
-"    background-color:  rgb(240, 240, 240);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"    \n"
-"QLineEdit:disabled {\n"
-"    background-color:  rgb(200,200,200);\n"
-"    color: rgb(45,45,45);\n"
-"}")
-        self.ew_line_3.setObjectName("ew_line_3")
-        self.gridLayout_11.addWidget(self.ew_line_3, 1, 1, 1, 1)
-        self.ew_line_2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_4)
-        self.ew_line_2.setEnabled(False)
-        self.ew_line_2.setMinimumSize(QtCore.QSize(70, 27))
-        self.ew_line_2.setMaximumSize(QtCore.QSize(70, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(9)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.ew_line_2.setFont(font)
-        self.ew_line_2.setStyleSheet("QLineEdit {\n"
-"    border-radius: 3px;\n"
-"    padding: 1px 4px 1px 4px;\n"
-"    background-color:  rgb(240, 240, 240);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"    \n"
-"QLineEdit:disabled {\n"
-"    background-color:  rgb(200,200,200);\n"
-"    color: rgb(45,45,45);\n"
-"}")
-        self.ew_line_2.setObjectName("ew_line_2")
-        self.gridLayout_11.addWidget(self.ew_line_2, 0, 1, 1, 1)
         self.ew_label_14 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
         self.ew_label_14.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -2892,6 +2821,31 @@ class Ui_exportWindow(object):
         self.ew_label_14.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ew_label_14.setObjectName("ew_label_14")
         self.gridLayout_11.addWidget(self.ew_label_14, 0, 0, 1, 1)
+        self.ew_line_2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_4)
+        self.ew_line_2.setEnabled(False)
+        self.ew_line_2.setMinimumSize(QtCore.QSize(70, 27))
+        self.ew_line_2.setMaximumSize(QtCore.QSize(70, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.ew_line_2.setFont(font)
+        self.ew_line_2.setStyleSheet("QLineEdit {\n"
+"    border-radius: 3px;\n"
+"    padding: 1px 4px 1px 4px;\n"
+"    background-color:  rgb(240, 240, 240);\n"
+"    color: rgb(45,45,45);\n"
+"}\n"
+"    \n"
+"QLineEdit:disabled {\n"
+"    background-color:  rgb(200,200,200);\n"
+"    color: rgb(45,45,45);\n"
+"}")
+        self.ew_line_2.setObjectName("ew_line_2")
+        self.gridLayout_11.addWidget(self.ew_line_2, 0, 1, 1, 1)
+        spacerItem33 = QtWidgets.QSpacerItem(10, 40, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_11.addItem(spacerItem33, 0, 2, 2, 1)
         self.ew_label_16 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
         self.ew_label_16.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -2916,10 +2870,149 @@ class Ui_exportWindow(object):
 "}")
         self.ew_label_16.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ew_label_16.setObjectName("ew_label_16")
-        self.gridLayout_11.addWidget(self.ew_label_16, 2, 0, 1, 1)
+        self.gridLayout_11.addWidget(self.ew_label_16, 0, 3, 1, 1)
+        self.ew_line_4 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_4)
+        self.ew_line_4.setEnabled(False)
+        self.ew_line_4.setMinimumSize(QtCore.QSize(70, 27))
+        self.ew_line_4.setMaximumSize(QtCore.QSize(70, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.ew_line_4.setFont(font)
+        self.ew_line_4.setStyleSheet("QLineEdit {\n"
+"    border-radius: 3px;\n"
+"    padding: 1px 4px 1px 4px;\n"
+"    background-color:  rgb(240, 240, 240);\n"
+"    color: rgb(45,45,45);\n"
+"}\n"
+"    \n"
+"QLineEdit:disabled {\n"
+"    background-color:  rgb(200,200,200);\n"
+"    color: rgb(45,45,45);\n"
+"}")
+        self.ew_line_4.setObjectName("ew_line_4")
+        self.gridLayout_11.addWidget(self.ew_line_4, 0, 4, 1, 1)
+        spacerItem34 = QtWidgets.QSpacerItem(198, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_11.addItem(spacerItem34, 0, 5, 1, 1)
+        self.ew_label_15 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
+        self.ew_label_15.setEnabled(False)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ew_label_15.sizePolicy().hasHeightForWidth())
+        self.ew_label_15.setSizePolicy(sizePolicy)
+        self.ew_label_15.setMinimumSize(QtCore.QSize(0, 27))
+        self.ew_label_15.setMaximumSize(QtCore.QSize(16777215, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.ew_label_15.setFont(font)
+        self.ew_label_15.setStyleSheet("QLabel {\n"
+"    color: rgb(45,45,45);\n"
+"}\n"
+"\n"
+"QLabel:disabled {\n"
+"    color: rgb(145,145,145);\n"
+"}")
+        self.ew_label_15.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ew_label_15.setObjectName("ew_label_15")
+        self.gridLayout_11.addWidget(self.ew_label_15, 1, 0, 1, 1)
+        self.ew_line_3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_4)
+        self.ew_line_3.setEnabled(False)
+        self.ew_line_3.setMinimumSize(QtCore.QSize(70, 27))
+        self.ew_line_3.setMaximumSize(QtCore.QSize(70, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.ew_line_3.setFont(font)
+        self.ew_line_3.setStyleSheet("QLineEdit {\n"
+"    border-radius: 3px;\n"
+"    padding: 1px 4px 1px 4px;\n"
+"    background-color:  rgb(240, 240, 240);\n"
+"    color: rgb(45,45,45);\n"
+"}\n"
+"    \n"
+"QLineEdit:disabled {\n"
+"    background-color:  rgb(200,200,200);\n"
+"    color: rgb(45,45,45);\n"
+"}")
+        self.ew_line_3.setObjectName("ew_line_3")
+        self.gridLayout_11.addWidget(self.ew_line_3, 1, 1, 1, 1)
+        self.ew_ticks_button = QtWidgets.QToolButton(self.scrollAreaWidgetContents_4)
+        self.ew_ticks_button.setEnabled(False)
+        self.ew_ticks_button.setMinimumSize(QtCore.QSize(160, 27))
+        self.ew_ticks_button.setMaximumSize(QtCore.QSize(160, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferDefault)
+        self.ew_ticks_button.setFont(font)
+        self.ew_ticks_button.setStyleSheet("QToolButton {\n"
+"    border: 1px solid #acacac;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                    stop:0 #f0f0f0, stop:1 #e5e5e5);\n"
+"    color: rgb(45,45,45);\n"
+"}\n"
+"\n"
+"QToolButton:disabled {\n"
+"    background-color:  rgb(200,200,200);\n"
+"    color: rgb(145,145,145);\n"
+"}\n"
+"\n"
+"QToolButton:hover {\n"
+"    border: 1px solid #7eb4ea;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                    stop:0 #ecf4fc, stop:1 #dcecfc);\n"
+"}\n"
+"\n"
+"QToolButton:pressed {\n"
+"    border: 1px solid #579de5;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                    stop:0 #daecfc, stop:1 #c4e0fc);\n"
+"}")
+        self.ew_ticks_button.setIconSize(QtCore.QSize(25, 25))
+        self.ew_ticks_button.setObjectName("ew_ticks_button")
+        self.gridLayout_11.addWidget(self.ew_ticks_button, 1, 3, 1, 2)
+        self.pw_grid_label_57 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
+        self.pw_grid_label_57.setEnabled(False)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pw_grid_label_57.sizePolicy().hasHeightForWidth())
+        self.pw_grid_label_57.setSizePolicy(sizePolicy)
+        self.pw_grid_label_57.setMinimumSize(QtCore.QSize(0, 27))
+        self.pw_grid_label_57.setMaximumSize(QtCore.QSize(16777215, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
+        font.setItalic(True)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.pw_grid_label_57.setFont(font)
+        self.pw_grid_label_57.setStyleSheet("QLabel {\n"
+"    color: rgb(45,45,45);\n"
+"}\n"
+"\n"
+"QLabel:disabled {\n"
+"    color: rgb(145,145,145);\n"
+"}")
+        self.pw_grid_label_57.setText("")
+        self.pw_grid_label_57.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.pw_grid_label_57.setObjectName("pw_grid_label_57")
+        self.gridLayout_11.addWidget(self.pw_grid_label_57, 1, 5, 1, 1)
         self.horizontalLayout_24.addLayout(self.gridLayout_11)
-        spacerItem33 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_24.addItem(spacerItem33)
         self.verticalLayout_2.addLayout(self.horizontalLayout_24)
         self.horizontalLayout_25 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_25.setObjectName("horizontalLayout_25")
@@ -2943,8 +3036,8 @@ class Ui_exportWindow(object):
         self.ew_checkbox_6.setChecked(True)
         self.ew_checkbox_6.setObjectName("ew_checkbox_6")
         self.horizontalLayout_25.addWidget(self.ew_checkbox_6)
-        spacerItem34 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_25.addItem(spacerItem34)
+        spacerItem35 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_25.addItem(spacerItem35)
         self.info_button_13 = QtWidgets.QToolButton(self.scrollAreaWidgetContents_4)
         self.info_button_13.setEnabled(False)
         self.info_button_13.setMaximumSize(QtCore.QSize(27, 27))
@@ -2964,13 +3057,13 @@ class Ui_exportWindow(object):
         self.info_button_13.setAutoRaise(False)
         self.info_button_13.setObjectName("info_button_13")
         self.horizontalLayout_25.addWidget(self.info_button_13)
-        spacerItem35 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_25.addItem(spacerItem35)
+        spacerItem36 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_25.addItem(spacerItem36)
         self.verticalLayout_2.addLayout(self.horizontalLayout_25)
         self.horizontalLayout_26 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_26.setObjectName("horizontalLayout_26")
-        spacerItem36 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_26.addItem(spacerItem36)
+        spacerItem37 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_26.addItem(spacerItem37)
         self.gridLayout_12 = QtWidgets.QGridLayout()
         self.gridLayout_12.setObjectName("gridLayout_12")
         self.ew_label_17 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
@@ -3021,8 +3114,8 @@ class Ui_exportWindow(object):
 "}")
         self.ew_line_5.setObjectName("ew_line_5")
         self.gridLayout_12.addWidget(self.ew_line_5, 0, 1, 1, 1)
-        spacerItem37 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_12.addItem(spacerItem37, 0, 2, 1, 1)
+        spacerItem38 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_12.addItem(spacerItem38, 0, 2, 1, 1)
         self.ew_label_20 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
         self.ew_label_20.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -3119,8 +3212,8 @@ class Ui_exportWindow(object):
 "}")
         self.ew_line_7.setObjectName("ew_line_7")
         self.gridLayout_12.addWidget(self.ew_line_7, 1, 1, 1, 1)
-        spacerItem38 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_12.addItem(spacerItem38, 1, 2, 1, 1)
+        spacerItem39 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_12.addItem(spacerItem39, 1, 2, 1, 1)
         self.ew_label_21 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
         self.ew_label_21.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -3217,8 +3310,8 @@ class Ui_exportWindow(object):
 "}")
         self.ew_line_9.setObjectName("ew_line_9")
         self.gridLayout_12.addWidget(self.ew_line_9, 2, 1, 1, 1)
-        spacerItem39 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_12.addItem(spacerItem39, 2, 2, 1, 1)
+        spacerItem40 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_12.addItem(spacerItem40, 2, 2, 1, 1)
         self.ew_label_22 = QtWidgets.QLabel(self.scrollAreaWidgetContents_4)
         self.ew_label_22.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -3268,8 +3361,8 @@ class Ui_exportWindow(object):
         self.ew_line_10.setObjectName("ew_line_10")
         self.gridLayout_12.addWidget(self.ew_line_10, 2, 4, 1, 1)
         self.horizontalLayout_26.addLayout(self.gridLayout_12)
-        spacerItem40 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_26.addItem(spacerItem40)
+        spacerItem41 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_26.addItem(spacerItem41)
         self.verticalLayout_2.addLayout(self.horizontalLayout_26)
         self.horizontalLayout_19.addLayout(self.verticalLayout_2)
         self.ew_vertical_layout_4.addLayout(self.horizontalLayout_19)
@@ -3280,13 +3373,13 @@ class Ui_exportWindow(object):
         self.page_6 = QtWidgets.QWidget()
         self.page_6.setObjectName("page_6")
         self.ew_stacked_widget.addWidget(self.page_6)
-        self.gridLayout_13.addWidget(self.ew_splitter, 2, 0, 1, 1)
-        spacerItem41 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_13.addItem(spacerItem41, 3, 0, 1, 1)
+        self.gridLayout_13.addWidget(self.ew_splitter, 2, 0, 1, 2)
+        spacerItem42 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_13.addItem(spacerItem42, 3, 1, 1, 1)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        spacerItem42 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem42)
+        spacerItem43 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem43)
         self.ew_export_button = QtWidgets.QToolButton(exportWindow)
         self.ew_export_button.setEnabled(False)
         self.ew_export_button.setMinimumSize(QtCore.QSize(100, 27))
@@ -3327,8 +3420,8 @@ class Ui_exportWindow(object):
 "}")
         self.ew_export_button.setObjectName("ew_export_button")
         self.horizontalLayout_2.addWidget(self.ew_export_button)
-        spacerItem43 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem43)
+        spacerItem44 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem44)
         self.ew_cancel_button = QtWidgets.QToolButton(exportWindow)
         self.ew_cancel_button.setMinimumSize(QtCore.QSize(100, 27))
         self.ew_cancel_button.setMaximumSize(QtCore.QSize(100, 27))
@@ -3363,12 +3456,12 @@ class Ui_exportWindow(object):
 "}")
         self.ew_cancel_button.setObjectName("ew_cancel_button")
         self.horizontalLayout_2.addWidget(self.ew_cancel_button)
-        spacerItem44 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem44)
-        self.gridLayout_13.addLayout(self.horizontalLayout_2, 4, 0, 1, 1)
+        spacerItem45 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem45)
+        self.gridLayout_13.addLayout(self.horizontalLayout_2, 4, 0, 1, 2)
 
         self.retranslateUi(exportWindow)
-        self.ew_stacked_widget.setCurrentIndex(0)
+        self.ew_stacked_widget.setCurrentIndex(5)
         QtCore.QMetaObject.connectSlotsByName(exportWindow)
 
     def retranslateUi(self, exportWindow):
@@ -3413,9 +3506,10 @@ class Ui_exportWindow(object):
         self.ew_combobox_8.setItemText(2, _translate("exportWindow", "last point"))
         self.ew_checkbox_4.setText(_translate("exportWindow", "Reverse colormap ?"))
         self.ew_checkbox_5.setText(_translate("exportWindow", "Handle colormap values automatically ?"))
-        self.ew_label_15.setText(_translate("exportWindow", "Max:"))
         self.ew_label_14.setText(_translate("exportWindow", "Min:"))
         self.ew_label_16.setText(_translate("exportWindow", "Nbr of steps:"))
+        self.ew_label_15.setText(_translate("exportWindow", "Max:"))
+        self.ew_ticks_button.setText(_translate("exportWindow", "Set colorbar ticks"))
         self.ew_checkbox_6.setText(_translate("exportWindow", "Handle colormap dimensions automatically ?"))
         self.ew_label_17.setText(_translate("exportWindow", "Figure width:"))
         self.ew_label_20.setText(_translate("exportWindow", "Figure height:"))

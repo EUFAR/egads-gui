@@ -29,7 +29,7 @@ The EGADS GUI is composed of different windows, designed to display information 
 Current GUI limitations
 -----------------------
 
-Actually, the GUI has few limitations based on the development time and the number of person working on this project. First the file formats handled by the GUI. Even if EGADS can handle text files (raw, ASCII and csv), the GUI can handle only NetCDF and NASA Ames file format at this time. Second, matrix variable (that is to say variables based on multiple dimensions, or gridded data) can be loaded in the GUI, but, at this time, only time series can be handled by the plot function. The plot function has been modified to handle data based on multiple dimensions, but it is still at an early development stage. Third, the NASA Ames function can only handle files with a FFI equal to 1001.
+Actually, the GUI has few limitations based on the development time and the number of person working on this project. First the file formats handled by the GUI. Even if EGADS can handle text files (raw, ASCII and csv), the GUI can handle only NetCDF and NASA Ames file format (FFI 1001) at this time. 
 
 
 ---------------
@@ -145,15 +145,8 @@ The data icons
 
 The sixth, seventh, and eighth icons are here to manipulate data:
 
-* |create| :    With this function, the user have the possibility to create a simple variable : a time series composed of 0 or 1, or a suite of values from n_start to n_end, or a matrix with personal values. It can be useful when a small matrix with optical values is needed in the case of few optical algorithms. NOT AVAILABLE AT THIS TIME !
 * |migrate| :   In EGADS GUI, once a variable is processed through an algorithm, the result is a new variable displayed in the ``New variables`` tab of the central widget. In this tab, a variable can't be saved in a file, only variables in the ``Variable`` tab are saved. The user has to migrate the new variable to the ``Variables`` tab. And he can do that with this function.
 * |delete| :    The purpose of this function is to delete a variable. If the file is saved after a deletion, obviously the deleted variable won't appear in the file anymore.
-
-.. |create| image:: images/icons/new_var_icon.png
-   :width: 130px
-   :height: 130px
-   :scale: 25 %
-   :align: middle
 
 .. |migrate| image:: images/icons/migrate_icon.png
    :width: 130px
@@ -251,7 +244,7 @@ The system doesn't test the algorithm created by the user, it is expected to wor
   English and normal characters must be used to write every part of the algorithm. Special characters can't be used and it will lead to a crash if the GUI tries to save a file with special characters.
 
 .. NOTE ::
-  For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT, p. 28.
+  For more details on how to create algorithms and the purpose of each field, please take a look in the EGADS Lineage Documentation, chapter ALGORITHM DEVELOPMENT.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -348,9 +341,9 @@ The batch processing window
 
 For those who want to process more than one file at a time, they can use the batch processing function from the File menu.
 
-.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_6.png
+.. image:: images/egads_gui_screencaptures/EGADS_GUI_batch_processing_exemple.png
    :width: 836px
-   :height: 596px
+   :height: 643px
    :scale: 45 %
    :align: center
 
@@ -441,7 +434,7 @@ This tab behaves completely as the ``Variables`` tab.
 The footbar
 -----------
 
-The purpose of the footbar is to display information about the file actually loaded, like the name, the size and the conventions, and messages to confirm the actions of the user, like the modification of metadata or the creation of variables.
+The purpose of the footbar is to display information about the file actually loaded, like the name, the size and the conventions, and messages to confirm the actions of the user, like the modification of metadata or the creation of variables. Since version 1.0.0, messages are displayed for few seconds about the actions performed and confirmed by the user: modification of metadata, deletion of variables, ...
 
 
 ---------------------
@@ -451,8 +444,8 @@ EGADS and GUI options
 The options of EGADS and its GUI are controled through the option window, in the About menu.
 
 .. image:: images/egads_gui_screencaptures/EGADS_GUI_option_window.png
-   :width: 732px
-   :height: 339px
+   :width: 702px
+   :height: 389px
    :scale: 45 %
    :align: center
 

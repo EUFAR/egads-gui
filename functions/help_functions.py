@@ -40,7 +40,18 @@ def option_information_text():
                  'info_button_12': 'When a user select for the first time, in each GUI running session, a standard '
                                    'variable to be plotted as the X axis, a popup will appear to inform him that it '
                                    'is intended to be used only with time series. This option can disable '
-                                   'the popup permanently.'}
+                                   'the popup permanently.',
+                 'info_button_13': 'Enable the possibility to save a list of the different files opened by the user, '
+                                   'in order to have a quick access to them. The list is accessible by clicking on '
+                                   'File, then Open Recent.',
+                 'info_button_14': 'This option gives the possibility to the user to register folders anywhere on the'
+                                   ' hard drive and makes them accessible by clicking on File, then Quick Access.',
+                 'info_button_15': 'By default, standard data are plotted according to there dimensions: the first '
+                                   'dimension is considered as X axis, the second dimension as Y axis, and so on. '
+                                   'With this option, the user can decide how the plot function will consider each '
+                                   'dimension.',
+                 'info_button_16': 'With this option, georeferenced gridded data are considered like standard data.',
+                 }
     return info_dict
 
 
@@ -286,7 +297,39 @@ def plot_information_text():
                                         'function',
                  'pw_plotOptions_bt_5': 'This checkbox activates or deactivates the opacity and the '
                                         'value of opacity.',
-                 'pw_plotOptions_bt_6': 'The name of the time series can be changed here.'}
+                 'pw_plotOptions_bt_6': 'The name of the time series can be changed here.',
+                 'pw_grid_info_button_1': 'Figure margins are set by moving the sliders. The greater the number, '
+                                          'the greater the margins. Please remember that the proportions of each '
+                                          'projection are fixed and can\'t be changed, whatever the margins.',
+                 'pw_grid_info_button_2': 'It is possible to customize the figure and axis titles, their fonts, '
+                                          'the size of their fonts, and their position.',
+                 'pw_grid_info_button_3': 'The projection can be chosen from this list. Options for each projection '
+                                          'are set by default and can be changed by clicking on Set options.',
+                 'pw_grid_info_button_6': 'Click on Set ticks to change the ticks set by default. Please remember '
+                                          'that this option is only available for two projections: PlateCarree and '
+                                          'Mercator. With the next version of Cartopy, this limitation will disappear.',
+                 'pw_grid_info_button_7': 'This section controls the addition of coastlines, their resolution, their '
+                                          'size and their color.',
+                 'pw_grid_info_button_8': 'This section controls the addition of lakes and rivers, their resolution, '
+                                          'their size and their color.',
+                 'pw_grid_info_button_4': 'With this option, it is possible to display or not a grid based on ticks. '
+                                          'following options control the appearance of the grid.',
+                 'pw_grid_info_button_5': 'This section control the aspect of the colorbar. Here is an explanation of '
+                                          'the different options:<ul><li>Colormap legend: the legend is based on the '
+                                          'units of the data, it can be modified by the user if '
+                                          'necessary.</li><li>Colormap position: controls the position of the '
+                                          'colorbar automatically.</li><li>Reverse colormap: it just reverse the '
+                                          'color in the colorbar.</li><li>Handle colormap values automatically: if '
+                                          'activated, the colormap values are set automatically by matplotlib and '
+                                          'cartopy ; if not activated, the user can set colormap values by entering '
+                                          'max and min values and a number of ticks, or by clicking on Set colorbar '
+                                          'ticks to set the value of each tick and the number of ticks precisely.</li>'
+                                          '<li>Handle colormap dimensions automatically: if activated, the dimensions '
+                                          'of the colorbar are set automatically by matplotlib and cartopy ; if not '
+                                          'activated, the user has to enter the dimensions and positions of the '
+                                          'colorbar. Please remember that for horizontal position, 0 is considered '
+                                          'are fully left and 1 as fully right. Same can apply for vertical position '
+                                          'with 0 as bottom and 1 as top.</li></ul>',}
     return info_dict
 
 

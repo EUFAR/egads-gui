@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ticks_labels_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_tickslabelsWindow(object):
     def setupUi(self, tickslabelsWindow):
         tickslabelsWindow.setObjectName("tickslabelsWindow")
-        tickslabelsWindow.resize(718, 143)
+        tickslabelsWindow.resize(716, 241)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icons/tick_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         tickslabelsWindow.setWindowIcon(icon)
@@ -180,32 +180,33 @@ class Ui_tickslabelsWindow(object):
 "}")
         self.gridLayout = QtWidgets.QGridLayout(tickslabelsWindow)
         self.gridLayout.setObjectName("gridLayout")
-        self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setSpacing(10)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.label = QtWidgets.QLabel(tickslabelsWindow)
-        self.label.setMinimumSize(QtCore.QSize(0, 27))
-        self.label.setMaximumSize(QtCore.QSize(16777215, 27))
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.x_label = QtWidgets.QLabel(tickslabelsWindow)
+        self.x_label.setMinimumSize(QtCore.QSize(0, 27))
+        self.x_label.setMaximumSize(QtCore.QSize(16777215, 27))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.label.setFont(font)
-        self.label.setStyleSheet("QLabel {\n"
+        self.x_label.setFont(font)
+        self.x_label.setStyleSheet("QLabel {\n"
 "    color: rgb(45,45,45);\n"
 "}")
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setObjectName("label")
-        self.verticalLayout.addWidget(self.label)
+        self.x_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.x_label.setObjectName("x_label")
+        self.verticalLayout_2.addWidget(self.x_label)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
-        self.add_button = QtWidgets.QToolButton(tickslabelsWindow)
-        self.add_button.setMinimumSize(QtCore.QSize(27, 27))
-        self.add_button.setMaximumSize(QtCore.QSize(27, 27))
-        self.add_button.setStyleSheet("QToolButton {\n"
+        self.x_add_button = QtWidgets.QToolButton(tickslabelsWindow)
+        self.x_add_button.setMinimumSize(QtCore.QSize(27, 27))
+        self.x_add_button.setMaximumSize(QtCore.QSize(27, 27))
+        self.x_add_button.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -217,14 +218,14 @@ class Ui_tickslabelsWindow(object):
 "}")
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap("icons/plus_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.add_button.setIcon(icon1)
-        self.add_button.setIconSize(QtCore.QSize(23, 23))
-        self.add_button.setObjectName("add_button")
-        self.horizontalLayout.addWidget(self.add_button)
-        self.del_button = QtWidgets.QToolButton(tickslabelsWindow)
-        self.del_button.setMinimumSize(QtCore.QSize(27, 27))
-        self.del_button.setMaximumSize(QtCore.QSize(27, 27))
-        self.del_button.setStyleSheet("QToolButton {\n"
+        self.x_add_button.setIcon(icon1)
+        self.x_add_button.setIconSize(QtCore.QSize(23, 23))
+        self.x_add_button.setObjectName("x_add_button")
+        self.horizontalLayout.addWidget(self.x_add_button)
+        self.x_del_button = QtWidgets.QToolButton(tickslabelsWindow)
+        self.x_del_button.setMinimumSize(QtCore.QSize(27, 27))
+        self.x_del_button.setMaximumSize(QtCore.QSize(27, 27))
+        self.x_del_button.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -236,19 +237,22 @@ class Ui_tickslabelsWindow(object):
 "}")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("icons/del_tick_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.del_button.setIcon(icon2)
-        self.del_button.setIconSize(QtCore.QSize(23, 23))
-        self.del_button.setObjectName("del_button")
-        self.horizontalLayout.addWidget(self.del_button)
+        self.x_del_button.setIcon(icon2)
+        self.x_del_button.setIconSize(QtCore.QSize(23, 23))
+        self.x_del_button.setObjectName("x_del_button")
+        self.horizontalLayout.addWidget(self.x_del_button)
         spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
-        self.verticalLayout.addLayout(self.horizontalLayout)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem2)
-        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        self.table = QtWidgets.QTableWidget(tickslabelsWindow)
-        self.table.setMinimumSize(QtCore.QSize(0, 0))
-        self.table.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
+        self.horizontalLayout_3.addLayout(self.verticalLayout_2)
+        self.x_table = QtWidgets.QTableWidget(tickslabelsWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.x_table.sizePolicy().hasHeightForWidth())
+        self.x_table.setSizePolicy(sizePolicy)
+        self.x_table.setMinimumSize(QtCore.QSize(0, 50))
+        self.x_table.setMaximumSize(QtCore.QSize(16777215, 50))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(10)
@@ -256,9 +260,9 @@ class Ui_tickslabelsWindow(object):
         font.setWeight(50)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.table.setFont(font)
-        self.table.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.table.setStyleSheet("QTableWidget {\n"
+        self.x_table.setFont(font)
+        self.x_table.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.x_table.setStyleSheet("QTableWidget {\n"
 "    selection-background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
 "                                    stop:0 #daecfc, stop:1 #c4e0fc);\n"
 "    selection-color: black;\n"
@@ -439,16 +443,16 @@ class Ui_tickslabelsWindow(object):
 "  right: -1px;\n"
 "  bottom: -1px;\n"
 "}")
-        self.table.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.table.setLineWidth(0)
-        self.table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
-        self.table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.table.setGridStyle(QtCore.Qt.SolidLine)
-        self.table.setRowCount(1)
-        self.table.setColumnCount(7)
-        self.table.setObjectName("table")
+        self.x_table.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.x_table.setLineWidth(0)
+        self.x_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.x_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.x_table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
+        self.x_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.x_table.setGridStyle(QtCore.Qt.SolidLine)
+        self.x_table.setRowCount(1)
+        self.x_table.setColumnCount(7)
+        self.x_table.setObjectName("x_table")
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
@@ -459,7 +463,7 @@ class Ui_tickslabelsWindow(object):
         brush.setStyle(QtCore.Qt.NoBrush)
         item.setBackground(brush)
         item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-        self.table.setItem(0, 0, item)
+        self.x_table.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
@@ -470,7 +474,7 @@ class Ui_tickslabelsWindow(object):
         brush.setStyle(QtCore.Qt.NoBrush)
         item.setBackground(brush)
         item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-        self.table.setItem(0, 1, item)
+        self.x_table.setItem(0, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
@@ -481,7 +485,7 @@ class Ui_tickslabelsWindow(object):
         brush.setStyle(QtCore.Qt.NoBrush)
         item.setBackground(brush)
         item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-        self.table.setItem(0, 2, item)
+        self.x_table.setItem(0, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
@@ -492,7 +496,7 @@ class Ui_tickslabelsWindow(object):
         brush.setStyle(QtCore.Qt.NoBrush)
         item.setBackground(brush)
         item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-        self.table.setItem(0, 3, item)
+        self.x_table.setItem(0, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
@@ -503,7 +507,7 @@ class Ui_tickslabelsWindow(object):
         brush.setStyle(QtCore.Qt.NoBrush)
         item.setBackground(brush)
         item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-        self.table.setItem(0, 4, item)
+        self.x_table.setItem(0, 4, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
@@ -514,7 +518,7 @@ class Ui_tickslabelsWindow(object):
         brush.setStyle(QtCore.Qt.NoBrush)
         item.setBackground(brush)
         item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-        self.table.setItem(0, 5, item)
+        self.x_table.setItem(0, 5, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
@@ -525,20 +529,381 @@ class Ui_tickslabelsWindow(object):
         brush.setStyle(QtCore.Qt.NoBrush)
         item.setBackground(brush)
         item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-        self.table.setItem(0, 6, item)
-        self.table.horizontalHeader().setVisible(False)
-        self.table.horizontalHeader().setDefaultSectionSize(80)
-        self.table.horizontalHeader().setHighlightSections(False)
-        self.table.horizontalHeader().setMinimumSectionSize(80)
-        self.table.verticalHeader().setVisible(False)
-        self.table.verticalHeader().setDefaultSectionSize(35)
-        self.table.verticalHeader().setHighlightSections(False)
-        self.table.verticalHeader().setMinimumSectionSize(35)
-        self.gridLayout.addWidget(self.table, 0, 1, 1, 1)
+        self.x_table.setItem(0, 6, item)
+        self.x_table.horizontalHeader().setVisible(False)
+        self.x_table.horizontalHeader().setDefaultSectionSize(80)
+        self.x_table.horizontalHeader().setHighlightSections(False)
+        self.x_table.horizontalHeader().setMinimumSectionSize(80)
+        self.x_table.verticalHeader().setVisible(False)
+        self.x_table.verticalHeader().setDefaultSectionSize(35)
+        self.x_table.verticalHeader().setHighlightSections(False)
+        self.x_table.verticalHeader().setMinimumSectionSize(35)
+        self.horizontalLayout_3.addWidget(self.x_table)
+        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 1)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout.addItem(spacerItem2, 1, 0, 1, 1)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.y_label = QtWidgets.QLabel(tickslabelsWindow)
+        self.y_label.setMinimumSize(QtCore.QSize(0, 27))
+        self.y_label.setMaximumSize(QtCore.QSize(16777215, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.y_label.setFont(font)
+        self.y_label.setStyleSheet("QLabel {\n"
+"    color: rgb(45,45,45);\n"
+"}")
+        self.y_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.y_label.setObjectName("y_label")
+        self.verticalLayout.addWidget(self.y_label)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem3)
+        self.y_add_button = QtWidgets.QToolButton(tickslabelsWindow)
+        self.y_add_button.setMinimumSize(QtCore.QSize(27, 27))
+        self.y_add_button.setMaximumSize(QtCore.QSize(27, 27))
+        self.y_add_button.setStyleSheet("QToolButton {\n"
+"    border: 1px solid transparent;\n"
+"    background-color: transparent;\n"
+"    width: 27px;\n"
+"    height: 27px;\n"
+"}\n"
+"\n"
+"QToolButton:flat {\n"
+"    border: none;\n"
+"}")
+        self.y_add_button.setIcon(icon1)
+        self.y_add_button.setIconSize(QtCore.QSize(23, 23))
+        self.y_add_button.setObjectName("y_add_button")
+        self.horizontalLayout_2.addWidget(self.y_add_button)
+        self.y_del_button = QtWidgets.QToolButton(tickslabelsWindow)
+        self.y_del_button.setMinimumSize(QtCore.QSize(27, 27))
+        self.y_del_button.setMaximumSize(QtCore.QSize(27, 27))
+        self.y_del_button.setStyleSheet("QToolButton {\n"
+"    border: 1px solid transparent;\n"
+"    background-color: transparent;\n"
+"    width: 27px;\n"
+"    height: 27px;\n"
+"}\n"
+"\n"
+"QToolButton:flat {\n"
+"    border: none;\n"
+"}")
+        self.y_del_button.setIcon(icon2)
+        self.y_del_button.setIconSize(QtCore.QSize(23, 23))
+        self.y_del_button.setObjectName("y_del_button")
+        self.horizontalLayout_2.addWidget(self.y_del_button)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem4)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout_4.addLayout(self.verticalLayout)
+        self.y_table = QtWidgets.QTableWidget(tickslabelsWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.y_table.sizePolicy().hasHeightForWidth())
+        self.y_table.setSizePolicy(sizePolicy)
+        self.y_table.setMinimumSize(QtCore.QSize(0, 50))
+        self.y_table.setMaximumSize(QtCore.QSize(16777215, 50))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.y_table.setFont(font)
+        self.y_table.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.y_table.setStyleSheet("QTableWidget {\n"
+"    selection-background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                    stop:0 #daecfc, stop:1 #c4e0fc);\n"
+"    selection-color: black;\n"
+"    background: transparent;\n"
+"}\n"
+"\n"
+"\n"
+"QTableWidget::item {\n"
+"    background-color: rgb(240,240,240);\n"
+"}\n"
+"\n"
+"QTableWidget::item:hover {\n"
+"    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                    stop:0 #ecf4fc, stop:1 #dcecfc);\n"
+"}\n"
+"\n"
+"QTableWidget::item:selected {\n"
+"    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                    stop:0 #daecfc, stop:1 #c4e0fc);\n"
+"}\n"
+"\n"
+"QScrollBar:vertical {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  margin: 21px 0px 21px 0px;\n"
+"}\n"
+"\n"
+"QScrollBar:horizontal {\n"
+"  border: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  margin: 0px 21px 0px 21px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-height: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:vertical:hover {\n"
+"  background-color: rgb(166, 166, 166);\n"
+"}\n"
+"\n"
+"QScrollBar:handle:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"  background-color: rgb(205, 205, 205);\n"
+"  min-width: 25px;\n"
+"}\n"
+"\n"
+"QScrollBar:handle:horizontal:hover {\n"
+"  background-color: rgb(166, 166, 166);\n"
+"}\n"
+"\n"
+"QScrollBar:handle:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"  border-top: 1px solid rgb(240,240,240);\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: bottom;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:hover {\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid rgb(240,240,240);\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  height: 20px;\n"
+"  subcontrol-position: top;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:hover {\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical {\n"
+"  image: url(icons/up_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical {\n"
+"  image: url(icons/down_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-arrow:vertical:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid rgb(240,240,240);\n"
+"  border-right: 1px solid white;\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: right;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"  border-top: 1px solid white;\n"
+"  border-left: 1px solid white;\n"
+"  border-right: 1px solid rgb(240,240,240);\n"
+"  border-bottom: 1px solid white;\n"
+"  background-color: rgb(240, 240, 240);\n"
+"  width: 20px;\n"
+"  subcontrol-position: left;\n"
+"  subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"  background-color: rgb(218, 218, 218);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"  background-color: rgb(96, 96, 96);\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal {\n"
+"  image: url(icons/left_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::left-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal {\n"
+"  image: url(icons/right_arrow_icon.svg); \n"
+"  width: 16px;\n"
+"  height: 16px;\n"
+"}\n"
+"\n"
+"QScrollBar::right-arrow:horizontal:pressed {\n"
+"  right: -1px;\n"
+"  bottom: -1px;\n"
+"}")
+        self.y_table.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.y_table.setLineWidth(0)
+        self.y_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.y_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.y_table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
+        self.y_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.y_table.setGridStyle(QtCore.Qt.SolidLine)
+        self.y_table.setRowCount(1)
+        self.y_table.setColumnCount(7)
+        self.y_table.setObjectName("y_table")
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        item.setFont(font)
+        brush = QtGui.QBrush(QtGui.QColor(230, 230, 230))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        item.setBackground(brush)
+        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+        self.y_table.setItem(0, 0, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        item.setFont(font)
+        brush = QtGui.QBrush(QtGui.QColor(230, 230, 230))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        item.setBackground(brush)
+        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+        self.y_table.setItem(0, 1, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        item.setFont(font)
+        brush = QtGui.QBrush(QtGui.QColor(230, 230, 230))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        item.setBackground(brush)
+        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+        self.y_table.setItem(0, 2, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        item.setFont(font)
+        brush = QtGui.QBrush(QtGui.QColor(230, 230, 230))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        item.setBackground(brush)
+        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+        self.y_table.setItem(0, 3, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        item.setFont(font)
+        brush = QtGui.QBrush(QtGui.QColor(230, 230, 230))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        item.setBackground(brush)
+        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+        self.y_table.setItem(0, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        item.setFont(font)
+        brush = QtGui.QBrush(QtGui.QColor(230, 230, 230))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        item.setBackground(brush)
+        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+        self.y_table.setItem(0, 5, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        item.setFont(font)
+        brush = QtGui.QBrush(QtGui.QColor(230, 230, 230))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        item.setBackground(brush)
+        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEditable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+        self.y_table.setItem(0, 6, item)
+        self.y_table.horizontalHeader().setVisible(False)
+        self.y_table.horizontalHeader().setDefaultSectionSize(80)
+        self.y_table.horizontalHeader().setHighlightSections(False)
+        self.y_table.horizontalHeader().setMinimumSectionSize(80)
+        self.y_table.verticalHeader().setVisible(False)
+        self.y_table.verticalHeader().setDefaultSectionSize(35)
+        self.y_table.verticalHeader().setHighlightSections(False)
+        self.y_table.verticalHeader().setMinimumSectionSize(35)
+        self.horizontalLayout_4.addWidget(self.y_table)
+        self.gridLayout.addLayout(self.horizontalLayout_4, 2, 0, 1, 1)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 2, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout.addItem(spacerItem5, 3, 0, 1, 1)
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem3)
+        spacerItem6 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem6)
         self.ok_button = QtWidgets.QToolButton(tickslabelsWindow)
         self.ok_button.setMinimumSize(QtCore.QSize(100, 27))
         self.ok_button.setMaximumSize(QtCore.QSize(100, 27))
@@ -574,8 +939,8 @@ class Ui_tickslabelsWindow(object):
 "}")
         self.ok_button.setObjectName("ok_button")
         self.horizontalLayout_7.addWidget(self.ok_button)
-        spacerItem4 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem4)
+        spacerItem7 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem7)
         self.cancel_button = QtWidgets.QToolButton(tickslabelsWindow)
         self.cancel_button.setMinimumSize(QtCore.QSize(100, 27))
         self.cancel_button.setMaximumSize(QtCore.QSize(100, 27))
@@ -611,9 +976,9 @@ class Ui_tickslabelsWindow(object):
 "}")
         self.cancel_button.setObjectName("cancel_button")
         self.horizontalLayout_7.addWidget(self.cancel_button)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem5)
-        self.gridLayout.addLayout(self.horizontalLayout_7, 1, 0, 1, 2)
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem8)
+        self.gridLayout.addLayout(self.horizontalLayout_7, 4, 0, 1, 1)
 
         self.retranslateUi(tickslabelsWindow)
         QtCore.QMetaObject.connectSlotsByName(tickslabelsWindow)
@@ -621,24 +986,42 @@ class Ui_tickslabelsWindow(object):
     def retranslateUi(self, tickslabelsWindow):
         _translate = QtCore.QCoreApplication.translate
         tickslabelsWindow.setWindowTitle(_translate("tickslabelsWindow", "Set your own ticks/labels"))
-        self.label.setText(_translate("tickslabelsWindow", "ticks/labels:"))
-        __sortingEnabled = self.table.isSortingEnabled()
-        self.table.setSortingEnabled(False)
-        item = self.table.item(0, 0)
+        self.x_label.setText(_translate("tickslabelsWindow", "X ticks/labels:"))
+        __sortingEnabled = self.x_table.isSortingEnabled()
+        self.x_table.setSortingEnabled(False)
+        item = self.x_table.item(0, 0)
         item.setToolTip(_translate("tickslabelsWindow", "Sunday"))
-        item = self.table.item(0, 1)
+        item = self.x_table.item(0, 1)
         item.setToolTip(_translate("tickslabelsWindow", "Monday"))
-        item = self.table.item(0, 2)
+        item = self.x_table.item(0, 2)
         item.setToolTip(_translate("tickslabelsWindow", "Tuesday"))
-        item = self.table.item(0, 3)
+        item = self.x_table.item(0, 3)
         item.setToolTip(_translate("tickslabelsWindow", "Wednesday"))
-        item = self.table.item(0, 4)
+        item = self.x_table.item(0, 4)
         item.setToolTip(_translate("tickslabelsWindow", "Thursday"))
-        item = self.table.item(0, 5)
+        item = self.x_table.item(0, 5)
         item.setToolTip(_translate("tickslabelsWindow", "Friday"))
-        item = self.table.item(0, 6)
+        item = self.x_table.item(0, 6)
         item.setToolTip(_translate("tickslabelsWindow", "Saturday"))
-        self.table.setSortingEnabled(__sortingEnabled)
+        self.x_table.setSortingEnabled(__sortingEnabled)
+        self.y_label.setText(_translate("tickslabelsWindow", "Y ticks/labels:"))
+        __sortingEnabled = self.y_table.isSortingEnabled()
+        self.y_table.setSortingEnabled(False)
+        item = self.y_table.item(0, 0)
+        item.setToolTip(_translate("tickslabelsWindow", "Sunday"))
+        item = self.y_table.item(0, 1)
+        item.setToolTip(_translate("tickslabelsWindow", "Monday"))
+        item = self.y_table.item(0, 2)
+        item.setToolTip(_translate("tickslabelsWindow", "Tuesday"))
+        item = self.y_table.item(0, 3)
+        item.setToolTip(_translate("tickslabelsWindow", "Wednesday"))
+        item = self.y_table.item(0, 4)
+        item.setToolTip(_translate("tickslabelsWindow", "Thursday"))
+        item = self.y_table.item(0, 5)
+        item.setToolTip(_translate("tickslabelsWindow", "Friday"))
+        item = self.y_table.item(0, 6)
+        item.setToolTip(_translate("tickslabelsWindow", "Saturday"))
+        self.y_table.setSortingEnabled(__sortingEnabled)
         self.ok_button.setText(_translate("tickslabelsWindow", "Ok"))
         self.cancel_button.setText(_translate("tickslabelsWindow", "Cancel"))
 
