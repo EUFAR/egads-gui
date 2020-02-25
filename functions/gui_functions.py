@@ -433,9 +433,10 @@ def update_variable_attribute_gui(self, index=None):
         units = self.new_units_ln
         fill_value = self.new_fill_ln
         dimensions = self.new_dimensions_ln
-    sublist = variables_and_attributes[str(list_object.currentItem().text())]
+    var = str(list_object.currentItem().text())
+    sublist = variables_and_attributes[var]
     metadata_dict = sublist[0].metadata
-    var_name.setText(str(list_object.currentItem().text()))
+    var_name.setText(var)
     read_set_attribute_gui(long_name, 'long_name', metadata_dict)
     read_set_attribute_gui(units, 'units', metadata_dict)
     read_set_attribute_gui(category, 'Category', metadata_dict)

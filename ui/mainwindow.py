@@ -529,7 +529,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             undeleted_window = MyInfo(text)
             undeleted_window.exec_()
 
-    def about_egads(self):
+    @staticmethod
+    def about_egads():
         logging.debug('gui - mainwindow.py - MainWindow - about_egads')
         egads_version = egads.__version__
         text = ('<p align=\"justify\">EGADS (EUFAR General Airborne Data-processing Software, v' + egads_version
@@ -598,8 +599,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                                                 self.min_egads_branch)
             self.check_egads_version_thread.start()
             self.check_egads_version_thread.version_issue.connect(self.parse_egads_version)
-    
-    def parse_egads_version(self, version_issue):
+
+    @staticmethod
+    def parse_egads_version(version_issue):
         logging.debug('gui - mainwindow.py - MainWindow - parse_egads_version - version_issue ' + str(version_issue))
         egads_version = egads.__version__
         if not version_issue['version'] or not version_issue['branch']:
@@ -795,7 +797,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def display_status_bar_msg(self, string):
         self.statusBar.showMessage(string)
 
-    def open_help(self):
+    @staticmethod
+    def open_help():
         logging.debug('gui - mainwindow.py - MainWindow - open_help')
         webbrowser.open('https://egads-gui.readthedocs.io/en/lineage/')
 
@@ -868,3 +871,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 event.accept()
         if self.file_is_opened:
             self.opened_file.close()
+        logging.info('**********************************')
+        logging.info('EGADS GUI ' + _gui_version + ' is closing ...')
+        logging.info('**********************************')

@@ -2,10 +2,18 @@
 
 * add map export possibility for GE. (v 1.2)
 * add HDF5 handling (with EGADS v 1.2.0, v 1.2)
+* rework logging system (v1.2)
   
 #### To fix list: ####
 
 * nothing
+
+
+### February 24 2020, Release version 1.1.1 ###
+  
+  * FIXED
+    * few mistakes in the documentation have been fixed.
+	* removed old matplotlib code (< 3.x) and updated the dependancies.
 
 
 ### December 16 2019, Release version 1.1.0 ###
@@ -30,6 +38,7 @@ More projections in Cartopy have been added to the plot function. At this time, 
   * MODIFIED:
 	* it is now possible to plot 3D gridded data, buttons are available to navigate into layers.
 	* the plot window has been reworked and enhanced.
+	* the documentation has been updated.
 
 
 ### September 6 2019, Release version 1.0.3 ###

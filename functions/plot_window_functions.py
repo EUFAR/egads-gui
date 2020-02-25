@@ -280,47 +280,6 @@ class PlotWindow(QtWidgets.QDialog, Ui_plotWindow):
         logging.debug('gui - plot_window_functions.py - PlotWindow - plot_home')
         self.navigation_toolbar.home()
 
-    # def plot_save(self):
-    #     logging.debug('gui - plot_window_functions.py - PlotWindow - plot_save')
-    #     save_file_name, save_file_ext = self.get_file_name()
-    #     if save_file_name:
-    #         out_file_ext = os.path.splitext(os.path.basename(save_file_name))[1]
-    #         if not out_file_ext:
-    #             save_file_name += images_extension_dict()[save_file_ext]
-    #         out_file_ext = os.path.splitext(os.path.basename(save_file_name))[1]
-    #         real_width, real_height = plt.gcf().get_size_inches()
-    #         set_height, set_width = None, None
-    #         if self.pw_saveOptions_ln_1.text():
-    #             set_height = float(self.pw_saveOptions_ln_1.text())
-    #             if self.pw_saveOptions_cb_1.currentText() == 'Centimeters':
-    #                 set_height = round((set_height / 2.54) * 100) / 100
-    #         if self.pw_saveOptions_ln_2.text():
-    #             set_width = float(self.pw_saveOptions_ln_2.text())
-    #             if self.pw_saveOptions_cb_2.currentText() == 'Centimeters':
-    #                 set_width = round((set_width / 2.54) * 100) / 100
-    #         user_size = False
-    #         if set_height is not None and set_width is not None:
-    #             if (real_height - 0.1) <= set_height <= (real_height + 0.1) and (real_width - 0.1) <= set_width <= (
-    #                     real_width + 0.1):
-    #                 pass
-    #             else:
-    #                 user_size = True
-    #                 plt.gcf().set_size_inches(set_width, set_height)
-    #         kwargs = {"orientation": 'landscape', "papertype": 'a4', "format": None,
-    #                   "bbox_inches": None, "pad_inches": 0.1, "frameon": None,
-    #                   'dpi': 100}
-    #         try:
-    #             kwargs['dpi'] = int(self.pw_saveOptions_ln_3.text())
-    #         except ValueError:
-    #             pass
-    #         if out_file_ext == '.jpg':
-    #             kwargs['quality'] = self.pw_saveOptions_sl_1.value()
-    #         kwargs['transparent'] = self.pw_saveOptions_ck_1.isChecked()
-    #         plt.savefig(save_file_name, **kwargs)
-    #         if user_size:
-    #             plt.gcf().set_size_inches(real_width, real_height)
-    #             self.canvas.draw()
-
     def unlock_size_edit(self):
         logging.debug('gui - plot_window_functions.py - PlotWindow - unlock_size_edit')
         if not self.pw_saveOptions_ln_1.isEnabled():

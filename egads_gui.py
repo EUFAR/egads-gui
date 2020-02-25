@@ -42,26 +42,29 @@ def launch_egads_gui(gui_path, user_path):
     logging.info('**********************************')
     logging.info('EGADS GUI ' + _gui_version + ' is starting ...')
     logging.info('**********************************')
-    logging.debug('gui - gui frozen ? ' + str(frozen))
+    logging.info('gui - gui frozen ? ' + str(frozen))
     system, release, version = platform.system_alias(platform.system(), platform.release(), platform.version())
-    logging.debug('gui - operating system: ' + system + ' ' + release + ' (' + version + ')')
+    logging.info('gui - operating system: ' + system + ' ' + release + ' (' + version + ')')
     installed = None
     if system == 'Windows':
         try:
             import winreg
             reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
             winreg.OpenKey(reg, r'Software\EUFAR\EGADS Lineage GUI')
-            installed = True
+            if frozen:
+                installed = True
+            else:
+                installed = False
         except FileNotFoundError:
             installed = False
-    logging.debug('gui - gui installed ? ' + str(installed))
+    logging.info('gui - gui installed ? ' + str(installed))
     python_version = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
-    logging.debug('gui - python version: ' + python_version)
-    logging.debug('gui - pyqt5 version: ' + qt_version)
-    logging.debug('gui - matplotlib version: ' + mpl_version)
-    logging.debug('gui - cartopy version: ' + cy_version)
-    logging.debug('gui - simplekml version: ' + km_version)
-    logging.debug('gui - markdown version: ' + mk_version)
+    logging.info('gui - python version: ' + python_version)
+    logging.info('gui - pyqt5 version: ' + qt_version)
+    logging.info('gui - matplotlib version: ' + mpl_version)
+    logging.info('gui - cartopy version: ' + cy_version)
+    logging.info('gui - simplekml version: ' + km_version)
+    logging.info('gui - markdown version: ' + mk_version)
     ui = MainWindow(gui_path, user_path, config_dict, frozen, system, installed)
     ui.show()
     splash.finish(ui)

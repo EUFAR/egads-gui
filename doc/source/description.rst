@@ -143,7 +143,7 @@ The three first icons of the icon bar give access to few basic functions to cont
 The data icons
 ^^^^^^^^^^^^^^
 
-The sixth, seventh, and eighth icons are here to manipulate data:
+The sixth and seventh icons are here to manipulate data:
 
 * |migrate| :   In EGADS GUI, once a variable is processed through an algorithm, the result is a new variable displayed in the ``New variables`` tab of the central widget. In this tab, a variable can't be saved in a file, only variables in the ``Variable`` tab are saved. The user has to migrate the new variable to the ``Variables`` tab. And he can do that with this function.
 * |delete| :    The purpose of this function is to delete a variable. If the file is saved after a deletion, obviously the deleted variable won't appear in the file anymore.
