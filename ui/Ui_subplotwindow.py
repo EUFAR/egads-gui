@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from functions.gui_elements import MyTableWidget
+from functions.gui_functions.gui_widgets import MyTableWidget
 
 class Ui_subplotWindow(object):
     def setupUi(self, subplotWindow):

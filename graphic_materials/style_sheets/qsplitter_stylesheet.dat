@@ -1,0 +1,15 @@
+QSplitter::handle {
+    background: rgb(220,220,220);
+}
+
+QSplitter::handle:horizontal {
+    width: 5px;
+}
+
+QSplitter::handle:vertical {
+    height: 5px;
+}
+
+QSplitter::handle:pressed {
+    background: rgb(190,190,190);
+}

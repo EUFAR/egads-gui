@@ -3,16 +3,6 @@ import platform
 import matplotlib
 
 
-def widgets_metadata_dict():
-    object_dict = {'gm_title_ln': ['title', 'MNAME'], 'gm_institution_ln': ['institution', 'ORG'],
-                   'gm_source_ln': ['source', 'SNAME'], 'gm_project_ln': ['project', 'ONAME'],
-                   'gm_history_ln': ['history', 'NCOM'], 'gm_comments_ln': ["", 'SCOM'],
-                   'va_varName_ln': 'var_name', 'va_longName_ln': 'long_name', 'va_category_ln': 'Category',
-                   'va_units_ln': 'units', 'new_varName_ln': 'var_name', 'new_longName_ln': 'long_name',
-                   'new_category_ln': 'Category', 'new_units_ln': 'units'}
-    return object_dict
-
-
 def setup_fonts():
     logging.debug('gui - material_functions.py - setup_fonts')
     if platform.system() == 'Linux':
@@ -288,3 +278,11 @@ def transparency_hexa_dict_function():
                  20: '33', 19: '30', 18: '2E', 17: '2B', 16: '29', 15: '26', 14: '24', 13: '21', 12: '1F', 11: '1C',
                  10: '1A', 9: '17', 8: '14', 7: '12', 6: '0F', 5: '0D', 4: '0A', 3: '08', 2: '05', 1: '03', 0: '00'}
     return hexa_dict
+
+
+def extension_filetype_dict_function():
+    logging.debug('gui - utils.py - extension_filetype_dict_function')
+    object_dict = {'.nc': 'NetCDF Files (*.nc *.cdf)', '.csv': 'CSV Files (*.csv *.dat *.txt)',
+                   '.dat': 'CSV Files (*.csv ''*.dat *.txt)', '.txt': 'CSV Files (*.csv *.dat *.txt)',
+                   '.na': 'NASA Ames Files (*.na)', '.h5': 'Hdf Files (*.h5 *.hdf5 *.he5)'}
+    return object_dict

@@ -1,12 +1,57 @@
 #### To do list: ####
 
-* add map export possibility for GE. (v 1.2)
-* add HDF5 handling (with EGADS v 1.2.0, v 1.2)
-* rework logging system (v1.2)
+* add map export possibility for GE. (v 1.3)
+* rework logging system (v1.3)
+* create a system to permit movement in TreeWidget and dimension handling in NetCdf with groups.
+* add a button to change dimension.
+* when creating a new variable or run an algorithme, the new variable shouldn't have a dimension -> let the user decide which dimension should be linked from a dimension list.
+* when error occures during var processing, return the error to the user.
+* update cartopy
+
   
 #### To fix list: ####
 
 * nothing
+
+
+### July 15 2020, Release version 1.2.0 ###
+
+EGADS Lineage v1.2.7 is mandatory ro run this version of the GUI. The GUI has been reworked to handle Hdf5 file and groups (NetCdf and Hdf5). Thus the GUI and its code have been totally redone and are now more flexible.
+Actually, all mechanisms for dataset and group movements in a file have been implemented, but because no solution has been found for dataset and their dimensions, only groups can be moved for now.
+Cartopy will be updated in the next version.
+
+  * FIXED
+    * an issue with an icon has been fixed in the Algorithm menu.
+	* when closing the GUI and a file has been modified, if the user clicks on cancel when the GUI asks to save the file, messages that the GUI has been closed are registered. It has been fixed.
+	* once a variable is deleted, and if no variable is selected, icons are not updated, fixed.
+	* row wasn't properly removed from a grid layout in the metadata window.
+	* in the metadata window, new attributes were added to the wrong layout.
+	* corrected few mistakes in few stylesheets.
+	* changed the way the right click menu in Qtreewidget is displayed (exec_() -> popup()) to avoid graphical issues with few other widgets.
+	* when reading a widget stylesheet file, the file wasn't closed properly, fixed.
+	* corrected strange issue with the migrate icon.
+	* in the batch processing window, if a user wants to add a file to the file list, and cancel, an exception occures. It has been fixed.
+	* replaced a false by a False in the class ReadFileThread...
+  
+  * MODIFIED
+    * stylesheet for widgets is now loaded from files for dynamic parts of the GUI.
+	* in plot window, for gridded and georeferenced data, ocean and land options have been divided. Now ocean (background color, no shape file), land (shapefile, color only) and coastlines (shapefile, line width and color) can be styled separately.
+	* colormap options have been moved to the global options tab.
+	* metadata windows have been modified to handle original metadata dict and not copies.
+	* progress bar has been modified for a better handling during saving operations.
+	* updated the batch processing window to handle Hdf5.
+	* in the batch processing window, the list of files is now stored in a list object.
+	* if paths for IN and OUT files are the same, a warning window is displayed asking to change OUT path.
+	* if the name of a dimension is modified, it is now reflected in other variables depending on that dimension.
+	
+  
+  * ADDED
+    * with Hdf and NetCdf containing groups, it is now possible to move dataset and groups to another place in the hierarchy.
+	* groups have their own metadata window to handle group metadata.
+	* in the plot window, a button to set the map extent has been added.
+	* in the plot window, grid and labels are now independant, and each of them can be tweaked and displayed (or not).
+	* in the plot window, a button to order layers has been added.
+	* a reload button has been added to the file list in batch processing.
 
 
 ### February 24 2020, Release version 1.1.1 ###

@@ -1,0 +1,4 @@
+QFrame {
+   background: rgb(230, 230, 230);
+   border: 3px dashed rgb(150,150,150);
+}

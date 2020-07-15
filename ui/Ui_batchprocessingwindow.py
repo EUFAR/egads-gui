@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'batchprocessing.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -24,88 +24,8 @@ class Ui_batchProcessingWindow(object):
         icon.addPixmap(QtGui.QPixmap("icons/batch_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         batchProcessingWindow.setWindowIcon(icon)
         batchProcessingWindow.setStyleSheet("")
-        self.gridLayout_5 = QtWidgets.QGridLayout(batchProcessingWindow)
-        self.gridLayout_5.setObjectName("gridLayout_5")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem)
-        self.bw_button_ok = QtWidgets.QToolButton(batchProcessingWindow)
-        self.bw_button_ok.setEnabled(False)
-        self.bw_button_ok.setMinimumSize(QtCore.QSize(180, 27))
-        self.bw_button_ok.setMaximumSize(QtCore.QSize(180, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_button_ok.setFont(font)
-        self.bw_button_ok.setStyleSheet("QToolButton {\n"
-"    border: 1px solid #acacac;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"QToolButton:disabled {\n"
-"    background-color:  rgb(200,200,200);\n"
-"}\n"
-"\n"
-"QToolButton:hover {\n"
-"    border: 1px solid #7eb4ea;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-"}\n"
-"\n"
-"\n"
-"QToolButton:pressed {\n"
-"    border: 1px solid #579de5;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                      stop: 0 #daecfc, stop: 1 #c4e0fc);\n"
-"}")
-        self.bw_button_ok.setObjectName("bw_button_ok")
-        self.horizontalLayout_2.addWidget(self.bw_button_ok)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem1)
-        self.bw_button_cancel = QtWidgets.QToolButton(batchProcessingWindow)
-        self.bw_button_cancel.setMinimumSize(QtCore.QSize(100, 27))
-        self.bw_button_cancel.setMaximumSize(QtCore.QSize(100, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_button_cancel.setFont(font)
-        self.bw_button_cancel.setStyleSheet("QToolButton {\n"
-"    border: 1px solid #acacac;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-"    color: rgb(45,45,45)\n"
-"}\n"
-"\n"
-"QToolButton:hover {\n"
-"    border: 1px solid #7eb4ea;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-"}\n"
-"\n"
-"\n"
-"QToolButton:pressed {\n"
-"    border: 1px solid #579de5;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                      stop: 0 #daecfc, stop: 1 #c4e0fc);\n"
-"}")
-        self.bw_button_cancel.setObjectName("bw_button_cancel")
-        self.horizontalLayout_2.addWidget(self.bw_button_cancel)
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem2)
-        self.gridLayout_5.addLayout(self.horizontalLayout_2, 2, 0, 1, 1)
+        self.gridLayout_2 = QtWidgets.QGridLayout(batchProcessingWindow)
+        self.gridLayout_2.setObjectName("gridLayout_2")
         self.tabWidget = QtWidgets.QTabWidget(batchProcessingWindow)
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
@@ -199,68 +119,15 @@ class Ui_batchProcessingWindow(object):
         self.tabWidget.setObjectName("tabWidget")
         self.tab_1 = QtWidgets.QWidget()
         self.tab_1.setObjectName("tab_1")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.tab_1)
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_2.addItem(spacerItem3, 0, 1, 1, 1)
-        spacerItem4 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_2.addItem(spacerItem4, 1, 0, 1, 1)
-        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout = QtWidgets.QGridLayout(self.tab_1)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
-        self.bw_label_2 = QtWidgets.QLabel(self.tab_1)
-        self.bw_label_2.setEnabled(False)
-        self.bw_label_2.setMinimumSize(QtCore.QSize(0, 27))
-        self.bw_label_2.setMaximumSize(QtCore.QSize(16777215, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_label_2.setFont(font)
-        self.bw_label_2.setStyleSheet("QLabel {\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"\n"
-"QLabel:disabled {\n"
-"    color: rgb(145,145,145);\n"
-"}")
-        self.bw_label_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.bw_label_2.setObjectName("bw_label_2")
-        self.gridLayout.addWidget(self.bw_label_2, 3, 0, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout.addItem(spacerItem, 0, 1, 1, 1)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        spacerItem5 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout.addItem(spacerItem5)
-        self.bw_line_1 = QtWidgets.QFrame(self.tab_1)
-        self.bw_line_1.setStyleSheet("QFrame {\n"
-"   background: rgb(190,190,190);\n"
-"   height: 5px;\n"
-"   border: 0px solid black;\n"
-"}")
-        self.bw_line_1.setFrameShape(QtWidgets.QFrame.HLine)
-        self.bw_line_1.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.bw_line_1.setObjectName("bw_line_1")
-        self.verticalLayout.addWidget(self.bw_line_1)
-        spacerItem6 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout.addItem(spacerItem6)
-        self.gridLayout.addLayout(self.verticalLayout, 1, 0, 1, 2)
-        self.bw_label_5 = QtWidgets.QLabel(self.tab_1)
-        self.bw_label_5.setMinimumSize(QtCore.QSize(0, 27))
-        self.bw_label_5.setMaximumSize(QtCore.QSize(16777215, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_label_5.setFont(font)
-        self.bw_label_5.setStyleSheet("QLabel {\n"
-"    color: rgb(45,45,45);\n"
-"}")
-        self.bw_label_5.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.bw_label_5.setObjectName("bw_label_5")
-        self.gridLayout.addWidget(self.bw_label_5, 7, 0, 1, 1)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.bw_label_1 = QtWidgets.QLabel(self.tab_1)
         self.bw_label_1.setEnabled(True)
         self.bw_label_1.setMinimumSize(QtCore.QSize(0, 27))
@@ -276,117 +143,7 @@ class Ui_batchProcessingWindow(object):
 "}")
         self.bw_label_1.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.bw_label_1.setObjectName("bw_label_1")
-        self.gridLayout.addWidget(self.bw_label_1, 0, 0, 1, 1)
-        self.bw_label_3 = QtWidgets.QLabel(self.tab_1)
-        self.bw_label_3.setEnabled(False)
-        self.bw_label_3.setMinimumSize(QtCore.QSize(0, 27))
-        self.bw_label_3.setMaximumSize(QtCore.QSize(16777215, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_label_3.setFont(font)
-        self.bw_label_3.setStyleSheet("QLabel {\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"\n"
-"QLabel:disabled {\n"
-"    color: rgb(145,145,145);\n"
-"}")
-        self.bw_label_3.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.bw_label_3.setObjectName("bw_label_3")
-        self.gridLayout.addWidget(self.bw_label_3, 4, 0, 1, 1)
-        spacerItem7 = QtWidgets.QSpacerItem(738, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem7, 6, 0, 1, 2)
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.bw_combobox_4 = QtWidgets.QComboBox(self.tab_1)
-        self.bw_combobox_4.setMinimumSize(QtCore.QSize(370, 27))
-        self.bw_combobox_4.setMaximumSize(QtCore.QSize(370, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(9)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_combobox_4.setFont(font)
-        self.bw_combobox_4.setStyleSheet("QComboBox {\n"
-"    border: 1px solid #acacac;\n"
-"    border-radius: 1px;\n"
-"    padding-left: 5px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"QComboBox:disabled {\n"
-"    background-color:  rgb(200,200,200);\n"
-"}\n"
-"\n"
-"QComboBox:hover {\n"
-"    border: 1px solid #7eb4ea;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-"}\n"
-"\n"
-"QComboBox::drop-down {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: top right;\n"
-"    width: 27px;\n"
-"    border-left-width: 1px;\n"
-"    border-left-color: darkgray;\n"
-"    border-left-style: solid;\n"
-"    border-top-right-radius: 3px;\n"
-"    border-bottom-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QComboBox::down-arrow {\n"
-"    image: url(icons/down_arrow_icon.svg); \n"
-"    width: 16px;\n"
-"    height: 16px\n"
-"}\n"
-"\n"
-"QComboBox QAbstractItemView {\n"
-"    selection-background-color: rgb(200,200,200);\n"
-"    selection-color: black;\n"
-"    background: #f0f0f0;\n"
-"    border: 0px solid #f0f0f0;\n"
-"}\n"
-"\n"
-"QComboBox QAbstractItemView::item {\n"
-"    margin: 5px 5px 5px 5px;\n"
-"}")
-        self.bw_combobox_4.setFrame(False)
-        self.bw_combobox_4.setObjectName("bw_combobox_4")
-        self.bw_combobox_4.addItem("")
-        self.bw_combobox_4.addItem("")
-        self.horizontalLayout_5.addWidget(self.bw_combobox_4)
-        spacerItem8 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem8)
-        self.bw_info_3 = QtWidgets.QToolButton(self.tab_1)
-        self.bw_info_3.setMinimumSize(QtCore.QSize(27, 27))
-        self.bw_info_3.setMaximumSize(QtCore.QSize(27, 27))
-        self.bw_info_3.setStyleSheet("QToolButton {\n"
-"    border: 1px solid transparent;\n"
-"    background-color: transparent;\n"
-"    width: 27px;\n"
-"    height: 27px;\n"
-"}\n"
-"\n"
-"QToolButton:flat {\n"
-"    border: none;\n"
-"}")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("icons/info_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.bw_info_3.setIcon(icon1)
-        self.bw_info_3.setIconSize(QtCore.QSize(23, 23))
-        self.bw_info_3.setObjectName("bw_info_3")
-        self.horizontalLayout_5.addWidget(self.bw_info_3)
-        spacerItem9 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem9)
-        self.gridLayout.addLayout(self.horizontalLayout_5, 7, 1, 1, 1)
+        self.horizontalLayout_3.addWidget(self.bw_label_1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.bw_combobox_1 = QtWidgets.QComboBox(self.tab_1)
@@ -453,10 +210,9 @@ class Ui_batchProcessingWindow(object):
         self.bw_combobox_1.addItem("")
         self.bw_combobox_1.addItem("")
         self.bw_combobox_1.addItem("")
-        self.bw_combobox_1.addItem("")
         self.horizontalLayout.addWidget(self.bw_combobox_1)
-        spacerItem10 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem10)
+        spacerItem1 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem1)
         self.bw_info_1 = QtWidgets.QToolButton(self.tab_1)
         self.bw_info_1.setMinimumSize(QtCore.QSize(27, 27))
         self.bw_info_1.setMaximumSize(QtCore.QSize(27, 27))
@@ -470,98 +226,66 @@ class Ui_batchProcessingWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap("icons/info_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.bw_info_1.setIcon(icon1)
         self.bw_info_1.setIconSize(QtCore.QSize(23, 23))
         self.bw_info_1.setObjectName("bw_info_1")
         self.horizontalLayout.addWidget(self.bw_info_1)
-        spacerItem11 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem11)
-        self.gridLayout.addLayout(self.horizontalLayout, 0, 1, 1, 1)
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.bw_combobox_3 = QtWidgets.QComboBox(self.tab_1)
-        self.bw_combobox_3.setEnabled(False)
-        self.bw_combobox_3.setMinimumSize(QtCore.QSize(250, 27))
-        self.bw_combobox_3.setMaximumSize(QtCore.QSize(250, 27))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(9)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_combobox_3.setFont(font)
-        self.bw_combobox_3.setStyleSheet("QComboBox {\n"
-"    border: 1px solid #acacac;\n"
-"    border-radius: 1px;\n"
-"    padding-left: 5px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"QComboBox:disabled {\n"
-"    background-color:  rgb(200,200,200);\n"
-"    color: rgb(145,145,145);\n"
-"}\n"
-"\n"
-"QComboBox:hover {\n"
-"    border: 1px solid #7eb4ea;\n"
-"    border-radius: 1px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
-"                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
-"}\n"
-"\n"
-"QComboBox::drop-down {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: top right;\n"
-"    width: 27px;\n"
-"    border-left-width: 1px;\n"
-"    border-left-color: darkgray;\n"
-"    border-left-style: solid;\n"
-"    border-top-right-radius: 3px;\n"
-"    border-bottom-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QComboBox::down-arrow {\n"
-"    image: url(icons/down_arrow_icon.svg); \n"
-"    width: 16px;\n"
-"    height: 16px\n"
-"}\n"
-"\n"
-"QComboBox::down-arrow:disabled {\n"
-"    image: url(icons/down_arrow_icon_deactivated.svg); \n"
-"    width: 16px;\n"
-"    height: 16px\n"
-"}\n"
-"\n"
-"QComboBox QAbstractItemView {\n"
-"    selection-background-color: rgb(200,200,200);\n"
-"    selection-color: black;\n"
-"    background: #f0f0f0;\n"
-"    border: 0px solid #f0f0f0;\n"
-"}\n"
-"\n"
-"QComboBox QAbstractItemView::item {\n"
-"    margin: 5px 5px 5px 5px;\n"
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem2)
+        self.horizontalLayout_3.addLayout(self.horizontalLayout)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout.addItem(spacerItem3)
+        self.bw_line_1 = QtWidgets.QFrame(self.tab_1)
+        self.bw_line_1.setStyleSheet("QFrame {\n"
+"   background: rgb(190,190,190);\n"
+"   height: 5px;\n"
+"   border: 0px solid black;\n"
 "}")
-        self.bw_combobox_3.setFrame(False)
-        self.bw_combobox_3.setObjectName("bw_combobox_3")
-        self.horizontalLayout_3.addWidget(self.bw_combobox_3)
-        spacerItem12 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem12)
-        self.gridLayout.addLayout(self.horizontalLayout_3, 4, 1, 1, 1)
+        self.bw_line_1.setFrameShape(QtWidgets.QFrame.HLine)
+        self.bw_line_1.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.bw_line_1.setObjectName("bw_line_1")
+        self.verticalLayout.addWidget(self.bw_line_1)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout.addItem(spacerItem4)
+        self.processing_layout = QtWidgets.QVBoxLayout()
+        self.processing_layout.setObjectName("processing_layout")
+        self.verticalLayout.addLayout(self.processing_layout)
+        spacerItem5 = QtWidgets.QSpacerItem(738, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem5)
+        spacerItem6 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout.addItem(spacerItem6)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.bw_combobox_2 = QtWidgets.QComboBox(self.tab_1)
-        self.bw_combobox_2.setEnabled(False)
-        self.bw_combobox_2.setMinimumSize(QtCore.QSize(250, 27))
-        self.bw_combobox_2.setMaximumSize(QtCore.QSize(250, 27))
+        self.bw_label_5 = QtWidgets.QLabel(self.tab_1)
+        self.bw_label_5.setMinimumSize(QtCore.QSize(0, 27))
+        self.bw_label_5.setMaximumSize(QtCore.QSize(16777215, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.bw_label_5.setFont(font)
+        self.bw_label_5.setStyleSheet("QLabel {\n"
+"    color: rgb(45,45,45);\n"
+"}")
+        self.bw_label_5.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.bw_label_5.setObjectName("bw_label_5")
+        self.horizontalLayout_4.addWidget(self.bw_label_5)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.bw_combobox_4 = QtWidgets.QComboBox(self.tab_1)
+        self.bw_combobox_4.setMinimumSize(QtCore.QSize(370, 27))
+        self.bw_combobox_4.setMaximumSize(QtCore.QSize(370, 27))
         font = QtGui.QFont()
         font.setFamily("fonts/SourceSansPro-Regular.ttf")
         font.setPointSize(9)
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_combobox_2.setFont(font)
-        self.bw_combobox_2.setStyleSheet("QComboBox {\n"
+        self.bw_combobox_4.setFont(font)
+        self.bw_combobox_4.setStyleSheet("QComboBox {\n"
 "    border: 1px solid #acacac;\n"
 "    border-radius: 1px;\n"
 "    padding-left: 5px;\n"
@@ -572,7 +296,6 @@ class Ui_batchProcessingWindow(object):
 "\n"
 "QComboBox:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
-"    color: rgb(145,145,145);\n"
 "}\n"
 "\n"
 "QComboBox:hover {\n"
@@ -599,12 +322,6 @@ class Ui_batchProcessingWindow(object):
 "    height: 16px\n"
 "}\n"
 "\n"
-"QComboBox::down-arrow:disabled {\n"
-"    image: url(icons/down_arrow_icon_deactivated.svg); \n"
-"    width: 16px;\n"
-"    height: 16px\n"
-"}\n"
-"\n"
 "QComboBox QAbstractItemView {\n"
 "    selection-background-color: rgb(200,200,200);\n"
 "    selection-color: black;\n"
@@ -615,16 +332,17 @@ class Ui_batchProcessingWindow(object):
 "QComboBox QAbstractItemView::item {\n"
 "    margin: 5px 5px 5px 5px;\n"
 "}")
-        self.bw_combobox_2.setFrame(False)
-        self.bw_combobox_2.setObjectName("bw_combobox_2")
-        self.horizontalLayout_4.addWidget(self.bw_combobox_2)
-        spacerItem13 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem13)
-        self.bw_info_2 = QtWidgets.QToolButton(self.tab_1)
-        self.bw_info_2.setEnabled(False)
-        self.bw_info_2.setMinimumSize(QtCore.QSize(27, 27))
-        self.bw_info_2.setMaximumSize(QtCore.QSize(27, 27))
-        self.bw_info_2.setStyleSheet("QToolButton {\n"
+        self.bw_combobox_4.setFrame(False)
+        self.bw_combobox_4.setObjectName("bw_combobox_4")
+        self.bw_combobox_4.addItem("")
+        self.bw_combobox_4.addItem("")
+        self.horizontalLayout_5.addWidget(self.bw_combobox_4)
+        spacerItem7 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem7)
+        self.bw_info_3 = QtWidgets.QToolButton(self.tab_1)
+        self.bw_info_3.setMinimumSize(QtCore.QSize(27, 27))
+        self.bw_info_3.setMaximumSize(QtCore.QSize(27, 27))
+        self.bw_info_3.setStyleSheet("QToolButton {\n"
 "    border: 1px solid transparent;\n"
 "    background-color: transparent;\n"
 "    width: 27px;\n"
@@ -634,446 +352,31 @@ class Ui_batchProcessingWindow(object):
 "QToolButton:flat {\n"
 "    border: none;\n"
 "}")
-        self.bw_info_2.setIcon(icon1)
-        self.bw_info_2.setIconSize(QtCore.QSize(23, 23))
-        self.bw_info_2.setObjectName("bw_info_2")
-        self.horizontalLayout_4.addWidget(self.bw_info_2)
-        spacerItem14 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem14)
-        self.gridLayout.addLayout(self.horizontalLayout_4, 3, 1, 1, 1)
-        self.bw_edit_1 = QtWidgets.QTextEdit(self.tab_1)
-        self.bw_edit_1.setEnabled(False)
-        self.bw_edit_1.setMinimumSize(QtCore.QSize(300, 110))
-        self.bw_edit_1.setMaximumSize(QtCore.QSize(16777215, 110))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(9)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_edit_1.setFont(font)
-        self.bw_edit_1.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
-        self.bw_edit_1.setStyleSheet("QTextEdit {\n"
-"    border-radius: 3px;\n"
-"    padding: 1px 0px 1px 4px;\n"
-"    background-color:  rgb(240, 240, 240);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"    \n"
-"QTextEdit:disabled {\n"
-"    background-color:  rgb(200, 200, 200);\n"
-"}\n"
-"\n"
-"QScrollBar:vertical {\n"
-"  border-left: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  width: 20px;\n"
-"  margin: 21px 0px 21px 0px;\n"
-"}\n"
-"\n"
-"QScrollBar:horizontal {\n"
-"  border: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  height: 20px;\n"
-"  margin: 0px 21px 0px 21px;\n"
-"}\n"
-"\n"
-"QScrollBar::handle:vertical {\n"
-"  background-color: rgb(205, 205, 205);\n"
-"  min-height: 25px;\n"
-"}\n"
-"\n"
-"QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
-"}\n"
-"\n"
-"QScrollBar:handle:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::handle:horizontal {\n"
-"  background-color: rgb(205, 205, 205);\n"
-"  min-width: 25px;\n"
-"}\n"
-"\n"
-"QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
-"}\n"
-"\n"
-"QScrollBar:handle:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical {\n"
-"  border-top: 0px solid rgb(240,240,240);\n"
-"  border-left: 0px solid white;\n"
-"  border-right: 0px solid white;\n"
-"  border-bottom: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  height: 20px;\n"
-"  subcontrol-position: bottom;\n"
-"  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:vertical {\n"
-"  border-top: 0px solid white;\n"
-"  border-left: 0px solid white;\n"
-"  border-right: 0px solid white;\n"
-"  border-bottom: 0px solid rgb(240,240,240);\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  height: 20px;\n"
-"  subcontrol-position: top;\n"
-"  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::up-arrow:vertical {\n"
-"  image: url(icons/up_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::up-arrow:vertical:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}\n"
-"\n"
-"QScrollBar::down-arrow:vertical {\n"
-"  image: url(icons/down_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::down-arrow:vertical:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:horizontal {\n"
-"  border-top: 0px solid white;\n"
-"  border-left: 0px solid rgb(240,240,240);\n"
-"  border-right: 0px solid white;\n"
-"  border-bottom: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  width: 20px;\n"
-"  subcontrol-position: right;\n"
-"  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal {\n"
-"  border-top: 0px solid white;\n"
-"  border-left: 0px solid white;\n"
-"  border-right: 0px solid rgb(240,240,240);\n"
-"  border-bottom: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  width: 20px;\n"
-"  subcontrol-position: left;\n"
-"  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::left-arrow:horizontal {\n"
-"  image: url(icons/left_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::left-arrow:horizontal:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}\n"
-"\n"
-"QScrollBar::right-arrow:horizontal {\n"
-"  image: url(icons/right_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::right-arrow:horizontal:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}")
-        self.bw_edit_1.setReadOnly(True)
-        self.bw_edit_1.setObjectName("bw_edit_1")
-        self.gridLayout.addWidget(self.bw_edit_1, 2, 1, 1, 1)
-        self.bw_label_4 = QtWidgets.QLabel(self.tab_1)
-        self.bw_label_4.setEnabled(False)
-        self.bw_label_4.setMinimumSize(QtCore.QSize(0, 27))
-        self.bw_label_4.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_label_4.setFont(font)
-        self.bw_label_4.setStyleSheet("QLabel {\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"\n"
-"QLabel:disabled {\n"
-"    color: rgb(145,145,145);\n"
-"}")
-        self.bw_label_4.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
-        self.bw_label_4.setObjectName("bw_label_4")
-        self.gridLayout.addWidget(self.bw_label_4, 2, 0, 1, 1)
-        self.bw_edit_4 = QtWidgets.QTextEdit(self.tab_1)
-        self.bw_edit_4.setEnabled(False)
-        self.bw_edit_4.setMinimumSize(QtCore.QSize(300, 110))
-        self.bw_edit_4.setMaximumSize(QtCore.QSize(16777215, 110))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(9)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_edit_4.setFont(font)
-        self.bw_edit_4.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
-        self.bw_edit_4.setStyleSheet("QTextEdit {\n"
-"    border-radius: 3px;\n"
-"    padding: 1px 0px 1px 4px;\n"
-"    background-color:  rgb(240, 240, 240);\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"    \n"
-"QTextEdit:disabled {\n"
-"    background-color:  rgb(200, 200, 200);\n"
-"}\n"
-"\n"
-"QScrollBar:vertical {\n"
-"  border-left: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  width: 20px;\n"
-"  margin: 21px 0px 21px 0px;\n"
-"}\n"
-"\n"
-"QScrollBar:horizontal {\n"
-"  border: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  height: 20px;\n"
-"  margin: 0px 21px 0px 21px;\n"
-"}\n"
-"\n"
-"QScrollBar::handle:vertical {\n"
-"  background-color: rgb(205, 205, 205);\n"
-"  min-height: 25px;\n"
-"}\n"
-"\n"
-"QScrollBar:handle:vertical:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
-"}\n"
-"\n"
-"QScrollBar:handle:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::handle:horizontal {\n"
-"  background-color: rgb(205, 205, 205);\n"
-"  min-width: 25px;\n"
-"}\n"
-"\n"
-"QScrollBar:handle:horizontal:hover {\n"
-"  background-color: rgb(166, 166, 166);\n"
-"}\n"
-"\n"
-"QScrollBar:handle:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical {\n"
-"  border-top: 0px solid rgb(240,240,240);\n"
-"  border-left: 0px solid white;\n"
-"  border-right: 0px solid white;\n"
-"  border-bottom: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  height: 20px;\n"
-"  subcontrol-position: bottom;\n"
-"  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:vertical {\n"
-"  border-top: 0px solid white;\n"
-"  border-left: 0px solid white;\n"
-"  border-right: 0px solid white;\n"
-"  border-bottom: 0px solid rgb(240,240,240);\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  height: 20px;\n"
-"  subcontrol-position: top;\n"
-"  subcontrol-origin: margin;\n"
-"  border-top-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:vertical:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:vertical:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::up-arrow:vertical {\n"
-"  image: url(icons/up_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::up-arrow:vertical:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}\n"
-"\n"
-"QScrollBar::down-arrow:vertical {\n"
-"  image: url(icons/down_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::down-arrow:vertical:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:horizontal {\n"
-"  border-top: 0px solid white;\n"
-"  border-left: 0px solid rgb(240,240,240);\n"
-"  border-right: 0px solid white;\n"
-"  border-bottom: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  width: 20px;\n"
-"  subcontrol-position: right;\n"
-"  subcontrol-origin: margin;\n"
-"  border-bottom-right-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::add-line:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal {\n"
-"  border-top: 0px solid white;\n"
-"  border-left: 0px solid white;\n"
-"  border-right: 0px solid rgb(240,240,240);\n"
-"  border-bottom: 0px solid white;\n"
-"  background-color: rgb(240, 240, 240);\n"
-"  width: 20px;\n"
-"  subcontrol-position: left;\n"
-"  subcontrol-origin: margin;\n"
-"border-bottom-left-radius: 3px;\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal:hover {\n"
-"  background-color: rgb(218, 218, 218);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-line:horizontal:pressed {\n"
-"  background-color: rgb(96, 96, 96);\n"
-"}\n"
-"\n"
-"QScrollBar::left-arrow:horizontal {\n"
-"  image: url(icons/left_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::left-arrow:horizontal:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}\n"
-"\n"
-"QScrollBar::right-arrow:horizontal {\n"
-"  image: url(icons/right_arrow_icon.svg); \n"
-"  width: 16px;\n"
-"  height: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::right-arrow:horizontal:pressed {\n"
-"  right: -1px;\n"
-"  bottom: -1px;\n"
-"}")
-        self.bw_edit_4.setReadOnly(True)
-        self.bw_edit_4.setObjectName("bw_edit_4")
-        self.gridLayout.addWidget(self.bw_edit_4, 5, 1, 1, 1)
-        self.bw_label_12 = QtWidgets.QLabel(self.tab_1)
-        self.bw_label_12.setEnabled(False)
-        self.bw_label_12.setMinimumSize(QtCore.QSize(0, 27))
-        self.bw_label_12.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("fonts/SourceSansPro-Regular.ttf")
-        font.setPointSize(10)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.bw_label_12.setFont(font)
-        self.bw_label_12.setStyleSheet("QLabel {\n"
-"    color: rgb(45,45,45);\n"
-"}\n"
-"\n"
-"\n"
-"QLabel:disabled {\n"
-"    color: rgb(145,145,145);\n"
-"}")
-        self.bw_label_12.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
-        self.bw_label_12.setObjectName("bw_label_12")
-        self.gridLayout.addWidget(self.bw_label_12, 5, 0, 1, 1)
-        self.gridLayout_2.addLayout(self.gridLayout, 1, 1, 1, 2)
-        spacerItem15 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_2.addItem(spacerItem15, 1, 3, 1, 1)
-        spacerItem16 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_2.addItem(spacerItem16, 2, 2, 1, 1)
+        self.bw_info_3.setIcon(icon1)
+        self.bw_info_3.setIconSize(QtCore.QSize(23, 23))
+        self.bw_info_3.setObjectName("bw_info_3")
+        self.horizontalLayout_5.addWidget(self.bw_info_3)
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem8)
+        self.horizontalLayout_4.addLayout(self.horizontalLayout_5)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.gridLayout.addLayout(self.verticalLayout, 1, 1, 2, 2)
+        spacerItem9 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout.addItem(spacerItem9, 1, 3, 1, 1)
+        spacerItem10 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout.addItem(spacerItem10, 2, 0, 1, 1)
+        spacerItem11 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout.addItem(spacerItem11, 3, 2, 1, 1)
         self.tabWidget.addTab(self.tab_1, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.tab_2)
         self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_4.setObjectName("gridLayout_4")
-        spacerItem17 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_4.addItem(spacerItem17, 0, 1, 1, 1)
-        spacerItem18 = QtWidgets.QSpacerItem(10, 38, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_4.addItem(spacerItem18, 1, 0, 1, 1)
+        spacerItem12 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_4.addItem(spacerItem12, 0, 1, 1, 1)
+        spacerItem13 = QtWidgets.QSpacerItem(10, 38, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_4.addItem(spacerItem13, 1, 0, 1, 1)
         self.gridLayout_3 = QtWidgets.QGridLayout()
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
@@ -1189,8 +492,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_open_button_1.setAutoRaise(False)
         self.bw_open_button_1.setObjectName("bw_open_button_1")
         self.horizontalLayout_7.addWidget(self.bw_open_button_1)
-        spacerItem19 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem19)
+        spacerItem14 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem14)
         self.bw_info_4 = QtWidgets.QToolButton(self.tab_2)
         self.bw_info_4.setMinimumSize(QtCore.QSize(27, 27))
         self.bw_info_4.setMaximumSize(QtCore.QSize(27, 27))
@@ -1209,8 +512,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_info_4.setObjectName("bw_info_4")
         self.horizontalLayout_7.addWidget(self.bw_info_4)
         self.gridLayout_3.addLayout(self.horizontalLayout_7, 0, 1, 1, 1)
-        spacerItem20 = QtWidgets.QSpacerItem(668, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_3.addItem(spacerItem20, 3, 0, 1, 2)
+        spacerItem15 = QtWidgets.QSpacerItem(668, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_3.addItem(spacerItem15, 3, 0, 1, 2)
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.listWidget = QtWidgets.QListWidget(self.tab_2)
@@ -1512,8 +815,29 @@ class Ui_batchProcessingWindow(object):
         self.bw_del_button.setAutoRaise(False)
         self.bw_del_button.setObjectName("bw_del_button")
         self.verticalLayout_2.addWidget(self.bw_del_button)
-        spacerItem21 = QtWidgets.QSpacerItem(20, 28, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_2.addItem(spacerItem21)
+        self.bw_reload_button = QtWidgets.QToolButton(self.tab_2)
+        self.bw_reload_button.setEnabled(True)
+        self.bw_reload_button.setMaximumSize(QtCore.QSize(27, 27))
+        self.bw_reload_button.setStyleSheet("QToolButton {\n"
+"    border: 1px solid transparent;\n"
+"    background-color: transparent;\n"
+"    width: 27px;\n"
+"    height: 27px;\n"
+"}\n"
+"\n"
+"QToolButton:flat {\n"
+"    border: none;\n"
+"}")
+        self.bw_reload_button.setText("")
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap("icons/reload_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.bw_reload_button.setIcon(icon7)
+        self.bw_reload_button.setIconSize(QtCore.QSize(23, 23))
+        self.bw_reload_button.setAutoRaise(False)
+        self.bw_reload_button.setObjectName("bw_reload_button")
+        self.verticalLayout_2.addWidget(self.bw_reload_button)
+        spacerItem16 = QtWidgets.QSpacerItem(20, 28, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem16)
         self.bw_file_info = QtWidgets.QToolButton(self.tab_2)
         self.bw_file_info.setEnabled(False)
         self.bw_file_info.setMinimumSize(QtCore.QSize(27, 27))
@@ -1581,8 +905,8 @@ class Ui_batchProcessingWindow(object):
         self.gridLayout_3.addWidget(self.bw_label_7, 4, 0, 1, 1)
         self.horizontalLayout_17 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_17.setObjectName("horizontalLayout_17")
-        spacerItem22 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_17.addItem(spacerItem22)
+        spacerItem17 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_17.addItem(spacerItem17)
         self.bw_radiobox_1 = QtWidgets.QRadioButton(self.tab_2)
         self.bw_radiobox_1.setMinimumSize(QtCore.QSize(0, 27))
         self.bw_radiobox_1.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -1605,8 +929,8 @@ class Ui_batchProcessingWindow(object):
         self.buttonGroup.setObjectName("buttonGroup")
         self.buttonGroup.addButton(self.bw_radiobox_1)
         self.horizontalLayout_17.addWidget(self.bw_radiobox_1)
-        spacerItem23 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_17.addItem(spacerItem23)
+        spacerItem18 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_17.addItem(spacerItem18)
         self.bw_radiobox_2 = QtWidgets.QRadioButton(self.tab_2)
         self.bw_radiobox_2.setMinimumSize(QtCore.QSize(0, 27))
         self.bw_radiobox_2.setMaximumSize(QtCore.QSize(16777215, 27))
@@ -1626,14 +950,35 @@ class Ui_batchProcessingWindow(object):
         self.bw_radiobox_2.setObjectName("bw_radiobox_2")
         self.buttonGroup.addButton(self.bw_radiobox_2)
         self.horizontalLayout_17.addWidget(self.bw_radiobox_2)
-        spacerItem24 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_17.addItem(spacerItem24)
+        spacerItem19 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_17.addItem(spacerItem19)
+        self.bw_radiobox_3 = QtWidgets.QRadioButton(self.tab_2)
+        self.bw_radiobox_3.setMinimumSize(QtCore.QSize(0, 27))
+        self.bw_radiobox_3.setMaximumSize(QtCore.QSize(16777215, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(9)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.bw_radiobox_3.setFont(font)
+        self.bw_radiobox_3.setStyleSheet("QRadioButton {\n"
+"   color: rgb(45,45,45);\n"
+"}\n"
+"\n"
+"QRadioButton:disabled {\n"
+"   color: rgb(145,145,145);\n"
+"}")
+        self.bw_radiobox_3.setObjectName("bw_radiobox_3")
+        self.buttonGroup.addButton(self.bw_radiobox_3)
+        self.horizontalLayout_17.addWidget(self.bw_radiobox_3)
+        spacerItem20 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_17.addItem(spacerItem20)
         self.gridLayout_3.addLayout(self.horizontalLayout_17, 1, 1, 1, 1)
         self.gridLayout_4.addLayout(self.gridLayout_3, 1, 1, 1, 1)
-        spacerItem25 = QtWidgets.QSpacerItem(10, 38, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_4.addItem(spacerItem25, 1, 2, 1, 1)
-        spacerItem26 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_4.addItem(spacerItem26, 2, 1, 1, 1)
+        spacerItem21 = QtWidgets.QSpacerItem(10, 38, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_4.addItem(spacerItem21, 1, 2, 1, 1)
+        spacerItem22 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_4.addItem(spacerItem22, 2, 1, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
@@ -1819,17 +1164,17 @@ class Ui_batchProcessingWindow(object):
         self.gridLayout_7 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_4)
         self.gridLayout_7.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_7.setObjectName("gridLayout_7")
-        spacerItem27 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_7.addItem(spacerItem27, 0, 1, 1, 1)
-        spacerItem28 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_7.addItem(spacerItem28, 1, 0, 1, 1)
+        spacerItem23 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_7.addItem(spacerItem23, 0, 1, 1, 1)
+        spacerItem24 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_7.addItem(spacerItem24, 1, 0, 1, 1)
         self.options_layout = QtWidgets.QVBoxLayout()
         self.options_layout.setObjectName("options_layout")
         self.gridLayout_7.addLayout(self.options_layout, 1, 1, 1, 1)
-        spacerItem29 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_7.addItem(spacerItem29, 1, 2, 1, 1)
-        spacerItem30 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_7.addItem(spacerItem30, 2, 1, 1, 1)
+        spacerItem25 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_7.addItem(spacerItem25, 1, 2, 1, 1)
+        spacerItem26 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_7.addItem(spacerItem26, 2, 1, 1, 1)
         self.scroll_area.setWidget(self.scrollAreaWidgetContents_4)
         self.gridLayout_8.addWidget(self.scroll_area, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_3, "")
@@ -1838,10 +1183,10 @@ class Ui_batchProcessingWindow(object):
         self.gridLayout_6 = QtWidgets.QGridLayout(self.tab_4)
         self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_6.setObjectName("gridLayout_6")
-        spacerItem31 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_6.addItem(spacerItem31, 0, 1, 1, 1)
-        spacerItem32 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_6.addItem(spacerItem32, 1, 0, 1, 1)
+        spacerItem27 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_6.addItem(spacerItem27, 0, 1, 1, 1)
+        spacerItem28 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_6.addItem(spacerItem28, 1, 0, 1, 1)
         self.verticalLayout_5 = QtWidgets.QVBoxLayout()
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.horizontalLayout_14 = QtWidgets.QHBoxLayout()
@@ -1970,8 +1315,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_open_button_2.setAutoRaise(False)
         self.bw_open_button_2.setObjectName("bw_open_button_2")
         self.horizontalLayout_14.addWidget(self.bw_open_button_2)
-        spacerItem33 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_14.addItem(spacerItem33)
+        spacerItem29 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_14.addItem(spacerItem29)
         self.bw_info_5 = QtWidgets.QToolButton(self.tab_4)
         self.bw_info_5.setMinimumSize(QtCore.QSize(27, 27))
         self.bw_info_5.setMaximumSize(QtCore.QSize(27, 27))
@@ -1992,8 +1337,8 @@ class Ui_batchProcessingWindow(object):
         self.verticalLayout_5.addLayout(self.horizontalLayout_14)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        spacerItem34 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_3.addItem(spacerItem34)
+        spacerItem30 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout_3.addItem(spacerItem30)
         self.bw_line_2 = QtWidgets.QFrame(self.tab_4)
         self.bw_line_2.setStyleSheet("QFrame {\n"
 "   background: rgb(190,190,190);\n"
@@ -2004,8 +1349,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.bw_line_2.setObjectName("bw_line_2")
         self.verticalLayout_3.addWidget(self.bw_line_2)
-        spacerItem35 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_3.addItem(spacerItem35)
+        spacerItem31 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout_3.addItem(spacerItem31)
         self.verticalLayout_5.addLayout(self.verticalLayout_3)
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
@@ -2026,13 +1371,13 @@ class Ui_batchProcessingWindow(object):
         self.bw_label_9.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.bw_label_9.setObjectName("bw_label_9")
         self.horizontalLayout_15.addWidget(self.bw_label_9)
-        spacerItem36 = QtWidgets.QSpacerItem(588, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_15.addItem(spacerItem36)
+        spacerItem32 = QtWidgets.QSpacerItem(588, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_15.addItem(spacerItem32)
         self.verticalLayout_5.addLayout(self.horizontalLayout_15)
         self.horizontalLayout_16 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_16.setObjectName("horizontalLayout_16")
-        spacerItem37 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_16.addItem(spacerItem37)
+        spacerItem33 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_16.addItem(spacerItem33)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout()
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.horizontalLayout_13 = QtWidgets.QHBoxLayout()
@@ -2052,8 +1397,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_checkbox_1.setChecked(True)
         self.bw_checkbox_1.setObjectName("bw_checkbox_1")
         self.horizontalLayout_13.addWidget(self.bw_checkbox_1)
-        spacerItem38 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_13.addItem(spacerItem38)
+        spacerItem34 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_13.addItem(spacerItem34)
         self.bw_info_6 = QtWidgets.QToolButton(self.tab_4)
         self.bw_info_6.setMinimumSize(QtCore.QSize(27, 27))
         self.bw_info_6.setMaximumSize(QtCore.QSize(27, 27))
@@ -2071,8 +1416,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_info_6.setIconSize(QtCore.QSize(23, 23))
         self.bw_info_6.setObjectName("bw_info_6")
         self.horizontalLayout_13.addWidget(self.bw_info_6)
-        spacerItem39 = QtWidgets.QSpacerItem(178, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_13.addItem(spacerItem39)
+        spacerItem35 = QtWidgets.QSpacerItem(178, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_13.addItem(spacerItem35)
         self.verticalLayout_4.addLayout(self.horizontalLayout_13)
         self.bw_label_10 = QtWidgets.QLabel(self.tab_4)
         self.bw_label_10.setEnabled(False)
@@ -2191,8 +1536,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_5.setFrame(False)
         self.bw_edit_5.setObjectName("bw_edit_5")
         self.horizontalLayout_8.addWidget(self.bw_edit_5)
-        spacerItem40 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_8.addItem(spacerItem40)
+        spacerItem36 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_8.addItem(spacerItem36)
         self.bw_combobox_5 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_5.setEnabled(False)
         self.bw_combobox_5.setMinimumSize(QtCore.QSize(210, 27))
@@ -2377,8 +1722,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_6.setFrame(False)
         self.bw_edit_6.setObjectName("bw_edit_6")
         self.horizontalLayout_9.addWidget(self.bw_edit_6)
-        spacerItem41 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem41)
+        spacerItem37 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_9.addItem(spacerItem37)
         self.bw_combobox_6 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_6.setEnabled(False)
         self.bw_combobox_6.setMinimumSize(QtCore.QSize(210, 27))
@@ -2563,8 +1908,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_7.setFrame(False)
         self.bw_edit_7.setObjectName("bw_edit_7")
         self.horizontalLayout_10.addWidget(self.bw_edit_7)
-        spacerItem42 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_10.addItem(spacerItem42)
+        spacerItem38 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_10.addItem(spacerItem38)
         self.bw_combobox_7 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_7.setEnabled(False)
         self.bw_combobox_7.setMinimumSize(QtCore.QSize(210, 27))
@@ -2749,8 +2094,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_8.setFrame(False)
         self.bw_edit_8.setObjectName("bw_edit_8")
         self.horizontalLayout_11.addWidget(self.bw_edit_8)
-        spacerItem43 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_11.addItem(spacerItem43)
+        spacerItem39 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_11.addItem(spacerItem39)
         self.bw_combobox_8 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_8.setEnabled(False)
         self.bw_combobox_8.setMinimumSize(QtCore.QSize(210, 27))
@@ -2935,8 +2280,8 @@ class Ui_batchProcessingWindow(object):
         self.bw_edit_9.setFrame(False)
         self.bw_edit_9.setObjectName("bw_edit_9")
         self.horizontalLayout_12.addWidget(self.bw_edit_9)
-        spacerItem44 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_12.addItem(spacerItem44)
+        spacerItem40 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_12.addItem(spacerItem40)
         self.bw_combobox_9 = QtWidgets.QComboBox(self.tab_4)
         self.bw_combobox_9.setEnabled(False)
         self.bw_combobox_9.setMinimumSize(QtCore.QSize(210, 27))
@@ -3031,14 +2376,92 @@ class Ui_batchProcessingWindow(object):
         self.horizontalLayout_16.addLayout(self.verticalLayout_4)
         self.verticalLayout_5.addLayout(self.horizontalLayout_16)
         self.gridLayout_6.addLayout(self.verticalLayout_5, 1, 1, 2, 2)
-        spacerItem45 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_6.addItem(spacerItem45, 2, 3, 1, 1)
-        spacerItem46 = QtWidgets.QSpacerItem(20, 17, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_6.addItem(spacerItem46, 3, 2, 1, 1)
+        spacerItem41 = QtWidgets.QSpacerItem(10, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_6.addItem(spacerItem41, 2, 3, 1, 1)
+        spacerItem42 = QtWidgets.QSpacerItem(20, 17, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_6.addItem(spacerItem42, 3, 2, 1, 1)
         self.tabWidget.addTab(self.tab_4, "")
-        self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
-        spacerItem47 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_5.addItem(spacerItem47, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.tabWidget, 0, 0, 1, 1)
+        spacerItem43 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_2.addItem(spacerItem43, 1, 0, 1, 1)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        spacerItem44 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem44)
+        self.bw_button_ok = QtWidgets.QToolButton(batchProcessingWindow)
+        self.bw_button_ok.setEnabled(False)
+        self.bw_button_ok.setMinimumSize(QtCore.QSize(180, 27))
+        self.bw_button_ok.setMaximumSize(QtCore.QSize(180, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.bw_button_ok.setFont(font)
+        self.bw_button_ok.setStyleSheet("QToolButton {\n"
+"    border: 1px solid #acacac;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
+"    color: rgb(45,45,45);\n"
+"}\n"
+"\n"
+"QToolButton:disabled {\n"
+"    background-color:  rgb(200,200,200);\n"
+"    color: rgb(145,145,145);\n"
+"}\n"
+"\n"
+"QToolButton:hover {\n"
+"    border: 1px solid #7eb4ea;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
+"}\n"
+"\n"
+"\n"
+"QToolButton:pressed {\n"
+"    border: 1px solid #579de5;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #daecfc, stop: 1 #c4e0fc);\n"
+"}")
+        self.bw_button_ok.setObjectName("bw_button_ok")
+        self.horizontalLayout_2.addWidget(self.bw_button_ok)
+        spacerItem45 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem45)
+        self.bw_button_cancel = QtWidgets.QToolButton(batchProcessingWindow)
+        self.bw_button_cancel.setMinimumSize(QtCore.QSize(100, 27))
+        self.bw_button_cancel.setMaximumSize(QtCore.QSize(100, 27))
+        font = QtGui.QFont()
+        font.setFamily("fonts/SourceSansPro-Regular.ttf")
+        font.setPointSize(10)
+        font.setKerning(True)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.bw_button_cancel.setFont(font)
+        self.bw_button_cancel.setStyleSheet("QToolButton {\n"
+"    border: 1px solid #acacac;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+"                                stop: 0 #f0f0f0, stop: 1 #e5e5e5);\n"
+"    color: rgb(45,45,45)\n"
+"}\n"
+"\n"
+"QToolButton:hover {\n"
+"    border: 1px solid #7eb4ea;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \n"
+"                                stop: 0 #ecf4fc, stop: 1 #dcecfc);\n"
+"}\n"
+"\n"
+"\n"
+"QToolButton:pressed {\n"
+"    border: 1px solid #579de5;\n"
+"    border-radius: 1px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                      stop: 0 #daecfc, stop: 1 #c4e0fc);\n"
+"}")
+        self.bw_button_cancel.setObjectName("bw_button_cancel")
+        self.horizontalLayout_2.addWidget(self.bw_button_cancel)
+        spacerItem46 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem46)
+        self.gridLayout_2.addLayout(self.horizontalLayout_2, 2, 0, 1, 1)
 
         self.retranslateUi(batchProcessingWindow)
         self.tabWidget.setCurrentIndex(0)
@@ -3047,29 +2470,23 @@ class Ui_batchProcessingWindow(object):
     def retranslateUi(self, batchProcessingWindow):
         _translate = QtCore.QCoreApplication.translate
         batchProcessingWindow.setWindowTitle(_translate("batchProcessingWindow", "Batch processinmg"))
-        self.bw_button_ok.setText(_translate("batchProcessingWindow", "Launch processing"))
-        self.bw_button_cancel.setText(_translate("batchProcessingWindow", "Cancel"))
-        self.bw_label_2.setText(_translate("batchProcessingWindow", "Category:"))
-        self.bw_label_5.setText(_translate("batchProcessingWindow", "Errors:"))
         self.bw_label_1.setText(_translate("batchProcessingWindow", "Processing:"))
-        self.bw_label_3.setText(_translate("batchProcessingWindow", "Algorithm:"))
-        self.bw_combobox_4.setItemText(0, _translate("batchProcessingWindow", "Stop processing if an error occurs"))
-        self.bw_combobox_4.setItemText(1, _translate("batchProcessingWindow", "Continue processing and display errors at the end"))
         self.bw_combobox_1.setItemText(0, _translate("batchProcessingWindow", "Make a choice..."))
         self.bw_combobox_1.setItemText(1, _translate("batchProcessingWindow", "Concatenate multiple files"))
-        self.bw_combobox_1.setItemText(2, _translate("batchProcessingWindow", "Convert NASA Ames files to NetCDF files"))
-        self.bw_combobox_1.setItemText(3, _translate("batchProcessingWindow", "Convert NetCDF files to NASA Ames files"))
-        self.bw_combobox_1.setItemText(4, _translate("batchProcessingWindow", "Delete one or more global metadata"))
-        self.bw_combobox_1.setItemText(5, _translate("batchProcessingWindow", "Delete one or more variables"))
-        self.bw_combobox_1.setItemText(6, _translate("batchProcessingWindow", "Execute an algorithm"))
-        self.bw_label_4.setText(_translate("batchProcessingWindow", "Description: "))
-        self.bw_label_12.setText(_translate("batchProcessingWindow", "Information:"))
+        self.bw_combobox_1.setItemText(2, _translate("batchProcessingWindow", "Convert between different file formats"))
+        self.bw_combobox_1.setItemText(3, _translate("batchProcessingWindow", "Delete one or more global metadata"))
+        self.bw_combobox_1.setItemText(4, _translate("batchProcessingWindow", "Delete one or more variables"))
+        self.bw_combobox_1.setItemText(5, _translate("batchProcessingWindow", "Execute an algorithm"))
+        self.bw_label_5.setText(_translate("batchProcessingWindow", "Errors:"))
+        self.bw_combobox_4.setItemText(0, _translate("batchProcessingWindow", "Stop processing if an error occurs"))
+        self.bw_combobox_4.setItemText(1, _translate("batchProcessingWindow", "Continue processing and display errors at the end"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), _translate("batchProcessingWindow", "Processing"))
         self.bw_label_11.setText(_translate("batchProcessingWindow", "Format:"))
         self.bw_label_6.setText(_translate("batchProcessingWindow", "Folder:"))
         self.bw_label_7.setText(_translate("batchProcessingWindow", "Files:"))
         self.bw_radiobox_1.setText(_translate("batchProcessingWindow", "NetCDF"))
         self.bw_radiobox_2.setText(_translate("batchProcessingWindow", "NASA Ames"))
+        self.bw_radiobox_3.setText(_translate("batchProcessingWindow", "HDF5"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("batchProcessingWindow", "Source"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("batchProcessingWindow", "Options"))
         self.bw_label_8.setText(_translate("batchProcessingWindow", "Folder:"))
@@ -3102,4 +2519,6 @@ class Ui_batchProcessingWindow(object):
         self.bw_combobox_9.setItemText(3, _translate("batchProcessingWindow", "Serial number with n digit"))
         self.bw_combobox_9.setItemText(4, _translate("batchProcessingWindow", "Text"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("batchProcessingWindow", "Destination"))
+        self.bw_button_ok.setText(_translate("batchProcessingWindow", "Launch processing"))
+        self.bw_button_cancel.setText(_translate("batchProcessingWindow", "Cancel"))
 

@@ -3402,6 +3402,7 @@ class Ui_exportWindow(object):
 "\n"
 "QToolButton:disabled {\n"
 "    background-color:  rgb(200,200,200);\n"
+"    color: rgb(145,145,145);\n"
 "}\n"
 "\n"
 "QToolButton:hover {\n"

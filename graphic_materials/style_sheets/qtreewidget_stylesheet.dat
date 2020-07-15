@@ -1,0 +1,200 @@
+QTreeWidget {
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
+    background-color:  rgb(240, 240, 240);
+    color: rgb(45,45,45);
+}
+
+QTreeWidget:disabled {
+    background-color:  rgb(200,200,200);
+    color: rgb(45,45,45);
+}
+
+QTreeWidget::item {
+    border: 0px solid rgb(240,240,240);
+    border-radius: 3px;
+    padding: 1px 1px 1px 1px;
+    margin: 3px 3px 3px 3px;
+}
+
+QTreeWidget::item:selected {
+    border: 0px solid rgb(240,240,240);
+    border-radius: 3px;
+}
+
+QTreeWidget::item:selected:!active {
+    background: rgb(200,200,200);
+}
+
+QTreeWidget::item:selected:active {
+    background: rgb(200,200,200);
+}
+
+QTreeWidget::item:hover {
+    background: rgb(230,230,230);
+    border-radius: 3px;
+}
+
+QScrollBar:vertical {
+  border: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  margin: 21px 0px 21px 0px;
+}
+
+QScrollBar:horizontal {
+  border: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  height: 20px;
+  margin: 0px 21px 0px 21px;
+}
+
+QScrollBar::handle:vertical {
+  background-color: rgb(205, 205, 205);
+  min-height: 25px;
+}
+
+QScrollBar:handle:vertical:hover {
+  background-color: rgb(166, 166, 166);
+}
+
+QScrollBar:handle:vertical:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
+QScrollBar::handle:horizontal {
+  background-color: rgb(205, 205, 205);
+  min-width: 25px;
+}
+
+QScrollBar:handle:horizontal:hover {
+  background-color: rgb(166, 166, 166);
+}
+
+QScrollBar:handle:horizontal:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
+QScrollBar::add-line:vertical {
+  border-top: 0px solid rgb(240,240,240);
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  height: 20px;
+  subcontrol-position: bottom;
+  subcontrol-origin: margin;
+  border-top-right-radius: 0px;
+}
+
+QScrollBar::add-line:vertical:hover {
+  background-color: rgb(218, 218, 218);
+}
+
+QScrollBar::add-line:vertical:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
+QScrollBar::sub-line:vertical {
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid white;
+  border-bottom: 0px solid rgb(240,240,240);
+  background-color: rgb(240, 240, 240);
+  height: 20px;
+  subcontrol-position: top;
+  subcontrol-origin: margin;
+  border-bottom-right-radius: 0px;
+}
+
+QScrollBar::sub-line:vertical:hover {
+  background-color: rgb(218, 218, 218);
+}
+
+QScrollBar::sub-line:vertical:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
+QScrollBar::up-arrow:vertical {
+  image: url(icons/up_arrow_icon.svg); 
+  width: 16px;
+  height: 16px;
+}
+
+QScrollBar::up-arrow:vertical:pressed {
+  right: -1px;
+  bottom: -1px;
+}
+
+QScrollBar::down-arrow:vertical {
+  image: url(icons/down_arrow_icon.svg); 
+  width: 16px;
+  height: 16px;
+}
+
+QScrollBar::down-arrow:vertical:pressed {
+  right: -1px;
+  bottom: -1px;
+}
+
+QScrollBar::add-line:horizontal {
+  border-top: 0px solid white;
+  border-left: 0px solid rgb(240,240,240);
+  border-right: 0px solid white;
+  border-bottom: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  subcontrol-position: right;
+  subcontrol-origin: margin;
+  border-bottom-right-radius: 0px;
+}
+
+QScrollBar::add-line:horizontal:hover {
+  background-color: rgb(218, 218, 218);
+}
+
+QScrollBar::add-line:horizontal:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
+QScrollBar::sub-line:horizontal {
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  border-right: 0px solid rgb(240,240,240);
+  border-bottom: 0px solid white;
+  background-color: rgb(240, 240, 240);
+  width: 20px;
+  subcontrol-position: left;
+  subcontrol-origin: margin;
+  border-bottom-left-radius: 3px;
+}
+
+QScrollBar::sub-line:horizontal:hover {
+  background-color: rgb(218, 218, 218);
+}
+
+QScrollBar::sub-line:horizontal:pressed {
+  background-color: rgb(96, 96, 96);
+}
+
+QScrollBar::left-arrow:horizontal {
+  image: url(icons/left_arrow_icon.svg); 
+  width: 16px;
+  height: 16px;
+}
+
+QScrollBar::left-arrow:horizontal:pressed {
+  right: -1px;
+  bottom: -1px;
+}
+
+QScrollBar::right-arrow:horizontal {
+  image: url(icons/right_arrow_icon.svg); 
+  width: 16px;
+  height: 16px;
+}
+
+QScrollBar::right-arrow:horizontal:pressed {
+  right: -1px;
+  bottom: -1px;
+}
