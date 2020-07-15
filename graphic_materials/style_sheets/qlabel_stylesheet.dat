@@ -1,0 +1,7 @@
+QLabel {
+    color: rgb(45,45,45);
+}
+
+QLabel:disabled {
+    color: rgb(145,145,145);
+}

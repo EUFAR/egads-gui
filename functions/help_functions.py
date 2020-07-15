@@ -128,7 +128,7 @@ def batch_processing_information_text():
                               'variables</li><li>and the use of an algorithm on multiple '
                               'files</li></ul>Select one of them to display options related to '
                               'the selected process.',
-                 'bw_info_2': 'Once a category and an algorithm have been selected, the Algorithm '
+                 'bw_proc_info_1': 'Once a category and an algorithm have been selected, the Algorithm '
                               'options tab will list the different input(s) and output(s).',
                  'bw_info_3': 'In case of error with one or more files, the GUI will decide to '
                               'continue or stop the processing based on this option.',
@@ -305,15 +305,22 @@ def plot_information_text():
                                           'the size of their fonts, and their position.',
                  'pw_grid_info_button_3': 'The projection can be chosen from this list. Options for each projection '
                                           'are set by default and can be changed by clicking on Set options.',
-                 'pw_grid_info_button_6': 'Click on Set ticks to change the ticks set by default. Please remember '
+                 'pw_grid_info_button_6': 'Click on Set X/Y ticks to change the ticks set by default. Please remember '
                                           'that this option is only available for two projections: PlateCarree and '
                                           'Mercator. With the next version of Cartopy, this limitation will disappear.',
+                 'pw_grid_info_button_11': 'Click on Set extent to change the extent of the map. If the '
+                                           'projection has options to limit the extent, the limits set by the '
+                                           'user can\'t excess the projection ones.',
                  'pw_grid_info_button_7': 'This section controls the addition of coastlines, their resolution, their '
                                           'size and their color.',
                  'pw_grid_info_button_8': 'This section controls the addition of lakes and rivers, their resolution, '
                                           'their size and their color.',
+                 'pw_grid_info_button_9': 'This section controls the addition of lands and their color.',
+                 'pw_grid_info_button_10': 'This section controls the addition of oceans and their color.',
                  'pw_grid_info_button_4': 'With this option, it is possible to display or not a grid based on ticks. '
-                                          'following options control the appearance of the grid.',
+                                          'Following options control the appearance of the grid.',
+                 'pw_grid_info_button_12': 'With this option, it is possible to display or not grid labels based on '
+                                           'ticks.',
                  'pw_grid_info_button_5': 'This section control the aspect of the colorbar. Here is an explanation of '
                                           'the different options:<ul><li>Colormap legend: the legend is based on the '
                                           'units of the data, it can be modified by the user if '

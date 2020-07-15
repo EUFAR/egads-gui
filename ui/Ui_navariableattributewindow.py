@@ -231,7 +231,7 @@ class Ui_naVariableAttributeWindow(object):
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.vw_mandatoryAttributes_lb.setFont(font)
         self.vw_mandatoryAttributes_lb.setStyleSheet("QLabel {\n"
-"    color: black;\n"
+"    color: rgb(45,45,45);\n"
 "}")
         self.vw_mandatoryAttributes_lb.setObjectName("vw_mandatoryAttributes_lb")
         self.horizontalLayout.addWidget(self.vw_mandatoryAttributes_lb)
@@ -458,7 +458,7 @@ class Ui_naVariableAttributeWindow(object):
 "}")
         self.vw_fillValue_ln.setText("")
         self.vw_fillValue_ln.setFrame(False)
-        self.vw_fillValue_ln.setReadOnly(True)
+        # self.vw_fillValue_ln.setReadOnly(True)
         self.vw_fillValue_ln.setObjectName("vw_fillValue_ln")
         self.gridLayout.addWidget(self.vw_fillValue_ln, 1, 1, 1, 1)
         self.vw_scalefactor_lb = QtWidgets.QLabel(naVariableAttributeWindow)

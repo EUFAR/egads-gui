@@ -1,0 +1,10 @@
+QLineEdit {
+    border-radius: 3px;
+    padding: 1px 4px 1px 4px;
+    background-color:  rgb(240, 240, 240);
+    color: rgb(45,45,45);
+}
+    
+QLineEdit:disabled {
+    background-color:  rgb(200,200,200);
+}

@@ -4,6 +4,7 @@ import egads
 import datetime
 import inspect
 import pathlib
+import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -111,16 +112,15 @@ def str_format(color, style=''):
     return _format
 
 
-STYLES = {
-        'keyword': str_format('blue'),
-        'operator': str_format('red'),
-        'brace': str_format('darkGray'),
-        'defclass': str_format('black', 'bold'),
-        'string': str_format('magenta'),
-        'string2': str_format('darkMagenta'),
-        'comment': str_format('darkGreen', 'italic'),
-        'self': str_format('black', 'italic'),
-        'numbers': str_format('brown')}
+STYLES = {'keyword': str_format('blue'),
+          'operator': str_format('red'),
+          'brace': str_format('darkGray'),
+          'defclass': str_format('black', 'bold'),
+          'string': str_format('magenta'),
+          'string2': str_format('darkMagenta'),
+          'comment': str_format('darkGreen', 'italic'),
+          'self': str_format('black', 'italic'),
+          'numbers': str_format('brown')}
 
 
 class Highlighter(QtGui.QSyntaxHighlighter):
@@ -462,3 +462,68 @@ def font_creation_function(font_style):
         font.setPointSize(9)
         font.setItalic(True)
     return font
+
+
+def stylesheet_creation_function(stylesheet):
+    logging.debug('gui - utils.py - stylesheet_creation_function')
+    stylesheet ='graphic_materials/style_sheets/' + stylesheet + '_stylesheet.dat'
+    f = open(stylesheet, 'r')
+    stylesheet_str = ''.join(f.readlines())
+    f.close()
+    return stylesheet_str
+
+
+def full_path_name_from_treewidget(treewidget=None, parent=None):
+    if parent is None:
+        parent = treewidget.selectedItems()[0]
+    path = parent.text(0)
+    var = parent.text(0)
+    while parent:
+        parent = parent.parent()
+        if parent is not None:
+            path = parent.text(0) + '/' + path
+    path = '/' + path
+    return path, var
+
+
+def multi_full_path_name_from_treewidget(treewidget):
+    multi_list = []
+    for parent in treewidget.selectedItems():
+        path = parent.text(0)
+        var = parent.text(0)
+        while parent:
+            parent = parent.parent()
+            if parent is not None:
+                path = parent.text(0) + '/' + path
+        path = '/' + path
+        multi_list.append([path, var])
+    return multi_list
+
+
+def replace_old_path_by_new_path(var_dict, old_path, new_path):
+    for key in list(var_dict.keys()):
+        if key.find(old_path) == 0 and key != new_path:
+            new_key = new_path + key[len(old_path):]
+            var_dict[new_key] = var_dict.pop(key)
+    return var_dict
+
+
+def replace_old_path_by_new_path_tooltip(treewidget, new_path):
+
+    def replace_old_path(parent):
+        for i in range(parent.childCount()):
+            if 'group' in parent.child(i).toolTip(0):
+                tooltip = 'group: ' + parent.toolTip(0)[7:] + '/' + parent.child(i).text(0)
+            else:
+                tooltip = 'dataset: ' + parent.toolTip(0)[7:] + '/' + parent.child(i).text(0)
+            parent.child(i).setToolTip(0, tooltip)
+            replace_old_path(parent.child(i))
+
+    item = treewidget.selectedItems()[0]
+    old_tooltip = item.toolTip(0)
+    if 'group' in old_tooltip:
+        new_tooltip = 'group: ' + new_path[1:]
+    else:
+        new_tooltip = 'dataset: ' + new_path[1:]
+    item.setToolTip(0, new_tooltip)
+    replace_old_path(item)

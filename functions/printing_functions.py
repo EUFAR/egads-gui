@@ -1,8 +1,8 @@
 import logging
 import os
 import matplotlib.pyplot as plt
-from functions.thread_functions import PrintingThread
-from functions.other_windows_functions import MyWait
+from functions.thread_functions.file_functions import PrintingThread
+from functions.window_functions.other_windows_functions import MyWait
 
 
 def plot_save(self):

@@ -1,0 +1,23 @@
+QToolButton {
+    border: 1px solid #acacac;
+    border-radius: 1px;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f0f0f0, stop:1 #e5e5e5);
+    color: rgb(45,45,45);
+}
+
+QToolButton:disabled {
+    background-color:  rgb(200,200,200);
+    color: rgb(145,145,145);
+}
+
+QToolButton:hover {
+    border: 1px solid #7eb4ea;
+    border-radius: 1px;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ecf4fc, stop:1 #dcecfc);
+}
+
+QToolButton:pressed {
+    border: 1px solid #579de5;
+    border-radius: 1px;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #daecfc, stop:1 #c4e0fc);
+}
