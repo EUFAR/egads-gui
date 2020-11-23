@@ -4,12 +4,18 @@
 * rework logging system (v1.6)
 * add an option to avoid loading data into memory (v1.5)
 * review the use of the modification variable in the title (v1.5)
-* rework batch processing window to handle folders and dimension selection (v1.5)
+* rework batch processing window to upgrade dimension handling (v1.5)
 
   
 #### To fix list: ####
 
-* check if regsitry key is removed when GUI is uninstalled.
+* nothing.
+
+
+### November 19 2020, Release version 1.4.1 ###
+
+  * FIXED:
+    * in the batch processing window, when exploring a file with the info button, the reading of group attributes lead to a crash.
 
 
 ### October 27 2020, Release version 1.4.0 ###

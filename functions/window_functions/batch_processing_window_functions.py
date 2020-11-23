@@ -1359,8 +1359,9 @@ class MyBatchInfo(QtWidgets.QDialog, Ui_batchInfoWindow):
                 else:
                     var_list[var_path] = [file.get_attribute_list(var_path), 'dataset']
 
-            for group_dict in file.get_group_list(details=True):
-                var_list[group_dict['path']] = [file.get_attribute_list(group_dict['path']), 'group']
+            for group_path in file.get_group_list(details=True):
+                var_list[group_path] = [file.get_attribute_list(group_path), 'group']
+
         else:
             self.file_dict['ext'] = 'nasaames'
             file = egads.input.NasaAmes(self.file_path, 'r')
@@ -1424,6 +1425,8 @@ class MyBatchInfo(QtWidgets.QDialog, Ui_batchInfoWindow):
         i = 0
         if var_type == 'group':
             value = 'Group'
+        elif var_type == 'dimension':
+            value = 'Dimension'
         else:
             value = 'Dataset'
         self.var_label.append(QtWidgets.QLabel())
