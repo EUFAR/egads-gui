@@ -1,4 +1,4 @@
-_gui_version = '1.4.1'
+_gui_version = '1.4.2'
 _gui_branch = 'Lineage'
 _pycharm_version = '2020.2.3'
 _python_version = '3.7.8'

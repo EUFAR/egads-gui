@@ -12,6 +12,10 @@
 * nothing.
 
 
+### January 6 2021, Release version 1.4.2 ###
+EGADS Lineage has been updated to v1.2.8 fixing an important issue with NetCDF handling. Thus this version of EGADS Lineage is mandatory to run the GUI.
+
+
 ### November 19 2020, Release version 1.4.1 ###
 
   * FIXED:

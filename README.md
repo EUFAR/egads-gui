@@ -1,7 +1,7 @@
 Version:
 -------
 
-EGADS Lineage GUI 1.4.1 (Python 3).
+EGADS Lineage GUI 1.4.2 (Python 3).
 
 
 Developments:
@@ -59,7 +59,7 @@ Do not forget to install dependancies:
 * Requests (2.24.0 or newer, optional, only to check updates if the user activates the option)
 * Pillow (7.2 or newer, optional, only to save figures in JPEG and TIFF format)
 
-Anaconda3 can be a good alternative, in particular if the use of Cartopy is mandatory and if the user can't build Cartopy himself. For Windows, an already-built version of Cartopy exists at the followind address : https://www.lfd.uci.edu/~gohlke/pythonlibs/
+Anaconda3 can be a good alternative, in particular if the use of Cartopy is mandatory and if the user can't build Cartopy himself. For Windows, an already-built version of Cartopy exists at the following address : https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
 Stand-alone package:

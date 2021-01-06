@@ -82,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.new_variables = False
         self.gui_update_url = None
         self.statusbar_msg_thread = None
-        self.min_egads_version = '1.2.7'
+        self.min_egads_version = '1.2.8'
         self.min_egads_branch = 'Lineage'
         self.variable_menu = None
         self.check_egads_version_thread = None
@@ -96,9 +96,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.check_egads_gui_update()
         self.statusbar_label = None
         self.set_status_bar_widgets()
-
         self.actionCreateVariableBar.setVisible(False)
-
         self.start_status_bar_msg_thread('Welcome to the EGADS Lineage GUI !')
         logging.info('gui - mainwindow.py - MainWindow ready')
 
