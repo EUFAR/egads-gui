@@ -2,6 +2,8 @@ import logging
 import pathlib
 import xml
 import os
+import copy
+from collections import OrderedDict
 from egads import EgadsData
 from PyQt5 import QtWidgets, QtCore, QtGui
 from functions.utils import (font_creation_function, stylesheet_creation_function, humansize, icon_creation_function,
@@ -320,15 +322,18 @@ def modify_attribute_gui_var(self, click):
                 self.list_of_variables_and_attributes[new_path] = self.list_of_variables_and_attributes.pop(path)
                 if self.list_of_variables_and_attributes[new_path][2]:
                     for var, value in self.list_of_variables_and_attributes.items():
-                        dim_dict = value[1]
                         modified = False
                         if isinstance(value[0], EgadsData) and not value[2]:
+                            dim_dict = copy.deepcopy(value[1])
+                            new_dim_dict = OrderedDict()
                             for dim_path in dim_dict:
                                 if dim_path == path:
-                                    dim_dict[new_path] = dim_dict.pop(path)
+                                    new_dim_dict[new_path] = dim_dict[path]
                                     modified = True
+                                else:
+                                    new_dim_dict[dim_path] = dim_dict[dim_path]
                             if modified:
-                                self.list_of_variables_and_attributes[var][1] = dim_dict
+                                self.list_of_variables_and_attributes[var][1] = new_dim_dict
                     dimensions_str = ''
                     if self.list_of_variables_and_attributes[new_path][1] is not None:
                         no_dim = False
@@ -352,7 +357,7 @@ def modify_attribute_gui_var(self, click):
                     else:
                         if self.list_of_variables_and_attributes[new_path][2]:
                             dimensions_str = (str(self.list_of_variables_and_attributes[new_path][0].shape[0])
-                                              + ' (' + os.path.basename(path) + '), ')
+                                              + ' (' + os.path.basename(new_path) + '), ')
                         else:
                             self.var_dimensions_lb.setStyleSheet(stylesheet_creation_function('qlabel_warning'))
                             self.var_dimensions_lb.setToolTip('This variable has no dimension')

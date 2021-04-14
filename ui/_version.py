@@ -1,5 +1,5 @@
-_gui_version = '1.4.2'
+_gui_version = '1.4.3'
 _gui_branch = 'Lineage'
-_pycharm_version = '2020.2.3'
+_pycharm_version = '2021.1'
 _python_version = '3.7.8'
 _pyqt5_version = '5.15.0'

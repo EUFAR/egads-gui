@@ -2,6 +2,7 @@ import logging
 from PyQt5 import QtWidgets
 from functions.utils import font_creation_function, icon_creation_function
 from functions.window_functions.algorithm_windows_functions import MyAlgorithmDisplay
+from functions.help_functions import frozen_algorithm_formula_text
 
 
 def algorithm_menu_initialization(self):

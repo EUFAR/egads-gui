@@ -12,6 +12,14 @@
 * nothing.
 
 
+### April 14 2021, Release version 1.4.3 ###
+  
+  * FIXED:
+    * an issue was fixed with the dictionary of dimensions when the user tries to modify the name of a dimension.
+	* when the name of a dimension is modified, the Dimension part of the GUI wasn't updated correctly.
+	* fixed an issue with the dedicated function to display algorithms when the app is frozen.
+
+
 ### January 6 2021, Release version 1.4.2 ###
 EGADS Lineage has been updated to v1.2.8 fixing an important issue with NetCDF handling. Thus this version of EGADS Lineage is mandatory to run the GUI.
 
