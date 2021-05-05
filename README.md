@@ -1,7 +1,7 @@
 Version:
 -------
 
-EGADS Lineage GUI 1.4.3 (Python 3).
+EGADS Lineage GUI 1.4.4 (Python 3).
 
 
 Developments:

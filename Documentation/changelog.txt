@@ -12,6 +12,12 @@
 * nothing.
 
 
+### May 5 2021, Release version 1.4.4 ###
+
+  * FIXED:
+	* fixed an issue when a user wants to plot multiple time series and select manually the location of each plot.
+
+
 ### April 14 2021, Release version 1.4.3 ###
   
   * FIXED:

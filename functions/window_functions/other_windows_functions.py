@@ -138,7 +138,7 @@ class MyWarningUpdate(QtWidgets.QDialog, Ui_updateWindow):
 
 class MySubplot(QtWidgets.QDialog, Ui_subplotWindow):
     def __init__(self, var_list):
-        logging.debug('gui - other_windows_functions.py - MyTest - __init__')
+        logging.debug('gui - other_windows_functions.py - MySubplot - __init__')
         QtWidgets.QWidget.__init__(self)
         self.setupUi(self)
         self.var_list = var_list
@@ -148,9 +148,10 @@ class MySubplot(QtWidgets.QDialog, Ui_subplotWindow):
         self.add_row.clicked.connect(self.add_table_row)
         self.subplot_layout = {}
         self.parse_var_list()
-        logging.info('gui - other_windows_functions.py - MyTest - ready')
+        logging.info('gui - other_windows_functions.py - MySubplot - ready')
 
     def parse_var_list(self):
+        logging.debug('gui - other_windows_functions.py - MySubplot - parse_var_list')
         k = 0
         for i in range(0, 3):
             for j in range(0, 3):
@@ -168,18 +169,21 @@ class MySubplot(QtWidgets.QDialog, Ui_subplotWindow):
                 k += 1
 
     def add_table_column(self):
+        logging.debug('gui - other_windows_functions.py - MySubplot - parse_var_list')
         idx = int(self.sw_table.columnCount())
         self.sw_table.insertColumn(idx)
         for i in range(0, int(self.sw_table.rowCount())):
             self.sw_table.setItem(i, idx, QtWidgets.QTableWidgetItem(''))
 
     def add_table_row(self):
+        logging.debug('gui - other_windows_functions.py - MySubplot - parse_var_list')
         idx = int(self.sw_table.rowCount())
         self.sw_table.insertRow(idx)
         for i in range(0, int(self.sw_table.columnCount())):
             self.sw_table.setItem(idx, i, QtWidgets.QTableWidgetItem(''))
 
     def create_layout(self):
+        logging.debug('gui - other_windows_functions.py - MySubplot - parse_var_list')
         self.remove_empty_row()
         self.remove_empty_column()
         k = 1
@@ -193,31 +197,35 @@ class MySubplot(QtWidgets.QDialog, Ui_subplotWindow):
         self.close()
 
     def remove_empty_row(self):
+        logging.debug('gui - other_windows_functions.py - MySubplot - parse_var_list')
         empty_row = []
         for i in range(0, int(self.sw_table.rowCount())):
             empty = True
             for j in range(0, int(self.sw_table.columnCount())):
-                if self.sw_table.item(i, j).text():
-                    empty = False
+                if self.sw_table.item(i, j) is not None:
+                    if self.sw_table.item(i, j).text():
+                        empty = False
             if empty:
                 empty_row.append(i)
         for i in reversed(empty_row):
             self.sw_table.removeRow(i)
 
     def remove_empty_column(self):
+        logging.debug('gui - other_windows_functions.py - MySubplot - parse_var_list')
         empty_col = []
         for i in range(0, int(self.sw_table.columnCount())):
             empty = True
             for j in range(0, int(self.sw_table.rowCount())):
-                if self.sw_table.item(j, i).text():
-                    empty = False
+                if self.sw_table.item(j, i) is not None:
+                    if self.sw_table.item(j, i).text():
+                        empty = False
             if empty:
                 empty_col.append(i)
         for i in reversed(empty_col):
             self.sw_table.removeColumn(i)
 
     def closeWindow(self):
-        logging.debug('gui - other_windows_functions.py - MyInfo - closeWindow')
+        logging.debug('gui - other_windows_functions.py - MySubplot - closeWindow')
         self.close()
 
 
